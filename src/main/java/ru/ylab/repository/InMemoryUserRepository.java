@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public class InMemoryUserRepository implements UserRepository {
-    private static final Map<String, User> USERS = init();
+    private static final Map<Long, User> USERS = init();
 
-    private static Map<String, User> init() {
+    private static Map<Long, User> init() {
         User admin = User.builder()
                 .name("admin")
                 .password("password")
@@ -18,26 +18,32 @@ public class InMemoryUserRepository implements UserRepository {
         User testUser = User.builder()
                 .name("testUser")
                 .password("password2")
-                .isAdmin(false)
                 .build();
-        Map<String, User> map = new HashMap<>();
-        map.put(admin.name(), admin);
-        map.put(testUser.name(), testUser);
+        Map<Long, User> map = new HashMap<>();
+        map.put(admin.getId(), admin);
+        map.put(testUser.getId(), testUser);
         return map;
     }
 
     @Override
     public boolean checkUserExistsByName(String username) {
-        return USERS.containsKey(username);
+        return getUserByName(username).isPresent();
     }
 
     @Override
     public void save(User user) {
-        USERS.put(user.name(), user);
+        USERS.put(user.getId(), user);
     }
 
     @Override
-    public Optional<User> getUserByName(String name) {
-        return Optional.ofNullable(USERS.get(name));
+    public Optional<User> getUserByName(String username) {
+        return USERS.values().stream()
+                .filter(u -> u.getName().equals(username))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<User> getUserById(Long userId) {
+        return Optional.ofNullable(USERS.get(userId));
     }
 }

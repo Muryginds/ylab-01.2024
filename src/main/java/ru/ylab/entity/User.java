@@ -1,15 +1,16 @@
 package ru.ylab.entity;
 
-import lombok.Builder;
+import lombok.*;
 
 @Builder
-public record User(
-        Long id,
-        String name,
-        String password,
-        boolean isAdmin) {
-    public static class UserBuilder {
-        private static Long userCounter = 0L;
-        private Long id = userCounter++;
-    }
+@Data
+public class User {
+    private static Long userCounter = 0L;
+
+    @Builder.Default
+    private final Long id = userCounter++;
+    private final String name;
+    private final String password;
+    @Builder.Default
+    private final boolean isAdmin = false;
 }

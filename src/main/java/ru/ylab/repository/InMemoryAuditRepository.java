@@ -1,27 +1,32 @@
 package ru.ylab.repository;
 
-import ru.ylab.entity.Event;
+import ru.ylab.entity.AuditionEvent;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class InMemoryAuditRepository implements AuditRepository {
-    private static final Map<String, TreeMap<LocalDateTime, Event>> EVENTS = init();
+    private static final Map<Long, TreeMap<LocalDateTime, AuditionEvent>> EVENTS = init();
 
-    private static Map<String, TreeMap<LocalDateTime, Event>> init() {
+    private static Map<Long, TreeMap<LocalDateTime, AuditionEvent>> init() {
         return new HashMap<>();
     }
 
-    @Override
-    public Map<LocalDateTime, Event> getEventsByUsername(String username) {
-        return EVENTS.getOrDefault(username, new TreeMap<>());
+    private static TreeMap<LocalDateTime, AuditionEvent> getUserEventsMap(Long userId) {
+        return EVENTS.getOrDefault(userId, new TreeMap<>());
     }
 
     @Override
-    public void addEvent(String username, Event event) {
-        var events = getEventsByUsername(username);
-        events.put(LocalDateTime.now(), event);
+    public Collection<AuditionEvent> getEventsByUserId(Long userId) {
+        return getUserEventsMap(userId).values();
+    }
+
+    @Override
+    public void addEvent(Long userId, AuditionEvent auditionEvent) {
+        var events = getUserEventsMap(userId);
+        events.put(auditionEvent.getDate(), auditionEvent);
     }
 }

@@ -27,7 +27,7 @@ public class UserService {
     public User authenticate(UserAuthenticationRequestDTO requestDTO) {
         var user = userRepository.getUserByName(requestDTO.name())
                 .orElseThrow(UserAuthenticationException::new);
-        if (!user.password().equals(requestDTO.password())) {
+        if (!user.getPassword().equals(requestDTO.password())) {
             throw new UserAuthenticationException();
         }
         return user;

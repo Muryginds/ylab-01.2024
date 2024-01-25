@@ -1,12 +1,11 @@
 package ru.ylab.repository;
 
-import ru.ylab.entity.Event;
+import ru.ylab.entity.AuditionEvent;
 
-import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.Collection;
 
 public interface AuditRepository {
-    Map<LocalDateTime, Event> getEventsByUsername(String username);
+    Collection<AuditionEvent> getEventsByUserId(Long userId);
 
-    void addEvent(String username, Event event);
+    void addEvent(Long userId, AuditionEvent auditionEvent);
 }

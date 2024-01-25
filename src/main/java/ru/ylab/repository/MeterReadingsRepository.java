@@ -3,17 +3,17 @@ package ru.ylab.repository;
 import ru.ylab.entity.MeterReadings;
 
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Collection;
+import java.util.Optional;
 
 public interface MeterReadingsRepository {
-    TreeMap<LocalDate, MeterReadings> getUserMeterReadings(String username);
+    Collection<MeterReadings> getUserMeterReadings(Long userId);
 
-    void addUserMeterReadings(String username, LocalDate date, MeterReadings meterReadings);
+    void addUserMeterReadings(Long userId, MeterReadings meterReadings);
 
-    boolean checkMeterReadingsExistByDate(String username, LocalDate date);
+    boolean checkMeterReadingsExistByDate(Long userId, LocalDate date);
 
-    Map.Entry<LocalDate, MeterReadings> getLastUserMeterReadings(String username);
+    Optional<MeterReadings> getLastUserMeterReadings(Long userId);
 
-    Map<String, TreeMap<LocalDate, MeterReadings>> getAll();
+    Collection<MeterReadings> getAll();
 }

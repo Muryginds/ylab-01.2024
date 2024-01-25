@@ -1,6 +1,6 @@
 package ru.ylab.enumerated;
 
-public enum EventType {
+public enum AuditionEventType {
     SESSION_START,
     SESSION_END,
     READING_ADD,
