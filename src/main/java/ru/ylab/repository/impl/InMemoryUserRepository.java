@@ -1,23 +1,27 @@
 package ru.ylab.repository;
 
 import ru.ylab.entity.User;
+import ru.ylab.repository.UserRepository;
+import ru.ylab.security.Password4jPasswordEncoder;
+import ru.ylab.security.PasswordEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class InMemoryUserRepository implements UserRepository {
+    private static final PasswordEncoder passwordEncoder = new Password4jPasswordEncoder();
     private static final Map<Long, User> USERS = init();
 
     private static Map<Long, User> init() {
         User admin = User.builder()
                 .name("admin")
-                .password("password")
+                .password(passwordEncoder.encode("admin"))
                 .isAdmin(true)
                 .build();
         User testUser = User.builder()
                 .name("testUser")
-                .password("password2")
+                .password(passwordEncoder.encode("testUser"))
                 .build();
         Map<Long, User> map = new HashMap<>();
         map.put(admin.getId(), admin);

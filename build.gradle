@@ -22,6 +22,8 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok:1.18.30'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    implementation group: 'com.password4j', name: 'password4j', version: '1.7.3'
 }
 
 test {

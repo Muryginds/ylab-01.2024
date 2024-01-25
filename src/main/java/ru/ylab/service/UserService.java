@@ -7,16 +7,20 @@ import ru.ylab.exception.UserAuthenticationException;
 import ru.ylab.dto.UserAuthenticationRequestDTO;
 import ru.ylab.dto.UserRegistrationRequestDTO;
 import ru.ylab.repository.UserRepository;
+import ru.ylab.security.PasswordEncoder;
 
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    @Getter
+    private User currentUser;
 
     public User registerUser(UserRegistrationRequestDTO requestDTO) {
         if (!checkUsernameExists(requestDTO.name())) {
             User user = User.builder()
                     .name(requestDTO.name())
-                    .password(requestDTO.password())
+                    .password(passwordEncoder.encode(requestDTO.password()))
                     .build();
             userRepository.save(user);
             return user;
@@ -27,7 +31,7 @@ public class UserService {
     public User authenticate(UserAuthenticationRequestDTO requestDTO) {
         var user = userRepository.getUserByName(requestDTO.name())
                 .orElseThrow(UserAuthenticationException::new);
-        if (!user.getPassword().equals(requestDTO.password())) {
+        if (!passwordEncoder.verify(requestDTO.password(), user.getPassword())) {
             throw new UserAuthenticationException();
         }
         return user;
