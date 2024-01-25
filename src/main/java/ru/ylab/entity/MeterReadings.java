@@ -11,7 +11,7 @@ import java.util.Map;
 @Builder
 @Data
 public class MeterReadings {
-    private static Long userCounter = 0L;
+    private static Long userCounter = 1L;
 
     @Builder.Default
     private final Long id = userCounter++;

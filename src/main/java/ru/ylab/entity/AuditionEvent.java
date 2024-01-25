@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class AuditionEvent {
-    private static Long userCounter = 0L;
+    private static Long userCounter = 1L;
 
     @Builder.Default
     private final Long id = userCounter++;

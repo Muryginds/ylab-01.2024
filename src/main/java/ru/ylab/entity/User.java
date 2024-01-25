@@ -6,7 +6,7 @@ import ru.ylab.enumerated.UserRole;
 @Builder
 @Data
 public class User {
-    private static Long userCounter = 0L;
+    private static Long userCounter = 1L;
 
     @Builder.Default
     private final Long id = userCounter++;
