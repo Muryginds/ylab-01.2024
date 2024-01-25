@@ -14,6 +14,4 @@ public interface MeterReadingsRepository {
     boolean checkMeterReadingsExistByDate(Long userId, LocalDate date);
 
     Optional<MeterReadings> getLastUserMeterReadings(Long userId);
-
-    Collection<MeterReadings> getAll();
 }

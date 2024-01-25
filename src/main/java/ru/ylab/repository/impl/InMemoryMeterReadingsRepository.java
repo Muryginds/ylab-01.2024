@@ -40,9 +40,4 @@ public class InMemoryMeterReadingsRepository implements MeterReadingsRepository 
         var readings = getUserMeterReadingsMap(userId);
         return Optional.ofNullable(readings.lastEntry().getValue());
     }
-
-    @Override
-    public Collection<MeterReadings> getAll() {
-        return READING.values().stream().flatMap(t -> t.values().stream()).toList();
-    }
 }
