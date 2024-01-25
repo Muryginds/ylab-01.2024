@@ -1,6 +1,7 @@
 package ru.ylab.entity;
 
 import lombok.*;
+import ru.ylab.enumerated.UserRole;
 
 @Builder
 @Data
@@ -12,5 +13,5 @@ public class User {
     private final String name;
     private final String password;
     @Builder.Default
-    private final boolean isAdmin = false;
+    private final UserRole role = UserRole.USER;
 }

@@ -1,6 +1,7 @@
 package ru.ylab.repository.impl;
 
 import ru.ylab.entity.User;
+import ru.ylab.enumerated.UserRole;
 import ru.ylab.repository.UserRepository;
 import ru.ylab.security.Password4jPasswordEncoder;
 import ru.ylab.security.PasswordEncoder;
@@ -17,7 +18,7 @@ public class InMemoryUserRepository implements UserRepository {
         var admin = User.builder()
                 .name("admin")
                 .password(passwordEncoder.encode("admin"))
-                .isAdmin(true)
+                .role(UserRole.ADMIN)
                 .build();
         var testUser = User.builder()
                 .name("testUser")
