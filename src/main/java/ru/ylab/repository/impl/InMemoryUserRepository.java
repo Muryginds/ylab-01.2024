@@ -1,4 +1,4 @@
-package ru.ylab.repository;
+package ru.ylab.repository.impl;
 
 import ru.ylab.entity.User;
 import ru.ylab.repository.UserRepository;
@@ -14,12 +14,12 @@ public class InMemoryUserRepository implements UserRepository {
     private static final Map<Long, User> USERS = init();
 
     private static Map<Long, User> init() {
-        User admin = User.builder()
+        var admin = User.builder()
                 .name("admin")
                 .password(passwordEncoder.encode("admin"))
                 .isAdmin(true)
                 .build();
-        User testUser = User.builder()
+        var testUser = User.builder()
                 .name("testUser")
                 .password(passwordEncoder.encode("testUser"))
                 .build();

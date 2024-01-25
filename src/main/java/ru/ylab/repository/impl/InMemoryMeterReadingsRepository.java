@@ -1,6 +1,7 @@
-package ru.ylab.repository;
+package ru.ylab.repository.impl;
 
 import ru.ylab.entity.MeterReadings;
+import ru.ylab.repository.MeterReadingsRepository;
 
 import java.time.LocalDate;
 import java.util.*;

@@ -1,5 +1,6 @@
 package ru.ylab.service;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.User;
 import ru.ylab.exception.UserAlreadyExistException;
@@ -19,7 +20,7 @@ public class UserService {
 
     public UserDTO registerUser(UserRegistrationRequestDTO requestDTO) {
         if (!checkUsernameExists(requestDTO.name())) {
-            User user = User.builder()
+            var user = User.builder()
                     .name(requestDTO.name())
                     .password(passwordEncoder.encode(requestDTO.password()))
                     .build();
@@ -38,12 +39,15 @@ public class UserService {
         if (!passwordEncoder.verify(requestDTO.password(), user.getPassword())) {
             throw new UserAuthenticationException();
         }
-        return user;
+        currentUser = user;
         return UserDTO.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .build();
     }
+
+    public void logout() {
+        currentUser = null;
     }
 
     public boolean checkUsernameExists(String username) {

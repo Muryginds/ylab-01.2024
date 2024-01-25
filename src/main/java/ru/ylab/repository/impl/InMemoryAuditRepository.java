@@ -1,6 +1,7 @@
-package ru.ylab.repository;
+package ru.ylab.repository.impl;
 
 import ru.ylab.entity.AuditionEvent;
+import ru.ylab.repository.AuditRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
