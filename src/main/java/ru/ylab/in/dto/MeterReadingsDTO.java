@@ -1,4 +1,4 @@
-package ru.ylab.out.dto;
+package ru.ylab.in.dto;
 
 import lombok.Builder;
 import ru.ylab.enumerated.MeterType;

@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.User;
 import ru.ylab.exception.UserAlreadyExistException;
 import ru.ylab.exception.UserAuthenticationException;
-import ru.ylab.in.dto.UserAuthenticationRequestDTO;
-import ru.ylab.in.dto.UserRegistrationRequestDTO;
-import ru.ylab.out.dto.UserDTO;
+import ru.ylab.in.dto.request.UserAuthenticationRequestDTO;
+import ru.ylab.in.dto.request.UserRegistrationRequestDTO;
+import ru.ylab.in.dto.UserDTO;
 import ru.ylab.repository.UserRepository;
 import ru.ylab.security.PasswordEncoder;
 
