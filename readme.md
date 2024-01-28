@@ -1,3 +1,33 @@
 ## Meter monitoring service
 
-Service for submitting readings of heating, hot, and cold water meters.
+#### Monitoring Service Console Application
+Is a simple Java-based program designed to manage and monitor various aspects related to meter readings and user submissions. The application offers different user interfaces for both regular and administrative users, allowing them to perform tasks such as submitting readings, accessing submission history, and managing meter types.
+
+#### Key Features
+User Authentication: Users can register, log in, and log out, ensuring secure access to the
+system. Submission Management: Users can submit meter readings, view their submission history,
+and retrieve specific submissions by date. Administrative Actions: Administrators have additional features,
+including adding new meter types, accessing audition event history, and retrieving submission information for
+specific users.
+
+#### Testing
+    By default, added user 'admin' with password 'admin' and administrative role
+
+### Run the Project:
+
+- Clone the repository
+- Open a terminal or command prompt.
+- Navigate to your project directory.
+- Run the following command to execute your application:
+
+#### On Unix-like systems:
+
+```bash
+./gradlew run -q --console=plain
+```
+#### On Windows:
+
+```bash
+gradlew.bat run -q --console=plain
+```
+The Gradle wrapper will download the specified Gradle distribution, compile and run your Java application.

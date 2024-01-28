@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group = 'ru.ylab'
@@ -7,6 +8,7 @@ version = '1.0-SNAPSHOT'
 
 java {
     sourceCompatibility = '17'
+    targetCompatibility = '17'
 }
 
 repositories {
@@ -34,6 +36,14 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
     testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     testAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+}
+
+application {
+    mainClassName = 'ru.ylab.Application'
+}
+
+run {
+    standardInput = System.in
 }
 
 test {
