@@ -5,11 +5,11 @@ import ru.ylab.enumerated.UserRole;
 
 @Builder
 @Data
-public class User {
-    private static Long userCounter = 1L;
+public final class User {
+    private static Long counter = 1L;
 
     @Builder.Default
-    private final Long id = userCounter++;
+    private final Long id = counter++;
     private final String name;
     private final String password;
     @Builder.Default

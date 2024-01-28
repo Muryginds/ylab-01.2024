@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 
 @Builder
 @Data
-public class AuditionEvent {
-    private static Long userCounter = 1L;
+public final class AuditionEvent {
+    private static Long counter = 1L;
 
     @Builder.Default
-    private final Long id = userCounter++;
+    private final Long id = counter++;
     private final User user;
     private final AuditionEventType type;
     private final String message;
