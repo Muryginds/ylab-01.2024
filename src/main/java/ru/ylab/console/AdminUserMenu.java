@@ -14,6 +14,11 @@ import ru.ylab.in.dto.request.SubmissionByDateRequestDTO;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents the menu for administrative user actions in the Monitoring Service console application.
+ *
+ * <p>This menu provides options for adding a meter type, retrieving submissions, and logging out.
+ */
 @RequiredArgsConstructor
 public class AdminUserMenu extends Menu {
     private static final Map<String, String> ACTIONS = generateActions();
@@ -92,7 +97,7 @@ public class AdminUserMenu extends Menu {
 
     private void getAuditionHistoryByUserId() {
         var userId = userIdReceivingHandler.handle();
-        var events = auditionEventController.getBySubmissionId(userId);
+        var events = auditionEventController.getEventsByUserId(userId);
         events.forEach(e -> System.out.printf("User: #'%s' event: '%s' date: '%s message: '%s'%n",
                 e.userDTO().id(), e.type().name(), e.date(), e.message()));
     }

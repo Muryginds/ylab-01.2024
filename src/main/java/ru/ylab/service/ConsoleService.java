@@ -5,6 +5,10 @@ import ru.ylab.controller.*;
 import ru.ylab.repository.impl.*;
 import ru.ylab.security.Password4jPasswordEncoder;
 
+/**
+ * A service class that initializes and runs the console-based application.
+ * It manages various controllers, handlers, and repositories to facilitate user interactions.
+ */
 public class ConsoleService {
     private final InMemoryMeterTypeRepository inMemoryMeterTypeRepository = new InMemoryMeterTypeRepository();
     private final AuditionEventService auditionEventService =
@@ -44,6 +48,10 @@ public class ConsoleService {
             new AuditionEventController(auditionEventService)
     );
 
+    /**
+     * The main method that initializes controllers, handlers, and repositories,
+     * and orchestrates the flow of the console-based application.
+     */
     public void run() {
         var entranceMenuHandler =
                 new EntranceMenuHandler(

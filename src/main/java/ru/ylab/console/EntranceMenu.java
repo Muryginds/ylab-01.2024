@@ -11,6 +11,11 @@ import ru.ylab.console.handler.UserMenuHandler;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents the entrance menu of the Monitoring Service console application.
+ *
+ * <p>This menu provides options for user authorization, registration, and exiting the application.
+ */
 @RequiredArgsConstructor
 public class EntranceMenu extends Menu {
     private static final Map<String, String> ACTIONS = generateActions();

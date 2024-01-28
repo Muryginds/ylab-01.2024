@@ -15,6 +15,12 @@ import ru.ylab.mapper.UserMapper;
 import ru.ylab.repository.UserRepository;
 import ru.ylab.security.PasswordEncoder;
 
+/**
+ * The UserService class provides functionality related to user management.
+ * It includes methods for user registration, user authentication, and other user-related operations.
+ * This service interacts with the UserRepository, PasswordEncoder, AuditionEventService, and MeterService
+ * to perform various user-related tasks.
+ */
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
@@ -25,6 +31,14 @@ public class UserService {
     @Getter
     private User currentUser;
 
+    /**
+     * Registers a new user with the specified registration details.
+     * Generates user-specific meters and adds an audition event for the registration.
+     *
+     * @param requestDTO The registration details of the new user.
+     * @return UserDTO representing the registered user.
+     * @throws UserAlreadyExistException If a user with the same name already exists.
+     */
     public UserDTO registerUser(UserRegistrationRequestDTO requestDTO) {
         if (!checkUserExistsByName(requestDTO.name())) {
             var user = User.builder()
@@ -44,6 +58,14 @@ public class UserService {
         throw new UserAlreadyExistException(requestDTO.name());
     }
 
+    /**
+     * Authenticates a user with the provided credentials.
+     * Adds an audition event for a successful authentication.
+     *
+     * @param requestDTO The user's authorization credentials.
+     * @return UserDTO representing the authenticated user.
+     * @throws UserAuthenticationException If authentication fails.
+     */
     public UserDTO authorize(UserAuthorizationRequestDTO requestDTO) {
         var user = userRepository.findUserByName(requestDTO.name())
                 .orElseThrow(UserAuthenticationException::new);
@@ -60,6 +82,10 @@ public class UserService {
         return UserMapper.MAPPER.toUserDTO(user);
     }
 
+    /**
+     * Logs out the currently authenticated user.
+     * Adds an audition event for the logout.
+     */
     public void logout() {
         var event = AuditionEvent.builder()
                 .user(currentUser)
@@ -70,18 +96,41 @@ public class UserService {
         currentUser = null;
     }
 
+    /**
+     * Checks if a user with the given username already exists.
+     *
+     * @param username The username to check.
+     * @return true if the user with the given username exists, false otherwise.
+     */
     public boolean checkUserExistsByName(String username) {
         return userRepository.checkUserExistsByName(username);
     }
 
+    /**
+     * Checks if a user with the given user ID exists.
+     *
+     * @param userId The user ID to check.
+     * @return true if the user with the given ID exists, false otherwise.
+     */
     public boolean checkUserExistsById(Long userId) {
         return userRepository.checkUserExistsById(userId);
     }
 
+    /**
+     * Retrieves the UserDTO representing the currently authenticated user.
+     *
+     * @return UserDTO representing the currently authenticated user.
+     */
     public UserDTO getCurrentUserDTO() {
         return UserMapper.MAPPER.toUserDTO(currentUser);
     }
 
+    /**
+     * Retrieves the User entity representing the user with the specified user ID.
+     *
+     * @param userId The ID of the user to retrieve.
+     * @return User entity representing the user with the specified user ID.
+     */
     public User getUserById(Long userId) {
         return userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));

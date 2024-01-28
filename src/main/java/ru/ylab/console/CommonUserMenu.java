@@ -14,6 +14,11 @@ import ru.ylab.in.dto.request.SubmissionByDateRequestDTO;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents the menu for common user actions in the Monitoring Service console application.
+ *
+ * <p>This menu provides options for submitting readings, retrieving submissions, and logging out.
+ */
 @RequiredArgsConstructor
 public class CommonUserMenu extends Menu {
     private static final Map<String, String> ACTIONS = generateActions();

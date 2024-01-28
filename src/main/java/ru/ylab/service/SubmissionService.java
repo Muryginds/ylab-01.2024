@@ -22,6 +22,13 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * The SubmissionService class provides functionality related to user submissions and meter readings.
+ * It includes methods for retrieving submission history, finding the last submission,
+ * saving new submissions, and other submission-related operations.
+ * This service interacts with the SubmissionRepository, MeterReadingsService, MeterService,
+ * UserService, and AuditionEventService to perform various submission-related tasks.
+ */
 @RequiredArgsConstructor
 public class SubmissionService {
     private final SubmissionRepository submissionRepository;
@@ -30,6 +37,14 @@ public class SubmissionService {
     private final UserService userService;
     private final AuditionEventService auditionEventService;
 
+    /**
+     * Retrieves all submissions for a given user based on user ID.
+     * Audits the action and logs an audition event.
+     *
+     * @param userId The ID of the user to retrieve submissions for.
+     * @return Collection of SubmissionDTO representing the user's submission history.
+     * @throws NoPermissionException If the current user does not have permission to access the history.
+     */
     public Collection<SubmissionDTO> getAllByUserId(Long userId) {
         if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
             throw new NoPermissionException();
@@ -46,6 +61,14 @@ public class SubmissionService {
         return SubmissionMapper.MAPPER.toSubmissionDTOs(submissions);
     }
 
+    /**
+     * Retrieves the last submission for a given user based on user ID.
+     * Audits the action and logs an audition event.
+     *
+     * @param userId The ID of the user to retrieve the last submission for.
+     * @return Optional<Submission> representing the last submission of the user.
+     * @throws NoPermissionException If the current user does not have permission to access the submission.
+     */
     public Optional<Submission> findLastSubmissionByUserId(Long userId) {
         if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
             throw new NoPermissionException();
@@ -69,6 +92,15 @@ public class SubmissionService {
         return userService.getCurrentUser().getRole().equals(UserRole.ADMIN);
     }
 
+    /**
+     * Retrieves the last submission for a given user based on user ID and converts it to a DTO.
+     * Audits the action and logs an audition event.
+     *
+     * @param userId The ID of the user to retrieve the last submission for.
+     * @return SubmissionDTO representing the last submission of the user.
+     * @throws NoPermissionException If the current user does not have permission to access the submission.
+     * @throws NoSubmissionException If no submissions are found for the user.
+     */
     public SubmissionDTO getLastSubmissionByUserId(Long userId) {
         var user = userService.getUserById(userId);
         var submission = findLastSubmissionByUserId(user.getId())
@@ -76,6 +108,15 @@ public class SubmissionService {
         return SubmissionMapper.MAPPER.toSubmissionDTO(submission);
     }
 
+    /**
+     * Retrieves a submission for a given user and date.
+     * Audits the action and logs an audition event.
+     *
+     * @param request The request containing user ID and submission date.
+     * @return SubmissionDTO representing the submission for the user and date.
+     * @throws NoPermissionException If the current user does not have permission to access the submission.
+     * @throws NoSubmissionException If no submissions are found for the user and date.
+     */
     public SubmissionDTO getSubmissionByDateAndUserId(SubmissionByDateRequestDTO request) {
         var user = userService.getUserById(request.userId());
         var submission = findByUserIdAndDate(user.getId(), request.date())
@@ -100,6 +141,14 @@ public class SubmissionService {
         return submissionRepository.findByUserIdAndDate(userId, date);
     }
 
+    /**
+     * Saves a new submission with the provided meter readings.
+     * Audits the action, logs an audition event, and performs necessary validations.
+     *
+     * @param request The request containing user ID and meter readings.
+     * @throws SubmissionExistsException If a submission already exists for the user on the current date.
+     * @throws MeterNotFoundException If a meter specified in the readings is not found.
+     */
     public void save(SubmissionRequestDTO request) {
         var date = LocalDate.now();
         var user = userService.getCurrentUser();

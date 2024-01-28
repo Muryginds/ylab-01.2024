@@ -10,7 +10,7 @@ import java.util.Collection;
 public class AuditionEventController {
     private final AuditionEventService auditionEventService;
 
-    public Collection<AuditionEventDTO> getBySubmissionId(Long userId){
+    public Collection<AuditionEventDTO> getEventsByUserId(Long userId){
         return auditionEventService.getEventsByUserId(userId);
     }
 }
