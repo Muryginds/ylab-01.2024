@@ -9,7 +9,7 @@ import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.enumerated.UserRole;
 import ru.ylab.exception.MeterNotFoundException;
 import ru.ylab.exception.NoPermissionException;
-import ru.ylab.exception.NoSubmissionsException;
+import ru.ylab.exception.NoSubmissionException;
 import ru.ylab.exception.SubmissionExistsException;
 import ru.ylab.in.dto.SubmissionDTO;
 import ru.ylab.in.dto.request.SubmissionRequestDTO;
@@ -72,18 +72,18 @@ public class SubmissionService {
     public SubmissionDTO getLastSubmissionByUserId(Long userId) {
         var user = userService.getUserById(userId);
         var submission = findLastSubmissionByUserId(user.getId())
-                .orElseThrow(() -> new NoSubmissionsException(user.getName()));
+                .orElseThrow(() -> new NoSubmissionException(user.getName()));
         return SubmissionMapper.MAPPER.toSubmissionDTO(submission);
     }
 
     public SubmissionDTO getSubmissionByDateAndUserId(SubmissionByDateRequestDTO request) {
         var user = userService.getUserById(request.userId());
         var submission = findByUserIdAndDate(user.getId(), request.date())
-                .orElseThrow(() -> new NoSubmissionsException(user.getName()));
+                .orElseThrow(() -> new NoSubmissionException(user.getName()));
         return SubmissionMapper.MAPPER.toSubmissionDTO(submission);
     }
 
-    public Optional<Submission> findByUserIdAndDate(Long userId, LocalDate date) {
+    private Optional<Submission> findByUserIdAndDate(Long userId, LocalDate date) {
         if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
             throw new NoPermissionException();
         }

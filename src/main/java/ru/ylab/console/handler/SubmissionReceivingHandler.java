@@ -5,7 +5,7 @@ import ru.ylab.controller.MeterController;
 import ru.ylab.controller.MeterReadingsController;
 import ru.ylab.controller.SubmissionController;
 import ru.ylab.controller.UserController;
-import ru.ylab.exception.NoSubmissionsException;
+import ru.ylab.exception.NoSubmissionException;
 import ru.ylab.exception.SubmissionExistsException;
 import ru.ylab.in.dto.MeterReadingDTO;
 import ru.ylab.in.dto.request.SubmissionRequestDTO;
@@ -32,7 +32,7 @@ public class SubmissionReceivingHandler extends Handler {
                 throw new SubmissionExistsException(userDTO.name(), LocalDate.now());
             }
             meterReadingDTOs = meterReadingsController.getAllBySubmissionId(submissionDTO.id());
-        } catch (NoSubmissionsException ex) {
+        } catch (NoSubmissionException ex) {
             meterReadingDTOs = meterController.getAllByUserId(userDTO.id()).stream()
                     .map(m -> MeterReadingDTO.builder()
                             .meterDTO(m)

@@ -6,7 +6,7 @@ import ru.ylab.console.handler.MeterTypeReceivingHandler;
 import ru.ylab.console.handler.UserIdReceivingHandler;
 import ru.ylab.controller.*;
 import ru.ylab.exception.MeterTypeExistException;
-import ru.ylab.exception.NoSubmissionsException;
+import ru.ylab.exception.NoSubmissionException;
 import ru.ylab.in.dto.MeterReadingDTO;
 import ru.ylab.in.dto.SubmissionDTO;
 import ru.ylab.in.dto.request.SubmissionByDateRequestDTO;
@@ -108,7 +108,7 @@ public class AdminUserMenu extends Menu {
             meterReadingsController.getAllBySubmissionId(submissionDTO.id())
                     .forEach(mr -> meterReadingFormattedOutput(mr, sb));
             System.out.println(sb);
-        } catch (NoSubmissionsException ex) {
+        } catch (NoSubmissionException ex) {
             System.out.println(ex.getMessage());
         }
     }
@@ -131,7 +131,7 @@ public class AdminUserMenu extends Menu {
             meterReadingsController.getAllBySubmissionId(submissionDTO.id())
                     .forEach(mr -> meterReadingFormattedOutput(mr, sb));
             System.out.println(sb);
-        } catch (NoSubmissionsException ex) {
+        } catch (NoSubmissionException ex) {
             System.out.println(ex.getMessage());
         }
     }
