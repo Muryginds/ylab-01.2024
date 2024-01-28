@@ -1,7 +1,7 @@
 package ru.ylab.repository.impl;
 
 import ru.ylab.entity.AuditionEvent;
-import ru.ylab.repository.AuditRepository;
+import ru.ylab.repository.AuditionEventRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -9,12 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class InMemoryAuditRepository implements AuditRepository {
-    private static final Map<Long, TreeMap<LocalDateTime, AuditionEvent>> EVENTS = init();
-
-    private static Map<Long, TreeMap<LocalDateTime, AuditionEvent>> init() {
-        return new HashMap<>();
-    }
+public class InMemoryAuditionEventRepository implements AuditionEventRepository {
+    private static final Map<Long, TreeMap<LocalDateTime, AuditionEvent>> EVENTS = new HashMap<>();
 
     private static TreeMap<LocalDateTime, AuditionEvent> getUserEventsMap(Long userId) {
         return EVENTS.getOrDefault(userId, new TreeMap<>());
@@ -26,8 +22,10 @@ public class InMemoryAuditRepository implements AuditRepository {
     }
 
     @Override
-    public void addEvent(Long userId, AuditionEvent auditionEvent) {
+    public void addEvent(AuditionEvent auditionEvent) {
+        var userId = auditionEvent.getUser().getId();
         var events = getUserEventsMap(userId);
         events.put(auditionEvent.getDate(), auditionEvent);
+        EVENTS.put(userId, events);
     }
 }

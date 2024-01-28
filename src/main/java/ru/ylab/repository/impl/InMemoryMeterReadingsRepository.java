@@ -1,43 +1,41 @@
 package ru.ylab.repository.impl;
 
-import ru.ylab.entity.MeterReadings;
+import lombok.RequiredArgsConstructor;
+import ru.ylab.entity.MeterReading;
 import ru.ylab.repository.MeterReadingsRepository;
 
-import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class InMemoryMeterReadingsRepository implements MeterReadingsRepository {
-    private static final Map<Long, TreeMap<LocalDate, MeterReadings>> READING = init();
+    private static final Map<Long, Set<MeterReading>> READINGS = new HashMap<>();
 
-    private static Map<Long, TreeMap<LocalDate, MeterReadings>> init() {
-        return new HashMap<>();
-    }
-
-    private static TreeMap<LocalDate, MeterReadings> getUserMeterReadingsMap(Long userId) {
-        return READING.getOrDefault(userId, new TreeMap<>());
+    @Override
+    public Set<MeterReading> getByUserId(Long userId) {
+        return READINGS.values().stream()
+                .flatMap(Collection::stream)
+                .filter(mr -> mr.getSubmission().getUser().getId().equals(userId))
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public Collection<MeterReadings> getUserMeterReadings(Long userId) {
-        return getUserMeterReadingsMap(userId).values();
+    public Set<MeterReading> getAllBySubmissionId(Long submissionId) {
+        return READINGS.get(submissionId);
     }
 
     @Override
-    public void addUserMeterReadings(Long userId, MeterReadings meterReadings) {
-        var readings = getUserMeterReadingsMap(userId);
-        readings.put(meterReadings.getDate(), meterReadings);
-        READING.put(userId, readings);
+    public void save(MeterReading meterReading) {
+        var submission = meterReading.getSubmission();
+        var readings = READINGS.getOrDefault(submission.getId(), new HashSet<>());
+        readings.add(meterReading);
+        READINGS.put(submission.getId(), readings);
     }
 
     @Override
-    public boolean checkMeterReadingsExistByDate(Long userId, LocalDate date) {
-        var readings = getUserMeterReadingsMap(userId);
-        return readings.containsKey(date);
-    }
-
-    @Override
-    public Optional<MeterReadings> getLastUserMeterReadings(Long userId) {
-        var readings = getUserMeterReadingsMap(userId);
-        return Optional.ofNullable(readings.lastEntry().getValue());
+    public void saveAll(Collection<MeterReading> meterReadings) {
+        for (MeterReading readings: meterReadings) {
+            save(readings);
+        }
     }
 }

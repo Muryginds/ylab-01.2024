@@ -4,8 +4,8 @@ import ru.ylab.entity.AuditionEvent;
 
 import java.util.Collection;
 
-public interface AuditRepository {
+public interface AuditionEventRepository {
     Collection<AuditionEvent> getEventsByUserId(Long userId);
 
-    void addEvent(Long userId, AuditionEvent auditionEvent);
+    void addEvent(AuditionEvent auditionEvent);
 }

@@ -7,9 +7,11 @@ import java.util.Optional;
 public interface UserRepository {
     boolean checkUserExistsByName(String username);
 
+    boolean checkUserExistsById(Long userId);
+
     void save(User user);
 
-    Optional<User> getUserByName(String name);
+    Optional<User> findUserByName(String name);
 
-    Optional<User> getUserById(Long userId);
+    Optional<User> findUserById(Long userId);
 }

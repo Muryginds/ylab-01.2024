@@ -20,19 +20,19 @@ public class InMemoryUserRepository implements UserRepository {
                 .password(passwordEncoder.encode("admin"))
                 .role(UserRole.ADMIN)
                 .build();
-        var testUser = User.builder()
-                .name("testUser")
-                .password(passwordEncoder.encode("testUser"))
-                .build();
         Map<Long, User> map = new HashMap<>();
         map.put(admin.getId(), admin);
-        map.put(testUser.getId(), testUser);
         return map;
     }
 
     @Override
     public boolean checkUserExistsByName(String username) {
-        return getUserByName(username).isPresent();
+        return findUserByName(username).isPresent();
+    }
+
+    @Override
+    public boolean checkUserExistsById(Long userId) {
+        return USERS.containsKey(userId);
     }
 
     @Override
@@ -41,14 +41,14 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> getUserByName(String username) {
+    public Optional<User> findUserByName(String username) {
         return USERS.values().stream()
                 .filter(u -> u.getName().equals(username))
                 .findFirst();
     }
 
     @Override
-    public Optional<User> getUserById(Long userId) {
+    public Optional<User> findUserById(Long userId) {
         return Optional.ofNullable(USERS.get(userId));
     }
 }

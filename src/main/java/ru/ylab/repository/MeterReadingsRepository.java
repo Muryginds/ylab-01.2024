@@ -1,17 +1,16 @@
 package ru.ylab.repository;
 
-import ru.ylab.entity.MeterReadings;
+import ru.ylab.entity.MeterReading;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.Set;
 
 public interface MeterReadingsRepository {
-    Collection<MeterReadings> getUserMeterReadings(Long userId);
+    Set<MeterReading> getByUserId(Long userId);
 
-    void addUserMeterReadings(Long userId, MeterReadings meterReadings);
+    Set<MeterReading> getAllBySubmissionId(Long submissionId);
 
-    boolean checkMeterReadingsExistByDate(Long userId, LocalDate date);
+    void save(MeterReading meterReading);
 
-    Optional<MeterReadings> getLastUserMeterReadings(Long userId);
+    void saveAll(Collection<MeterReading> meterReadings);
 }
