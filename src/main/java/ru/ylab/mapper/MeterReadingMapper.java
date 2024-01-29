@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.ylab.entity.MeterReading;
-import ru.ylab.in.dto.MeterReadingDTO;
+import ru.ylab.dto.MeterReadingDTO;
 
 import java.util.Set;
 

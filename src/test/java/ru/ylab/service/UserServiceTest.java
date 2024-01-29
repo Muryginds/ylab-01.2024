@@ -10,9 +10,9 @@ import org.mockito.MockitoAnnotations;
 import ru.ylab.entity.User;
 import ru.ylab.exception.UserAlreadyExistException;
 import ru.ylab.exception.UserAuthenticationException;
-import ru.ylab.in.dto.UserDTO;
-import ru.ylab.in.dto.request.UserAuthorizationRequestDTO;
-import ru.ylab.in.dto.request.UserRegistrationRequestDTO;
+import ru.ylab.dto.UserDTO;
+import ru.ylab.dto.request.UserAuthorizationRequestDTO;
+import ru.ylab.dto.request.UserRegistrationRequestDTO;
 import ru.ylab.repository.UserRepository;
 import ru.ylab.security.PasswordEncoder;
 

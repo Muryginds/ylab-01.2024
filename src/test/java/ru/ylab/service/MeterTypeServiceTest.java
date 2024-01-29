@@ -10,7 +10,7 @@ import org.mockito.MockitoAnnotations;
 import ru.ylab.entity.MeterType;
 import ru.ylab.exception.MeterTypeExistException;
 import ru.ylab.exception.MeterTypeNotFoundException;
-import ru.ylab.in.dto.MeterTypeDTO;
+import ru.ylab.dto.MeterTypeDTO;
 import ru.ylab.repository.MeterTypeRepository;
 
 import java.util.Collection;

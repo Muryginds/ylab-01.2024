@@ -1,4 +1,4 @@
-package ru.ylab.in.dto;
+package ru.ylab.dto;
 
 import lombok.Builder;
 import ru.ylab.enumerated.UserRole;

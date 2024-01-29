@@ -6,7 +6,7 @@ import ru.ylab.entity.MeterType;
 import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.exception.MeterTypeExistException;
 import ru.ylab.exception.MeterTypeNotFoundException;
-import ru.ylab.in.dto.MeterTypeDTO;
+import ru.ylab.dto.MeterTypeDTO;
 import ru.ylab.mapper.MeterTypeMapper;
 import ru.ylab.repository.MeterTypeRepository;
 

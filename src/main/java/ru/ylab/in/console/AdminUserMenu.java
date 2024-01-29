@@ -1,15 +1,15 @@
-package ru.ylab.console;
+package ru.ylab.in.console;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.console.handler.DateReceivingHandler;
-import ru.ylab.console.handler.MeterTypeReceivingHandler;
-import ru.ylab.console.handler.UserIdReceivingHandler;
+import ru.ylab.in.console.handler.DateReceivingHandler;
+import ru.ylab.in.console.handler.MeterTypeReceivingHandler;
+import ru.ylab.in.console.handler.UserIdReceivingHandler;
 import ru.ylab.controller.*;
 import ru.ylab.exception.MeterTypeExistException;
 import ru.ylab.exception.NoSubmissionException;
-import ru.ylab.in.dto.MeterReadingDTO;
-import ru.ylab.in.dto.SubmissionDTO;
-import ru.ylab.in.dto.request.SubmissionByDateRequestDTO;
+import ru.ylab.dto.MeterReadingDTO;
+import ru.ylab.dto.SubmissionDTO;
+import ru.ylab.dto.request.SubmissionByDateRequestDTO;
 
 import java.util.HashMap;
 import java.util.Map;

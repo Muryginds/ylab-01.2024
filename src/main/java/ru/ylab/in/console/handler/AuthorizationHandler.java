@@ -1,6 +1,6 @@
-package ru.ylab.console.handler;
+package ru.ylab.in.console.handler;
 
-import ru.ylab.in.dto.request.UserAuthorizationRequestDTO;
+import ru.ylab.dto.request.UserAuthorizationRequestDTO;
 
 public class AuthorizationHandler extends Handler {
 

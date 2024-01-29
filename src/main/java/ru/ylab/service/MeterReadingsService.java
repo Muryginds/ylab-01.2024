@@ -3,7 +3,7 @@ package ru.ylab.service;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.MeterReading;
 import ru.ylab.entity.User;
-import ru.ylab.in.dto.MeterReadingDTO;
+import ru.ylab.dto.MeterReadingDTO;
 import ru.ylab.mapper.MeterReadingMapper;
 import ru.ylab.repository.MeterReadingsRepository;
 

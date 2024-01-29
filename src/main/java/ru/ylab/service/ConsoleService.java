@@ -1,7 +1,7 @@
 package ru.ylab.service;
 
-import ru.ylab.console.handler.*;
 import ru.ylab.controller.*;
+import ru.ylab.in.console.handler.*;
 import ru.ylab.repository.impl.*;
 import ru.ylab.security.Password4jPasswordEncoder;
 

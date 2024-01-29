@@ -1,12 +1,12 @@
-package ru.ylab.console;
+package ru.ylab.in.console;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.controller.UserController;
 import ru.ylab.exception.UserAlreadyExistException;
 import ru.ylab.exception.UserAuthenticationException;
-import ru.ylab.console.handler.AuthorizationHandler;
-import ru.ylab.console.handler.RegistrationHandler;
-import ru.ylab.console.handler.UserMenuHandler;
+import ru.ylab.in.console.handler.AuthorizationHandler;
+import ru.ylab.in.console.handler.RegistrationHandler;
+import ru.ylab.in.console.handler.UserMenuHandler;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,9 +1,9 @@
 package ru.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.in.dto.SubmissionDTO;
-import ru.ylab.in.dto.request.SubmissionByDateRequestDTO;
-import ru.ylab.in.dto.request.SubmissionRequestDTO;
+import ru.ylab.dto.SubmissionDTO;
+import ru.ylab.dto.request.SubmissionByDateRequestDTO;
+import ru.ylab.dto.request.SubmissionRequestDTO;
 import ru.ylab.service.SubmissionService;
 
 import java.util.Collection;

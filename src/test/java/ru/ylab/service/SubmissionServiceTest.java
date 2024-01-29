@@ -14,8 +14,8 @@ import ru.ylab.entity.User;
 import ru.ylab.enumerated.UserRole;
 import ru.ylab.exception.MeterNotFoundException;
 import ru.ylab.exception.SubmissionExistsException;
-import ru.ylab.in.dto.SubmissionDTO;
-import ru.ylab.in.dto.request.SubmissionRequestDTO;
+import ru.ylab.dto.SubmissionDTO;
+import ru.ylab.dto.request.SubmissionRequestDTO;
 import ru.ylab.mapper.SubmissionMapper;
 import ru.ylab.repository.SubmissionRepository;
 

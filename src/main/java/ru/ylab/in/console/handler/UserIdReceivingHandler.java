@@ -1,4 +1,4 @@
-package ru.ylab.console.handler;
+package ru.ylab.in.console.handler;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.controller.UserController;

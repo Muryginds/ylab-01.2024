@@ -1,4 +1,4 @@
-package ru.ylab.console;
+package ru.ylab.in.console;
 
 import java.util.Map;
 

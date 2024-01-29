@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.ylab.entity.Submission;
-import ru.ylab.in.dto.SubmissionDTO;
+import ru.ylab.dto.SubmissionDTO;
 
 import java.util.Collection;
 

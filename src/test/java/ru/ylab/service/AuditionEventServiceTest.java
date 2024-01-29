@@ -10,7 +10,7 @@ import org.mockito.MockitoAnnotations;
 import ru.ylab.entity.AuditionEvent;
 import ru.ylab.entity.User;
 import ru.ylab.enumerated.AuditionEventType;
-import ru.ylab.in.dto.AuditionEventDTO;
+import ru.ylab.dto.AuditionEventDTO;
 import ru.ylab.mapper.AuditionEventMapper;
 import ru.ylab.repository.AuditionEventRepository;
 

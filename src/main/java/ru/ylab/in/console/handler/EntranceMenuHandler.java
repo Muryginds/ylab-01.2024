@@ -1,7 +1,7 @@
-package ru.ylab.console.handler;
+package ru.ylab.in.console.handler;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.console.EntranceMenu;
+import ru.ylab.in.console.EntranceMenu;
 import ru.ylab.controller.UserController;
 
 @RequiredArgsConstructor

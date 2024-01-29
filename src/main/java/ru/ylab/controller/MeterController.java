@@ -1,7 +1,7 @@
 package ru.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.in.dto.MeterDTO;
+import ru.ylab.dto.MeterDTO;
 import ru.ylab.service.MeterService;
 
 import java.util.Collection;

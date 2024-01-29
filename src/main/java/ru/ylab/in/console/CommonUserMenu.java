@@ -1,15 +1,15 @@
-package ru.ylab.console;
+package ru.ylab.in.console;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.console.handler.DateReceivingHandler;
-import ru.ylab.console.handler.SubmissionReceivingHandler;
+import ru.ylab.in.console.handler.DateReceivingHandler;
+import ru.ylab.in.console.handler.SubmissionReceivingHandler;
 import ru.ylab.controller.MeterReadingsController;
 import ru.ylab.controller.SubmissionController;
 import ru.ylab.controller.UserController;
 import ru.ylab.exception.BaseMonitoringServiceException;
-import ru.ylab.in.dto.MeterReadingDTO;
-import ru.ylab.in.dto.SubmissionDTO;
-import ru.ylab.in.dto.request.SubmissionByDateRequestDTO;
+import ru.ylab.dto.MeterReadingDTO;
+import ru.ylab.dto.SubmissionDTO;
+import ru.ylab.dto.request.SubmissionByDateRequestDTO;
 
 import java.util.HashMap;
 import java.util.Map;

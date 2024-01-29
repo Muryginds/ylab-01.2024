@@ -1,9 +1,9 @@
-package ru.ylab.console.handler;
+package ru.ylab.in.console.handler;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.console.AdminUserMenu;
-import ru.ylab.console.CommonUserMenu;
-import ru.ylab.console.Menu;
+import ru.ylab.in.console.AdminUserMenu;
+import ru.ylab.in.console.CommonUserMenu;
+import ru.ylab.in.console.Menu;
 import ru.ylab.controller.*;
 
 @RequiredArgsConstructor

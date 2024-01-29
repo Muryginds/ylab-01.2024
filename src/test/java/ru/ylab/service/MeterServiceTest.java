@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import ru.ylab.entity.Meter;
 import ru.ylab.entity.MeterType;
-import ru.ylab.in.dto.MeterDTO;
+import ru.ylab.dto.MeterDTO;
 import ru.ylab.mapper.MeterMapper;
 import ru.ylab.repository.MeterRepository;
 import ru.ylab.repository.MeterTypeRepository;

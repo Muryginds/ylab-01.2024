@@ -1,4 +1,4 @@
-package ru.ylab.in.dto.request;
+package ru.ylab.dto.request;
 
 import lombok.Builder;
 

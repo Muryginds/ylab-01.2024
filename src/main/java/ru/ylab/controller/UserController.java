@@ -1,9 +1,9 @@
 package ru.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.in.dto.UserDTO;
-import ru.ylab.in.dto.request.UserAuthorizationRequestDTO;
-import ru.ylab.in.dto.request.UserRegistrationRequestDTO;
+import ru.ylab.dto.UserDTO;
+import ru.ylab.dto.request.UserAuthorizationRequestDTO;
+import ru.ylab.dto.request.UserRegistrationRequestDTO;
 import ru.ylab.service.UserService;
 
 /**

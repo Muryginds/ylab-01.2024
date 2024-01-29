@@ -1,4 +1,4 @@
-package ru.ylab.console.handler;
+package ru.ylab.in.console.handler;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.controller.MeterController;
@@ -7,8 +7,8 @@ import ru.ylab.controller.SubmissionController;
 import ru.ylab.controller.UserController;
 import ru.ylab.exception.NoSubmissionException;
 import ru.ylab.exception.SubmissionExistsException;
-import ru.ylab.in.dto.MeterReadingDTO;
-import ru.ylab.in.dto.request.SubmissionRequestDTO;
+import ru.ylab.dto.MeterReadingDTO;
+import ru.ylab.dto.request.SubmissionRequestDTO;
 
 import java.time.LocalDate;
 import java.util.HashMap;
