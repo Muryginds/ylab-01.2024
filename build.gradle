@@ -23,12 +23,17 @@ ext {
     lombokMapstructBindingVersion = '0.2.0'
     log4jApiVersion = '2.22.1'
     log4jCoreVersion = '2.22.1'
+    log4jSlf4j2ImplVersion = '2.22.1'
     slf4NopVersion = '2.0.11'
     junitVersion = '5.9.1'
     mockitoCoreVersion = '5.10.0'
 }
 
 dependencies {
+    implementation "org.apache.logging.log4j:log4j-api:${log4jApiVersion}"
+    implementation "org.apache.logging.log4j:log4j-core:${log4jCoreVersion}"
+    implementation "org.apache.logging.log4j:log4j-slf4j2-impl:${log4jSlf4j2ImplVersion}"
+
     implementation "com.password4j:password4j:${password4jVersion}"
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -36,11 +41,6 @@ dependencies {
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructProcessorVersion}"
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
 
-    implementation "org.apache.logging.log4j:log4j-api:${log4jApiVersion}"
-    implementation "org.apache.logging.log4j:log4j-core:${log4jCoreVersion}"
-    implementation ("org.slf4j:slf4j-nop:${slf4NopVersion}") {
-        exclude module: 'slf4j-api'
-    }
 
     testImplementation platform("org.junit:junit-bom:${junitVersion}")
     testImplementation "org.junit.jupiter:junit-jupiter"
