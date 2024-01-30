@@ -1,7 +1,10 @@
 package ru.ylab.service;
 
 import ru.ylab.controller.*;
-import ru.ylab.in.console.handler.*;
+import ru.ylab.in.console.EntranceMenu;
+import ru.ylab.in.console.handler.ConsoleInputHandler;
+import ru.ylab.in.console.handler.MenuHandler;
+import ru.ylab.in.console.handler.UserMenuHandlerFactory;
 import ru.ylab.repository.impl.*;
 import ru.ylab.security.Password4jPasswordEncoder;
 
@@ -31,21 +34,16 @@ public class ConsoleService {
     private final MeterReadingsController meterReadingsController = new MeterReadingsController(meterReadingsService);
     private final MeterTypeController meterTypeController = new MeterTypeController(meterTypeService);
     private final MeterController meterController = new MeterController(meterService);
-    private final RegistrationHandler registrationHandler = new RegistrationHandler(userController);
-    private final AuthorizationHandler authorizationHandler = new AuthorizationHandler();
-    private final DateReceivingHandler dateReceivingHandler = new DateReceivingHandler();
-    private final SubmissionReceivingHandler submissionReceivingHandler = new SubmissionReceivingHandler(
-            userController, submissionController, meterReadingsController, meterController);
-    private final UserMenuHandler userMenuHandler = new UserMenuHandler(
+    private final AuditionEventController auditionEventController = new AuditionEventController(auditionEventService);
+    private final ConsoleInputHandler consoleInputHandler = new ConsoleInputHandler(
+            userController, meterTypeController, submissionController, meterReadingsController, meterController);
+    private final UserMenuHandlerFactory userMenuHandlerFactory = new UserMenuHandlerFactory(
             userController,
             submissionController,
             meterReadingsController,
-            submissionReceivingHandler,
-            dateReceivingHandler,
+            auditionEventController,
             meterTypeController,
-            new MeterTypeReceivingHandler(meterTypeController),
-            new UserIdReceivingHandler(userController),
-            new AuditionEventController(auditionEventService)
+            consoleInputHandler
     );
 
     /**
@@ -53,13 +51,12 @@ public class ConsoleService {
      * and orchestrates the flow of the console-based application.
      */
     public void run() {
-        var entranceMenuHandler =
-                new EntranceMenuHandler(
+        var entranceMenuHandler = new MenuHandler(
+                new EntranceMenu(
+                        consoleInputHandler,
                         userController,
-                        registrationHandler,
-                        authorizationHandler,
-                        userMenuHandler
-                );
+                        userMenuHandlerFactory
+                ));
         entranceMenuHandler.handleMenu();
     }
 }

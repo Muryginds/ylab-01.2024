@@ -7,49 +7,37 @@ import ru.ylab.in.console.Menu;
 import ru.ylab.controller.*;
 
 @RequiredArgsConstructor
-public class UserMenuHandler extends MenuHandler {
+public class UserMenuHandlerFactory {
     private final UserController userController;
     private final SubmissionController submissionController;
     private final MeterReadingsController meterReadingsController;
-    private final SubmissionReceivingHandler submissionReceivingHandler;
-    private final DateReceivingHandler dateReceivingHandler;
-    private final MeterTypeController meterTypeController;
-    private final MeterTypeReceivingHandler meterTypeReceivingHandler;
-    private final UserIdReceivingHandler userIdReceivingHandler;
     private final AuditionEventController auditionEventController;
+    private final MeterTypeController meterTypeController;
+    private final ConsoleInputHandler consoleInputHandler;
 
-    public void handleMenu() {
-        boolean finished = false;
-        var userMenu = getUserMenuHandler();
-        while (!finished) {
-            userMenu.printMenuOptions(userMenu.getMenuOptions());
-            var answer = SCANNER.nextLine();
-            finished = userMenu.executeCommand(answer);
-        }
+    public MenuHandler getCurrentUserMenuHandler() {
+        return new MenuHandler(getCurrentUserMenu());
     }
 
-    private Menu getUserMenuHandler() {
+    private Menu getCurrentUserMenu() {
         var currentUser = userController.getCurrentUser();
         return switch (currentUser.role()) {
             case USER -> new CommonUserMenu(
                     userController,
                     submissionController,
                     meterReadingsController,
-                    submissionReceivingHandler,
-                    dateReceivingHandler
+                    consoleInputHandler
             );
             case ADMIN -> new AdminUserMenu(
                     userController,
                     submissionController,
                     meterReadingsController,
+                    auditionEventController,
                     meterTypeController,
-                    meterTypeReceivingHandler,
-                    userIdReceivingHandler,
-                    dateReceivingHandler,
-                    auditionEventController
+                    consoleInputHandler
             );
             default -> throw new IllegalArgumentException(String.format(
-                    "No Menu Handler for role '%s'",
+                    "No default Menu for role '%s'",
                     currentUser.role())
             );
         };

@@ -1,153 +1,121 @@
 package ru.ylab.in.console;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.in.console.handler.DateReceivingHandler;
-import ru.ylab.in.console.handler.SubmissionReceivingHandler;
+import lombok.extern.slf4j.Slf4j;
 import ru.ylab.controller.MeterReadingsController;
 import ru.ylab.controller.SubmissionController;
 import ru.ylab.controller.UserController;
-import ru.ylab.exception.BaseMonitoringServiceException;
-import ru.ylab.dto.MeterReadingDTO;
-import ru.ylab.dto.SubmissionDTO;
 import ru.ylab.dto.request.SubmissionByDateRequestDTO;
+import ru.ylab.in.console.handler.ConsoleInputHandler;
+import ru.ylab.utils.ConsoleUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static ru.ylab.in.console.CommonUserMenu.MenuAction.*;
 
 /**
  * Represents the menu for common user actions in the Monitoring Service console application.
  *
  * <p>This menu provides options for submitting readings, retrieving submissions, and logging out.
  */
+@Slf4j
 @RequiredArgsConstructor
 public class CommonUserMenu extends Menu {
-    private static final Map<String, String> ACTIONS = generateActions();
+    private static final Map<String, MenuAction> ACTIONS = generateActions();
     private final UserController userController;
     private final SubmissionController submissionController;
     private final MeterReadingsController meterReadingsController;
-    private final SubmissionReceivingHandler submissionReceivingHandler;
-    private final DateReceivingHandler dateReceivingHandler;
+    private final ConsoleInputHandler consoleInputHandler;
 
-    private static Map<String, String> generateActions() {
-        Map<String, String> map = new HashMap<>();
-        map.put("1", "Submit readings");
-        map.put("2", "Get my last submission");
-        map.put("3", "Get submission by date");
-        map.put("4", "Get all my submissions");
-        map.put("5", "Logout");
+    private static Map<String, MenuAction> generateActions() {
+        Map<String, MenuAction> map = new HashMap<>();
+        map.put("1", NEW_SUBMISSION);
+        map.put("2", GET_LAST_SUBMISSION);
+        map.put("3", GET_SUBMISSION_BY_DATE);
+        map.put("4", GET_ALL_SUBMISSIONS);
+        map.put("5", LOGOUT);
         return map;
     }
 
     public boolean executeCommand(String command) {
-        var action = ACTIONS.get(command);
-        if (action == null) {
-            action = "unknown";
-        }
-
-        return switch (action) {
-            case "Submit readings" -> {
-                submitReadings();
-                yield false;
-            }
-            case "Get my last submission" -> {
-                getMyLastSubmission();
-                yield false;
-            }
-            case "Get all my submissions" -> {
-                getMySubmissions();
-                yield false;
-            }
-            case "Get submission by date" -> {
-                getSubmissionByDate();
-                yield false;
-            }
-            case "Logout" -> {
-                logout();
-                yield true;
-            }
-            default -> {
-                System.out.println("Invalid command. Please try again.");
-                yield false;
-            }
+        return switch (ACTIONS.get(command)) {
+            case NEW_SUBMISSION -> submitReadings();
+            case GET_LAST_SUBMISSION -> getMyLastSubmission();
+            case GET_SUBMISSION_BY_DATE -> getSubmissionByDate();
+            case GET_ALL_SUBMISSIONS -> getMySubmissions();
+            case LOGOUT -> logout();
+            default -> throw new IllegalArgumentException("No suitable ACTION");
         };
     }
 
-    private void getSubmissionByDate() {
-        try {
-            var userDTO = userController.getCurrentUser();
-            var request = new SubmissionByDateRequestDTO(dateReceivingHandler.handle(), userDTO.id());
-            var submissionDTO = submissionController.getSubmissionByDate(request);
-            var sb = new StringBuilder();
-            submissionFormattedOutput(submissionDTO, sb);
-            meterReadingsController.getAllBySubmissionId(submissionDTO.id())
-                    .forEach(mr -> meterReadingFormattedOutput(mr, sb));
-            System.out.println(sb);
-        } catch (BaseMonitoringServiceException ex) {
-            System.out.println(ex.getMessage());
-        }
+    private boolean getSubmissionByDate() {
+        var userDTO = userController.getCurrentUser();
+        var request = new SubmissionByDateRequestDTO(consoleInputHandler.handleDate(), userDTO.id());
+        var submissionDTO = submissionController.getSubmissionByDate(request);
+        var sb = new StringBuilder();
+        ConsoleUtils.submissionFormattedOutput(submissionDTO, sb);
+        meterReadingsController.getAllBySubmissionId(submissionDTO.id())
+                .forEach(mr -> ConsoleUtils.meterReadingFormattedOutput(mr, sb));
+        log.info(sb.toString());
+        return false;
     }
 
-    private void getMyLastSubmission() {
-        try {
-            var userDTO = userController.getCurrentUser();
-            var submissionDTO = submissionController.getLastSubmissionByUserId(userDTO.id());
-            var sb = new StringBuilder();
-            submissionFormattedOutput(submissionDTO, sb);
-            meterReadingsController.getAllBySubmissionId(submissionDTO.id())
-                    .forEach(mr -> meterReadingFormattedOutput(mr, sb));
-            System.out.println(sb);
-        } catch (BaseMonitoringServiceException ex) {
-            System.out.println(ex.getMessage());
-        }
+    private boolean getMyLastSubmission() {
+        var userDTO = userController.getCurrentUser();
+        var submissionDTO = submissionController.getLastSubmissionByUserId(userDTO.id());
+        var sb = new StringBuilder();
+        ConsoleUtils.submissionFormattedOutput(submissionDTO, sb);
+        meterReadingsController.getAllBySubmissionId(submissionDTO.id())
+                .forEach(mr -> ConsoleUtils.meterReadingFormattedOutput(mr, sb));
+        log.info(sb.toString());
+        return false;
     }
 
-    private void logout() {
+    private boolean logout() {
         userController.logout();
+        return true;
     }
 
-    private void getMySubmissions() {
+    private boolean getMySubmissions() {
         var userDTO = userController.getCurrentUser();
         var sb = new StringBuilder();
         submissionController.getAllByUserId(userDTO.id()).forEach(
                 s -> {
-                    submissionFormattedOutput(s, sb);
+                    ConsoleUtils.submissionFormattedOutput(s, sb);
                     meterReadingsController.getAllBySubmissionId(s.id()).forEach(
-                            mr -> meterReadingFormattedOutput(mr, sb)
+                            mr -> ConsoleUtils.meterReadingFormattedOutput(mr, sb)
                     );
                     sb.append("---------------------------");
                 }
         );
-        System.out.println(sb);
+        log.info(sb.toString());
+        return false;
     }
 
-    private void submitReadings() {
-        try {
-            submissionController.save(submissionReceivingHandler.handle());
-        } catch (BaseMonitoringServiceException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    private void submissionFormattedOutput(SubmissionDTO submissionDTO, StringBuilder sb) {
-        sb.append("Submission by user id #'")
-                .append(submissionDTO.userDTO().id())
-                .append("' at ")
-                .append(submissionDTO.date())
-                .append("\n");
-    }
-
-    private void meterReadingFormattedOutput(MeterReadingDTO meterReadingDTO, StringBuilder sb) {
-        sb.append("Meter #'")
-                .append(meterReadingDTO.meterDTO().factoryNumber())
-                .append("' type:'")
-                .append(meterReadingDTO.meterDTO().typeDTO().typeName())
-                .append("' value:")
-                .append(meterReadingDTO.value())
-                .append("\n");
+    private boolean submitReadings() {
+        submissionController.save(consoleInputHandler.handleSubmission());
+        return false;
     }
 
     @Override
-    public Map<String, String> getMenuOptions() {
+    Map<String, MenuAction> getMenuOptions() {
         return ACTIONS;
+    }
+
+    @RequiredArgsConstructor
+    enum MenuAction implements MenuOption {
+        NEW_SUBMISSION("Submit new readings"),
+        GET_LAST_SUBMISSION("Get my last submission"),
+        GET_SUBMISSION_BY_DATE("Get submission by date"),
+        GET_ALL_SUBMISSIONS("Get all my submissions"),
+        LOGOUT("Logout");
+
+        private final String optionName;
+
+        @Override
+        public String getOptionName() {
+            return optionName;
+        }
     }
 }

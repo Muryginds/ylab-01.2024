@@ -1,168 +1,134 @@
 package ru.ylab.in.console;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.in.console.handler.DateReceivingHandler;
-import ru.ylab.in.console.handler.MeterTypeReceivingHandler;
-import ru.ylab.in.console.handler.UserIdReceivingHandler;
+import lombok.extern.slf4j.Slf4j;
 import ru.ylab.controller.*;
-import ru.ylab.exception.MeterTypeExistException;
-import ru.ylab.exception.NoSubmissionException;
-import ru.ylab.dto.MeterReadingDTO;
 import ru.ylab.dto.SubmissionDTO;
 import ru.ylab.dto.request.SubmissionByDateRequestDTO;
+import ru.ylab.in.console.handler.ConsoleInputHandler;
+import ru.ylab.utils.ConsoleUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static ru.ylab.in.console.AdminUserMenu.MenuAction.*;
 
 /**
  * Represents the menu for administrative user actions in the Monitoring Service console application.
  *
  * <p>This menu provides options for adding a meter type, retrieving submissions, and logging out.
  */
+@Slf4j
 @RequiredArgsConstructor
 public class AdminUserMenu extends Menu {
-    private static final Map<String, String> ACTIONS = generateActions();
+    private static final Map<String, MenuAction> ACTIONS = generateActions();
     private final UserController userController;
     private final SubmissionController submissionController;
     private final MeterReadingsController meterReadingsController;
-    private final MeterTypeController meterTypeController;
-    private final MeterTypeReceivingHandler meterTypeReceivingHandler;
-    private final UserIdReceivingHandler userIdReceivingHandler;
-    private final DateReceivingHandler dateReceivingHandler;
     private final AuditionEventController auditionEventController;
+    private final MeterTypeController meterTypeController;
+    private final ConsoleInputHandler consoleInputHandler;
 
-    private static Map<String, String> generateActions() {
-        Map<String, String> map = new HashMap<>();
-        map.put("1", "Add meter type");
-        map.put("2", "Get last submission by user id");
-        map.put("3", "Get all submissions by user id");
-        map.put("4", "Get submission by user id and date");
-        map.put("5", "Get audition history by user id");
-        map.put("6", "Logout");
+    private static Map<String, MenuAction> generateActions() {
+        Map<String, MenuAction> map = new HashMap<>();
+        map.put("1", ADD_METER_TYPE);
+        map.put("2", GET_LAST_SUBMISSION_BY_USER_ID);
+        map.put("3", GET_ALL_SUBMISSIONS_BY_USER_ID);
+        map.put("4", GET_SUBMISSION_BY_DATE_AND_USER_ID);
+        map.put("5", GET_AUDITION_HISTORY_BY_USER_ID);
+        map.put("6", LOGOUT);
         return map;
     }
 
     public boolean executeCommand(String command) {
-        var action = ACTIONS.get(command);
-        if (action == null) {
-            action = "unknown";
-        }
-
-        return switch (action) {
-            case "Add meter type" -> {
-                submitMeterType();
-                yield false;
-            }
-            case "Get last submission by user id" -> {
-                getLastSubmissionByUserId();
-                yield false;
-            }
-            case "Get all submissions by user id" -> {
-                getAllSubmissionsByUserId();
-                yield false;
-            }
-            case "Get submission by user id and date" -> {
-                getSubmissionsByUserIdAndDate();
-                yield false;
-            }
-            case "Get audition history by user id" -> {
-                getAuditionHistoryByUserId();
-                yield false;
-            }
-            case "Logout" -> {
-                logout();
-                yield true;
-            }
-            default -> {
-                System.out.println("Invalid command. Please try again.");
-                yield false;
-            }
+        return switch (ACTIONS.get(command)) {
+            case ADD_METER_TYPE -> submitMeterType();
+            case GET_LAST_SUBMISSION_BY_USER_ID -> getLastSubmissionByUserId();
+            case GET_ALL_SUBMISSIONS_BY_USER_ID -> getAllSubmissionsByUserId();
+            case GET_SUBMISSION_BY_DATE_AND_USER_ID -> getSubmissionsByUserIdAndDate();
+            case GET_AUDITION_HISTORY_BY_USER_ID -> getAuditionHistoryByUserId();
+            case LOGOUT -> logout();
+            default -> throw new IllegalArgumentException("No suitable ACTION");
         };
     }
 
-    private void getAllSubmissionsByUserId() {
-        var userId = userIdReceivingHandler.handle();
+    private boolean getAllSubmissionsByUserId() {
+        var userId = consoleInputHandler.handleUserId();
         var sb = new StringBuilder();
         submissionController.getAllByUserId(userId).forEach(
                 s -> {
-                    submissionFormattedOutput(s, sb);
-                    meterReadingsController.getAllBySubmissionId(s.id()).forEach(
-                            mr -> meterReadingFormattedOutput(mr, sb)
-                    );
+                    sb.append(prepareSubmissionInfoOutput(s));
                     sb.append("---------------------------");
                 }
         );
-        System.out.println(sb);
+        log.info(sb.toString());
+        return false;
     }
 
-    private void getAuditionHistoryByUserId() {
-        var userId = userIdReceivingHandler.handle();
+    private boolean getAuditionHistoryByUserId() {
+        var userId = consoleInputHandler.handleUserId();
         var events = auditionEventController.getEventsByUserId(userId);
-        events.forEach(e -> System.out.printf("User: #'%s' event: '%s' date: '%s message: '%s'%n",
+        events.forEach(e -> log.info("User: #'{}' event: '{}' date: '{} message: '{}'",
                 e.userDTO().id(), e.type().name(), e.date(), e.message()));
+        return false;
     }
 
-    private void getSubmissionsByUserIdAndDate() {
-        try {
-            var userId = userIdReceivingHandler.handle();
-            var date = dateReceivingHandler.handle();
-            var request = new SubmissionByDateRequestDTO(date, userId);
-            var submissionDTO = submissionController.getSubmissionByDate(request);
-            var sb = new StringBuilder();
-            submissionFormattedOutput(submissionDTO, sb);
-            meterReadingsController.getAllBySubmissionId(submissionDTO.id())
-                    .forEach(mr -> meterReadingFormattedOutput(mr, sb));
-            System.out.println(sb);
-        } catch (NoSubmissionException ex) {
-            System.out.println(ex.getMessage());
-        }
+    private boolean getSubmissionsByUserIdAndDate() {
+        var userId = consoleInputHandler.handleUserId();
+        var date = consoleInputHandler.handleDate();
+        var request = new SubmissionByDateRequestDTO(date, userId);
+        var submissionDTO = submissionController.getSubmissionByDate(request);
+        var outputString = prepareSubmissionInfoOutput(submissionDTO).toString();
+        log.info(outputString);
+        return false;
     }
 
-    private void submitMeterType() {
-        try {
-            var meterTypeName = meterTypeReceivingHandler.handle();
-            meterTypeController.save(meterTypeName);
-        } catch (MeterTypeExistException ex) {
-            System.out.println(ex.getMessage());
-        }
+    private boolean submitMeterType() {
+        var meterTypeName = consoleInputHandler.handleMeterType();
+        meterTypeController.save(meterTypeName);
+        return false;
     }
 
-    private void getLastSubmissionByUserId() {
-        try {
-            var userId = userIdReceivingHandler.handle();
-            var submissionDTO = submissionController.getLastSubmissionByUserId(userId);
-            var sb = new StringBuilder();
-            submissionFormattedOutput(submissionDTO, sb);
-            meterReadingsController.getAllBySubmissionId(submissionDTO.id())
-                    .forEach(mr -> meterReadingFormattedOutput(mr, sb));
-            System.out.println(sb);
-        } catch (NoSubmissionException ex) {
-            System.out.println(ex.getMessage());
-        }
+    private boolean getLastSubmissionByUserId() {
+        var userId = consoleInputHandler.handleUserId();
+        var submissionDTO = submissionController.getLastSubmissionByUserId(userId);
+        var outputString = prepareSubmissionInfoOutput(submissionDTO).toString();
+        log.info(outputString);
+        return false;
     }
 
-    private void submissionFormattedOutput(SubmissionDTO submissionDTO, StringBuilder sb) {
-        sb.append("Submission at ")
-                .append(submissionDTO.date())
-                .append("\n");
-    }
-
-    private void meterReadingFormattedOutput(MeterReadingDTO meterReadingDTO, StringBuilder sb) {
-        sb.append("Meter #'")
-                .append(meterReadingDTO.meterDTO().factoryNumber())
-                .append("' type:'")
-                .append(meterReadingDTO.meterDTO().typeDTO().typeName())
-                .append("' value:")
-                .append(meterReadingDTO.value())
-                .append("\n");
-    }
-
-    private void logout() {
+    private boolean logout() {
         userController.logout();
+        return true;
+    }
+
+    private StringBuilder prepareSubmissionInfoOutput(SubmissionDTO submissionDTO) {
+        var sb = new StringBuilder();
+        ConsoleUtils.submissionFormattedOutput(submissionDTO, sb);
+        meterReadingsController.getAllBySubmissionId(submissionDTO.id())
+                .forEach(mr -> ConsoleUtils.meterReadingFormattedOutput(mr, sb));
+        return sb;
     }
 
     @Override
-    public Map<String, String> getMenuOptions() {
+    Map<String, MenuAction> getMenuOptions() {
         return ACTIONS;
+    }
+
+    @RequiredArgsConstructor
+    enum MenuAction implements MenuOption {
+        ADD_METER_TYPE("Add meter type"),
+        GET_LAST_SUBMISSION_BY_USER_ID("Get last submission by user id"),
+        GET_SUBMISSION_BY_DATE_AND_USER_ID("Get submission by user id and date"),
+        GET_ALL_SUBMISSIONS_BY_USER_ID("Get all submissions by user id"),
+        GET_AUDITION_HISTORY_BY_USER_ID("Get audition history by user id"),
+        LOGOUT("Logout");
+
+        private final String optionName;
+
+        @Override
+        public String getOptionName() {
+            return optionName;
+        }
     }
 }

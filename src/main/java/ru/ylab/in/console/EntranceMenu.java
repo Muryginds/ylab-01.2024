@@ -1,94 +1,94 @@
 package ru.ylab.in.console;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.ylab.controller.UserController;
-import ru.ylab.exception.UserAlreadyExistException;
-import ru.ylab.exception.UserAuthenticationException;
-import ru.ylab.in.console.handler.AuthorizationHandler;
-import ru.ylab.in.console.handler.RegistrationHandler;
-import ru.ylab.in.console.handler.UserMenuHandler;
+import ru.ylab.exception.BaseMonitoringServiceException;
+import ru.ylab.in.console.handler.ConsoleInputHandler;
+import ru.ylab.in.console.handler.UserMenuHandlerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static ru.ylab.in.console.EntranceMenu.MenuAction.*;
 
 /**
  * Represents the entrance menu of the Monitoring Service console application.
  *
  * <p>This menu provides options for user authorization, registration, and exiting the application.
  */
+@Slf4j
 @RequiredArgsConstructor
 public class EntranceMenu extends Menu {
-    private static final Map<String, String> ACTIONS = generateActions();
-    private final RegistrationHandler registrationHandler;
-    private final AuthorizationHandler authorizationHandler;
-    private final UserMenuHandler userMenuHandler;
+    private static final Map<String, MenuAction> ACTIONS = generateActions();
+    private final ConsoleInputHandler consoleInputHandler;
     private final UserController userController;
+    private final UserMenuHandlerFactory userMenuHandlerFactory;
 
-    private static Map<String, String> generateActions() {
-        Map<String, String> map = new HashMap<>();
-        map.put("1", "Authorization");
-        map.put("2", "Registration");
-        map.put("3", "Exit");
+    private static Map<String, MenuAction> generateActions() {
+        Map<String, MenuAction> map = new HashMap<>();
+        map.put("1", AUTHORIZATION);
+        map.put("2", REGISTRATION);
+        map.put("3", EXIT);
         return map;
     }
 
     public boolean executeCommand(String command) {
-        var action = ACTIONS.get(command);
-        if (action == null) {
-            action = "unknown";
-        }
-
-        return switch (action) {
-            case "Authorization" -> {
-                authorizeUser();
-                yield false;
-            }
-            case "Registration" -> {
-                registerUser();
-                yield false;
-            }
-            case "Exit" -> {
-                exitApplication();
-                yield true;
-            }
-            default -> {
-                System.out.println("Invalid command. Please try again.");
-                yield false;
-            }
-        };
-    }
-
-    private void exitApplication() {
-        System.out.println("Exiting the Monitoring Service. Goodbye!");
-    }
-
-    private void registerUser() {
         try {
-            var registrationRequest = registrationHandler.handle();
-            var userDTO = userController.register(registrationRequest);
-            System.out.printf(
-                    "You are registered as '%s' with id '%s', please authorize%n",
-                    userDTO.name(),
-                    userDTO.id()
-            );
-        } catch (UserAlreadyExistException ex) {
-            System.out.println(ex.getMessage());
+            return switch (ACTIONS.get(command)) {
+                case AUTHORIZATION -> authorizeUser();
+                case REGISTRATION -> registerUser();
+                case EXIT -> exitApplication();
+                default -> throw new IllegalArgumentException("No suitable ACTION");
+            };
+        } catch (BaseMonitoringServiceException ex) {
+            log.info(ex.getMessage());
+        } catch (NullPointerException ex) {
+            log.info("Invalid command. Please try again.");
         }
+        return false;
     }
 
-    private void authorizeUser() {
-        try {
-            var authorizationRequest = authorizationHandler.handle();
-            var userDTO = userController.authorize(authorizationRequest);
-            System.out.printf("You are successfully authorized as '%s'%n", userDTO.name());
-            userMenuHandler.handleMenu();
-        } catch (UserAuthenticationException ex) {
-            System.out.println(ex.getMessage());
-        }
+    private boolean exitApplication() {
+        log.info("Exiting the Monitoring Service. Goodbye!");
+        return true;
+    }
+
+    private boolean registerUser() {
+        var registrationRequest = consoleInputHandler.handleRegistration();
+        var userDTO = userController.register(registrationRequest);
+        log.info(String.format(
+                "You are registered as '%s' with id '%s', please authorize",
+                userDTO.name(),
+                userDTO.id()
+        ));
+        return false;
+    }
+
+    private boolean authorizeUser() {
+        var authorizationRequest = consoleInputHandler.handleAuthorization();
+        var userDTO = userController.authorize(authorizationRequest);
+        log.info(String.format("You are successfully authorized as '%s'", userDTO.name()));
+        userMenuHandlerFactory.getCurrentUserMenuHandler().handleMenu();
+        return false;
     }
 
     @Override
-    public Map<String, String> getMenuOptions() {
+    Map<String, MenuAction> getMenuOptions() {
         return ACTIONS;
+    }
+
+    @RequiredArgsConstructor
+    enum MenuAction implements MenuOption {
+        AUTHORIZATION("Authorization"),
+        REGISTRATION("Registration"),
+        EXIT("Exit");
+
+        private final String optionName;
+
+        @Override
+        public String getOptionName() {
+            return optionName;
+        }
     }
 }

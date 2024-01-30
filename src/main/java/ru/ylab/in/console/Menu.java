@@ -1,16 +1,20 @@
 package ru.ylab.in.console;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
+@Slf4j
 public abstract class Menu {
-    public final void printMenuOptions(Map<String, String> menuOptions) {
-        System.out.println();
-        for (var entry : menuOptions.entrySet()) {
-            System.out.printf("[%s]: %s%n", entry.getKey(), entry.getValue());
+
+    @SuppressWarnings("java:S1452")
+    abstract Map<String, ? extends MenuOption> getMenuOptions();
+
+    public void printMenuOptions() {
+        for (var entry : getMenuOptions().entrySet()) {
+            log.info("[{}]: {}", entry.getKey(), entry.getValue().getOptionName());
         }
     }
-
-    public abstract Map<String, String> getMenuOptions();
 
     public abstract boolean executeCommand(String command);
 }

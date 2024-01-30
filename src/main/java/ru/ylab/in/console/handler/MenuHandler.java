@@ -1,6 +1,28 @@
 package ru.ylab.in.console.handler;
 
-public abstract class MenuHandler extends Handler {
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import ru.ylab.exception.BaseMonitoringServiceException;
+import ru.ylab.in.console.Menu;
 
-    public abstract void handleMenu();
+@Slf4j
+@RequiredArgsConstructor
+public class MenuHandler extends Handler {
+
+    private final Menu menu;
+
+    public void handleMenu() {
+        boolean finished = false;
+        while (!finished) {
+            menu.printMenuOptions();
+            var answer = SCANNER.nextLine();
+            try {
+                finished = menu.executeCommand(answer);
+            } catch (BaseMonitoringServiceException ex) {
+                log.info(ex.getMessage());
+            } catch (NullPointerException ex) {
+                log.info("Invalid command. Please try again.");
+            }
+        }
+    }
 }
