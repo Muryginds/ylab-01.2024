@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres:16.1
+    environment:
+      POSTGRES_DB: monitoring
+      POSTGRES_USER: secretUser
+      POSTGRES_PASSWORD: secretPassword
+      PGDATA: /data/postgres
+    volumes:
+        - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "--quiet" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 5
+        window: 60s
+
+volumes:
+  postgres:

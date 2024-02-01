@@ -1,0 +1,237 @@
+databaseChangeLog:
+  - changeSet:
+      id: MeterType-table
+      author: muryginds
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: meter_types_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: type_name
+                  type: VARCHAR(255)
+            tableName: meter_types
+  - changeSet:
+      id: User-table
+      author: muryginds
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: role
+                  type: VARCHAR(255)
+            tableName: users
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: users_name_unique_key
+            tableName: users
+  - changeSet:
+      id: Meter-table
+      author: muryginds
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: meters_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: factory_number
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: meter_type_id
+                  type: BIGINT
+            tableName: meters
+
+        - addForeignKeyConstraint:
+            baseColumnNames: meter_type_id
+            baseTableName: meters
+            constraintName: fkbrg922bkqn5m7212jsqjg6ioe
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: meter_types
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: meters
+            constraintName: fkhods8r8oyyx7tuj3c91ki2sk1
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: Submission-table
+      author: muryginds
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: submissions_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: date
+                  type: DATE
+            tableName: submissions
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: submissions
+            constraintName: fkbrg456bkqn5m3456jsqjg6ioe
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: submissions
+            validate: true
+  - changeSet:
+      id: MeterReading-table
+      author: muryginds
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: meter_readings_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: meter_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: value
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: submission_id
+                  type: BIGINT
+            tableName: meter_readings
+        - addForeignKeyConstraint:
+            baseColumnNames: meter_id
+            baseTableName: meter_readings
+            constraintName: fki7pp0331nbiwd2844kg78kfwb
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: meters
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: submission_id
+            baseTableName: meter_readings
+            constraintName: fkn2na60ukhs76ibtpt9burkm27
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: submissions
+            validate: true
+  - changeSet:
+      id: AuditionEvent-table
+      author: muryginds
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: audition_events_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: message
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: date
+                  type: DATE
+            tableName: audition_events
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: audition_events
+            constraintName: fkbrg234bkqn5m9342jsqjg6ioe
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true

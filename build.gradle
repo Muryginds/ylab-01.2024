@@ -27,25 +27,31 @@ ext {
     slf4NopVersion = '2.0.11'
     junitVersion = '5.9.1'
     mockitoCoreVersion = '5.10.0'
+    postgresqlVersion = '42.7.1'
+    liquibaseVersion = '4.25.1'
 }
 
 dependencies {
     implementation "org.apache.logging.log4j:log4j-api:${log4jApiVersion}"
     implementation "org.apache.logging.log4j:log4j-core:${log4jCoreVersion}"
     implementation "org.apache.logging.log4j:log4j-slf4j2-impl:${log4jSlf4j2ImplVersion}"
-
     implementation "com.password4j:password4j:${password4jVersion}"
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    implementation "org.postgresql:postgresql:${postgresqlVersion}"
+    implementation "org.liquibase:liquibase-core:${liquibaseVersion}"
+
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
+
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructProcessorVersion}"
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
 
-
     testImplementation platform("org.junit:junit-bom:${junitVersion}")
     testImplementation "org.junit.jupiter:junit-jupiter"
     testImplementation "org.mockito:mockito-core:${mockitoCoreVersion}"
+
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructProcessorVersion}"
     testAnnotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
