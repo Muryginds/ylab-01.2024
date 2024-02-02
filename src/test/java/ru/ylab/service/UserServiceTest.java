@@ -70,7 +70,7 @@ class UserServiceTest {
     void testAuthorize_whenExistingUser_thenReturnUserDTO() {
         UserAuthorizationRequestDTO requestDTO = new UserAuthorizationRequestDTO("testUser", "password");
         User user = User.builder().name("testUser").password("encodedPassword").build();
-        Mockito.when(userRepository.findUserByName(requestDTO.name())).thenReturn(Optional.of(user));
+        //Mockito.when(userRepository.findUserByName(requestDTO.name())).thenReturn(Optional.of(user));
         Mockito.when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(true);
 
         UserDTO result = userService.authorize(requestDTO);
@@ -93,7 +93,7 @@ class UserServiceTest {
     void testAuthorize_whenWrongPassword_throwUserAuthenticationException() {
         UserAuthorizationRequestDTO requestDTO = new UserAuthorizationRequestDTO("testUser", "wrongPassword");
         User user = User.builder().name("testUser").password("encodedPassword").build();
-        Mockito.when(userRepository.findUserByName(requestDTO.name())).thenReturn(Optional.of(user));
+        //Mockito.when(userRepository.findUserByName(requestDTO.name())).thenReturn(Optional.of(user));
         Mockito.when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(false);
 
         Assertions.assertThrows(UserAuthenticationException.class, () -> userService.authorize(requestDTO));
@@ -104,7 +104,7 @@ class UserServiceTest {
     void testLogout() {
         UserAuthorizationRequestDTO requestDTO = new UserAuthorizationRequestDTO("testUser", "password");
         User user = User.builder().name("testUser").password("password").build();
-        Mockito.when(userRepository.findUserByName(requestDTO.name())).thenReturn(Optional.of(user));
+        //Mockito.when(userRepository.findUserByName(requestDTO.name())).thenReturn(Optional.of(user));
         Mockito.when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(true);
 
         userService.authorize(requestDTO);
@@ -141,7 +141,7 @@ class UserServiceTest {
     void testGetCurrentUserDTO() {
         UserAuthorizationRequestDTO requestDTO = new UserAuthorizationRequestDTO("testUser", "password");
         User user = User.builder().name("testUser").password("password").build();
-        Mockito.when(userRepository.findUserByName(requestDTO.name())).thenReturn(Optional.of(user));
+        //Mockito.when(userRepository.findUserByName(requestDTO.name())).thenReturn(Optional.of(user));
         Mockito.when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(true);
 
         userService.authorize(requestDTO);
@@ -155,7 +155,7 @@ class UserServiceTest {
     void testGetUserById() {
         long userId = 1L;
         User user = User.builder().name("testUser").password("password").build();
-        Mockito.when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
+        //Mockito.when(userRepository.findUserById(userId)).thenReturn(Optional.of(user));
 
         User result = userService.getUserById(userId);
 

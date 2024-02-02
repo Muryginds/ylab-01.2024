@@ -63,7 +63,7 @@ class MeterServiceTest {
         long meterId = 1L;
         MeterType typeElectricity = MeterType.builder().typeName("Electricity").build();
         Meter meter = Meter.builder().id(meterId).factoryNumber("123456789012").type(typeElectricity).build();
-        Mockito.when(meterRepository.findById(meterId)).thenReturn(Optional.of(meter));
+        //Mockito.when(meterRepository.findById(meterId)).thenReturn(Optional.of(meter));
 
         Meter result = meterService.getById(meterId);
 
@@ -78,7 +78,7 @@ class MeterServiceTest {
         Meter meter1 = Meter.builder().factoryNumber("123456789012").type(typeElectricity).build();
         Meter meter2 = Meter.builder().factoryNumber("987654321098").type(typeGas).build();
         Set<Meter> meters = Set.of(meter1, meter2);
-        Mockito.when(meterRepository.getByUserId(userId)).thenReturn(meters);
+        //Mockito.when(meterRepository.getByUserId(userId)).thenReturn(meters);
 
         Collection<MeterDTO> result = meterService.getMeterDTOsByUserId(userId);
 
@@ -94,7 +94,7 @@ class MeterServiceTest {
         Meter meter1 = Meter.builder().factoryNumber("123456789012").type(typeElectricity).build();
         Meter meter2 = Meter.builder().factoryNumber("987654321098").type(typeGas).build();
         Set<Meter> meters = Set.of(meter1, meter2);
-        Mockito.when(meterRepository.getByUserId(userId)).thenReturn(meters);
+        //Mockito.when(meterRepository.getByUserId(userId)).thenReturn(meters);
 
         Collection<Meter> result = meterService.getMetersByUserId(userId);
 

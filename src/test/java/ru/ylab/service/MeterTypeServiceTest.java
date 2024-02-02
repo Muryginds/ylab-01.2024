@@ -59,7 +59,7 @@ class MeterTypeServiceTest {
     void testGetById_whenExistingType_thenReturnMeterTypeDTO() {
         long meterTypeId = 1L;
         MeterType meterType = MeterType.builder().id(meterTypeId).typeName("Electricity").build();
-        Mockito.when(meterTypeRepository.findById(meterTypeId)).thenReturn(java.util.Optional.of(meterType));
+        //Mockito.when(meterTypeRepository.findById(meterTypeId)).thenReturn(java.util.Optional.of(meterType));
 
         MeterTypeDTO result = meterTypeService.getById(meterTypeId);
 
@@ -80,7 +80,7 @@ class MeterTypeServiceTest {
         MeterType type1 = MeterType.builder().typeName("Electricity").build();
         MeterType type2 = MeterType.builder().typeName("Water").build();
         Collection<MeterType> types = java.util.List.of(type1, type2);
-        Mockito.when(meterTypeRepository.getAll()).thenReturn(types);
+        //Mockito.when(meterTypeRepository.getAll()).thenReturn(types);
 
         Collection<MeterType> result = meterTypeService.getAll();
 
