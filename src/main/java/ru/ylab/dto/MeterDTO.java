@@ -13,6 +13,6 @@ public record MeterDTO(
         Long id,
         String factoryNumber,
         UserDTO userDTO,
-        MeterTypeDTO typeDTO
+        MeterTypeDTO meterTypeDTO
 ) {
 }

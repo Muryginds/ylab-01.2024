@@ -2,12 +2,12 @@ package ru.ylab.service;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.MeterReading;
-import ru.ylab.entity.User;
 import ru.ylab.dto.MeterReadingDTO;
 import ru.ylab.mapper.MeterReadingMapper;
 import ru.ylab.repository.MeterReadingsRepository;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -18,16 +18,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class MeterReadingsService {
     private final MeterReadingsRepository meterReadingsRepository;
-
-    /**
-     * Retrieves meter readings associated with a specific user.
-     *
-     * @param user The user for whom meter readings are retrieved.
-     * @return Collection of MeterReading representing the user's meter readings.
-     */
-    public Collection<MeterReading> getByUser(User user) {
-        return meterReadingsRepository.getByUserId(user.getId());
-    }
+    private final SubmissionService submissionService;
+    private final MeterService meterService;
 
     /**
      * Retrieves all meter readings associated with a submission ID.
@@ -36,8 +28,15 @@ public class MeterReadingsService {
      * @return Set of MeterReadingDTO representing all readings associated with the submission.
      */
     public Set<MeterReadingDTO> getAllBySubmissionId(Long submissionId) {
-        var meterReadings = meterReadingsRepository.getAllBySubmissionId(submissionId);
-        return MeterReadingMapper.MAPPER.toMeterReadingDTOSet(meterReadings);
+        var submission = submissionService.getSubmissionById(submissionId);
+        var meterReadingModels = meterReadingsRepository.getAllBySubmissionId(submissionId);
+        var collection = new HashSet<MeterReading>();
+        for (var meterReadingModel : meterReadingModels) {
+            var meter = meterService.getById(meterReadingModel.meterId());
+            collection.add(MeterReadingMapper.MAPPER.toMeterReading(meterReadingModel, meter, submission));
+        }
+
+        return  MeterReadingMapper.MAPPER.toMeterReadingDTOSet(collection);
     }
 
     /**

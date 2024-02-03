@@ -11,6 +11,6 @@ public record UserModel(
         UserRole role) {
 
     public static class UserModelBuilder {
-        private final UserRole role = UserRole.USER;
+        private UserRole role = UserRole.USER;
     }
 }

@@ -9,13 +9,10 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public final class AuditionEvent {
-    private static Long counter = 1L;
-
+    private Long id;
+    private User user;
+    private AuditionEventType eventType;
+    private String message;
     @Builder.Default
-    private final Long id = counter++;
-    private final User user;
-    private final AuditionEventType type;
-    private final String message;
-    @Builder.Default
-    private final LocalDateTime date = LocalDateTime.now();
+    private LocalDateTime date = LocalDateTime.now();
 }

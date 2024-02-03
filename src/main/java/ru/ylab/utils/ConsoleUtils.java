@@ -21,7 +21,7 @@ public class ConsoleUtils {
         sb.append("Meter #'")
                 .append(meterReadingDTO.meterDTO().factoryNumber())
                 .append("' type:'")
-                .append(meterReadingDTO.meterDTO().typeDTO().typeName())
+                .append(meterReadingDTO.meterDTO().meterTypeDTO().typeName())
                 .append("' value:")
                 .append(meterReadingDTO.value())
                 .append("\n");

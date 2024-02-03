@@ -8,11 +8,8 @@ import java.time.LocalDate;
 @Builder
 @Data
 public final class Submission {
-    private static Long counter = 1L;
-
+    private Long id;
+    private User user;
     @Builder.Default
-    private final Long id = counter++;
-    private final User user;
-    @Builder.Default
-    private final LocalDate date = LocalDate.now();
+    private LocalDate date = LocalDate.now();
 }

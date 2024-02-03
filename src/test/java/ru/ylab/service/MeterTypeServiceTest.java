@@ -7,13 +7,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import ru.ylab.dto.MeterTypeDTO;
 import ru.ylab.entity.MeterType;
 import ru.ylab.exception.MeterTypeExistException;
 import ru.ylab.exception.MeterTypeNotFoundException;
-import ru.ylab.dto.MeterTypeDTO;
+import ru.ylab.mapper.MeterTypeMapper;
+import ru.ylab.model.MeterTypeModel;
 import ru.ylab.repository.MeterTypeRepository;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 class MeterTypeServiceTest {
 
@@ -58,31 +61,35 @@ class MeterTypeServiceTest {
     @Test
     void testGetById_whenExistingType_thenReturnMeterTypeDTO() {
         long meterTypeId = 1L;
-        MeterType meterType = MeterType.builder().id(meterTypeId).typeName("Electricity").build();
-        //Mockito.when(meterTypeRepository.findById(meterTypeId)).thenReturn(java.util.Optional.of(meterType));
+        var meterTypeModel = MeterTypeModel.builder().id(meterTypeId).typeName("Electricity").build();
+        Mockito.when(meterTypeRepository.findById(meterTypeId)).thenReturn(Optional.of(meterTypeModel));
 
-        MeterTypeDTO result = meterTypeService.getById(meterTypeId);
+        MeterTypeDTO result = meterTypeService.getMeterTypeDTOById(meterTypeId);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(meterType.getTypeName(), result.typeName());
+        Assertions.assertEquals(meterTypeModel.typeName(), result.typeName());
     }
 
     @Test
     void testGetById_whenNonExistingType_thenThrowMeterTypeNotFoundException() {
         long meterTypeId = 1L;
-        Mockito.when(meterTypeRepository.findById(meterTypeId)).thenReturn(java.util.Optional.empty());
+        Mockito.when(meterTypeRepository.findById(meterTypeId)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(MeterTypeNotFoundException.class, () -> meterTypeService.getById(meterTypeId));
+        Assertions.assertThrows(MeterTypeNotFoundException.class, () -> meterTypeService.getMeterTypeDTOById(meterTypeId));
     }
 
     @Test
     void testGetAll_whenTypesExist_thenReturnCollectionOfMeterTypes() {
-        MeterType type1 = MeterType.builder().typeName("Electricity").build();
-        MeterType type2 = MeterType.builder().typeName("Water").build();
-        Collection<MeterType> types = java.util.List.of(type1, type2);
-        //Mockito.when(meterTypeRepository.getAll()).thenReturn(types);
+        var typeModel1 = MeterTypeModel.builder().typeName("Electricity").build();
+        var typeModel2 = MeterTypeModel.builder().typeName("Water").build();
+        var types = List.of(
+                MeterTypeMapper.MAPPER.toMeterType(typeModel1),
+                MeterTypeMapper.MAPPER.toMeterType(typeModel2)
+        );
+        var typeModels = List.of(typeModel1, typeModel2);
+        Mockito.when(meterTypeRepository.getAll()).thenReturn(typeModels);
 
-        Collection<MeterType> result = meterTypeService.getAll();
+        var result = meterTypeService.getAll();
 
         Assertions.assertEquals(types, result);
     }

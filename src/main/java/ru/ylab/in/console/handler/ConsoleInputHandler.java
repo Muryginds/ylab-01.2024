@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ConsoleInputHandler extends Handler {
     public static final String INPUT_MUST_BE_NUMBER = "Input must be number";
+
     private final UserController userController;
     private final MeterTypeController meterTypeController;
     private final SubmissionController submissionController;
@@ -145,7 +146,7 @@ public class ConsoleInputHandler extends Handler {
         for (var readingDTO : meterReadingDTOs) {
             log.info(
                     "Enter meter value for '{}' meter #'{}'",
-                    readingDTO.meterDTO().typeDTO().typeName(),
+                    readingDTO.meterDTO().meterTypeDTO().typeName(),
                     readingDTO.meterDTO().factoryNumber()
             );
             var value = -1L;

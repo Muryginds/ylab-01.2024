@@ -3,7 +3,6 @@ package ru.ylab.controller;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.dto.SubmissionDTO;
 import ru.ylab.dto.request.SubmissionByDateRequestDTO;
-import ru.ylab.dto.request.SubmissionRequestDTO;
 import ru.ylab.service.SubmissionService;
 
 import java.util.Collection;
@@ -20,15 +19,6 @@ public class SubmissionController {
      * The associated service for submission-related operations.
      */
     private final SubmissionService submissionService;
-
-    /**
-     * Saves a new submission based on the provided submission request.
-     *
-     * @param request The submission request containing meter readings.
-     */
-    public void save(SubmissionRequestDTO request) {
-        submissionService.save(request);
-    }
 
     /**
      * Retrieves all submissions for a user with the specified ID.

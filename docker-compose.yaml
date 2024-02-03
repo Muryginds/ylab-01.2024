@@ -2,7 +2,7 @@ version: "3.8"
 services:
 
   postgres:
-    container_name: postgres
+    container_name: postgres_m
     image: postgres:16.1
     environment:
       POSTGRES_DB: monitoring

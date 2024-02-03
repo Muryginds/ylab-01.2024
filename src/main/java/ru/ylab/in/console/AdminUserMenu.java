@@ -22,7 +22,7 @@ import static ru.ylab.in.console.AdminUserMenu.MenuAction.*;
 @RequiredArgsConstructor
 public class AdminUserMenu extends Menu {
     private static final Map<String, MenuAction> ACTIONS = generateActions();
-    private final UserController userController;
+    private final LoginController loginController;
     private final SubmissionController submissionController;
     private final MeterReadingsController meterReadingsController;
     private final AuditionEventController auditionEventController;
@@ -69,7 +69,7 @@ public class AdminUserMenu extends Menu {
         var userId = consoleInputHandler.handleUserId();
         var events = auditionEventController.getEventsByUserId(userId);
         events.forEach(e -> log.info("User: #'{}' event: '{}' date: '{} message: '{}'",
-                e.userDTO().id(), e.type().name(), e.date(), e.message()));
+                e.userDTO().id(), e.eventType().name(), e.date(), e.message()));
         return false;
     }
 
@@ -98,7 +98,7 @@ public class AdminUserMenu extends Menu {
     }
 
     private boolean logout() {
-        userController.logout();
+        loginController.logout();
         return true;
     }
 

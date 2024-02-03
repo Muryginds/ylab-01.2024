@@ -10,6 +10,6 @@ public record SubmissionModel(
         Long userId,
         LocalDate date) {
     public static class SubmissionModelBuilder {
-        private final LocalDate date = LocalDate.now();
+        private LocalDate date = LocalDate.now();
     }
 }

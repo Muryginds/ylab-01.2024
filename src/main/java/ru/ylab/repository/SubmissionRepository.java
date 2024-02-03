@@ -1,6 +1,7 @@
 package ru.ylab.repository;
 
 import ru.ylab.entity.Submission;
+import ru.ylab.model.SubmissionModel;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -15,9 +16,11 @@ public interface SubmissionRepository {
      * Gets all submissions associated with a specific user ID.
      *
      * @param userId The ID of the user.
-     * @return A collection of submissions for the specified user.
+     * @return A collection of submission models for the specified user.
      */
-    Collection<Submission> getByUserId(Long userId);
+    Collection<SubmissionModel> getByUserId(Long userId);
+
+    Optional<SubmissionModel> getById(Long submissionId);
 
     /**
      * Saves a submission in the repository.
@@ -40,15 +43,15 @@ public interface SubmissionRepository {
      *
      * @param userId The ID of the user.
      * @param date   The date of the submission.
-     * @return An optional containing the found submission or empty if not found.
+     * @return An optional containing the found submission model or empty if not found.
      */
-    Optional<Submission> findByUserIdAndDate(Long userId, LocalDate date);
+    Optional<SubmissionModel> findSubmissionByUserIdAndDate(Long userId, LocalDate date);
 
     /**
      * Finds the last submission by user ID in the repository.
      *
      * @param userId The ID of the user.
-     * @return An optional containing the last found submission or empty if not found.
+     * @return An optional containing the last found submission model or empty if not found.
      */
-    Optional<Submission> findLastByUserId(Long userId);
+    Optional<SubmissionModel> findLastSubmissionByUserId(Long userId);
 }

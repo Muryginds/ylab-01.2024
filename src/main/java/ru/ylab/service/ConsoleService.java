@@ -1,10 +1,9 @@
 package ru.ylab.service;
 
 import ru.ylab.controller.*;
-import ru.ylab.in.console.EntranceMenu;
 import ru.ylab.in.console.handler.ConsoleInputHandler;
-import ru.ylab.in.console.handler.MenuHandler;
-import ru.ylab.in.console.handler.UserMenuHandlerFactory;
+import ru.ylab.in.console.handler.MenuHandlerFactory;
+import ru.ylab.repository.MeterTypeRepository;
 import ru.ylab.repository.impl.*;
 import ru.ylab.security.Password4jPasswordEncoder;
 
@@ -13,33 +12,42 @@ import ru.ylab.security.Password4jPasswordEncoder;
  * It manages various controllers, handlers, and repositories to facilitate user interactions.
  */
 public class ConsoleService {
-    private final InMemoryMeterTypeRepository inMemoryMeterTypeRepository = new InMemoryMeterTypeRepository();
+    private final MeterTypeRepository meterTypeRepository = new JdbcMeterTypeRepository();
+    private final UserService userService = new UserService(new JdbcUserRepository());
     private final AuditionEventService auditionEventService =
-            new AuditionEventService(new InMemoryAuditionEventRepository());
+            new AuditionEventService(new JdbcAuditionEventRepository(), userService);
+    private final MeterTypeService meterTypeService =
+            new MeterTypeService(meterTypeRepository, auditionEventService, userService);
     private final MeterService meterService =
-            new MeterService(new InMemoryMeterRepository(), inMemoryMeterTypeRepository);
-    private final UserService userService = new UserService(
-            new InMemoryUserRepository(),
+            new MeterService(new JdbcMeterRepository(), meterTypeService, userService);
+    private final LoginService loginService = new LoginService(
+            userService,
             new Password4jPasswordEncoder(),
             auditionEventService,
-            meterService);
-    private final MeterTypeService meterTypeService =
-            new MeterTypeService(inMemoryMeterTypeRepository, auditionEventService, userService);
-    private final MeterReadingsService meterReadingsService =
-            new MeterReadingsService(new InMemoryMeterReadingsRepository());
+            meterService
+    );
     private final SubmissionService submissionService = new SubmissionService(
-            new InMemorySubmissionRepository(), meterReadingsService, meterService, userService, auditionEventService);
+            new JdbcSubmissionRepository(), userService, auditionEventService);
+    private final MeterReadingsService meterReadingsService =
+            new MeterReadingsService(new JdbcMeterReadingsRepository(), submissionService, meterService);
+    private final ReadingsRecordingService readingsRecordingService = new ReadingsRecordingService(
+            meterReadingsService, meterService, submissionService, userService, auditionEventService);
+    private final LoginController loginController = new LoginController(loginService);
     private final UserController userController = new UserController(userService);
     private final SubmissionController submissionController = new SubmissionController(submissionService);
+    private final ReadingsRecordingController readingsRecordingController =
+            new ReadingsRecordingController(readingsRecordingService);
     private final MeterReadingsController meterReadingsController = new MeterReadingsController(meterReadingsService);
     private final MeterTypeController meterTypeController = new MeterTypeController(meterTypeService);
     private final MeterController meterController = new MeterController(meterService);
     private final AuditionEventController auditionEventController = new AuditionEventController(auditionEventService);
     private final ConsoleInputHandler consoleInputHandler = new ConsoleInputHandler(
             userController, meterTypeController, submissionController, meterReadingsController, meterController);
-    private final UserMenuHandlerFactory userMenuHandlerFactory = new UserMenuHandlerFactory(
+    private final MenuHandlerFactory menuHandlerFactory = new MenuHandlerFactory(
             userController,
+            loginController,
             submissionController,
+            readingsRecordingController,
             meterReadingsController,
             auditionEventController,
             meterTypeController,
@@ -51,12 +59,7 @@ public class ConsoleService {
      * and orchestrates the flow of the console-based application.
      */
     public void run() {
-        var entranceMenuHandler = new MenuHandler(
-                new EntranceMenu(
-                        consoleInputHandler,
-                        userController,
-                        userMenuHandlerFactory
-                ));
-        entranceMenuHandler.handleMenu();
+        var menuHandler = menuHandlerFactory.getMenuHandler();
+        menuHandler.handleMenu();
     }
 }

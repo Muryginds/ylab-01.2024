@@ -1,6 +1,7 @@
 package ru.ylab.repository;
 
 import ru.ylab.entity.Meter;
+import ru.ylab.model.MeterModel;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -15,9 +16,9 @@ public interface MeterRepository {
      * Gets all meters associated with a specific user.
      *
      * @param userId The ID of the user.
-     * @return A set of meters associated with the specified user.
+     * @return A set of meter models associated with the specified user.
      */
-    Set<Meter> getByUserId(Long userId);
+    Set<MeterModel> getByUserId(Long userId);
 
     /**
      * Saves a single meter in the repository.
@@ -34,10 +35,10 @@ public interface MeterRepository {
     void save(Collection<Meter> meters);
 
     /**
-     * Finds a meter by its ID in the repository.
+     * Finds a meter model by its ID in the repository.
      *
      * @param meterId The ID of the meter.
-     * @return An optional containing the found meter or empty if not found.
+     * @return An optional containing the found meter model or empty if not found.
      */
-    Optional<Meter> findById(Long meterId);
+    Optional<MeterModel> findById(Long meterId);
 }

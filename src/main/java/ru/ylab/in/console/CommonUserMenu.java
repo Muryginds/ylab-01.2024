@@ -2,9 +2,7 @@ package ru.ylab.in.console;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.ylab.controller.MeterReadingsController;
-import ru.ylab.controller.SubmissionController;
-import ru.ylab.controller.UserController;
+import ru.ylab.controller.*;
 import ru.ylab.dto.request.SubmissionByDateRequestDTO;
 import ru.ylab.in.console.handler.ConsoleInputHandler;
 import ru.ylab.utils.ConsoleUtils;
@@ -24,7 +22,9 @@ import static ru.ylab.in.console.CommonUserMenu.MenuAction.*;
 public class CommonUserMenu extends Menu {
     private static final Map<String, MenuAction> ACTIONS = generateActions();
     private final UserController userController;
+    private final LoginController loginController;
     private final SubmissionController submissionController;
+    private final ReadingsRecordingController readingsRecordingController;
     private final MeterReadingsController meterReadingsController;
     private final ConsoleInputHandler consoleInputHandler;
 
@@ -73,7 +73,7 @@ public class CommonUserMenu extends Menu {
     }
 
     private boolean logout() {
-        userController.logout();
+        loginController.logout();
         return true;
     }
 
@@ -94,7 +94,7 @@ public class CommonUserMenu extends Menu {
     }
 
     private boolean submitReadings() {
-        submissionController.save(consoleInputHandler.handleSubmission());
+        readingsRecordingController.saveNewSubmission(consoleInputHandler.handleSubmission());
         return false;
     }
 

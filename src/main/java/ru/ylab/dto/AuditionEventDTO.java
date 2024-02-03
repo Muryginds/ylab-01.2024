@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public record AuditionEventDTO(
         Long id,
         UserDTO userDTO,
-        AuditionEventType type,
+        AuditionEventType eventType,
         String message,
         LocalDateTime date
 ) {

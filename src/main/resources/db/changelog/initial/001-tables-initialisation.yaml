@@ -140,7 +140,7 @@ databaseChangeLog:
             onDelete: NO ACTION
             onUpdate: NO ACTION
             referencedColumnNames: id
-            referencedTableName: submissions
+            referencedTableName: users
             validate: true
   - changeSet:
       id: MeterReading-table
@@ -213,6 +213,11 @@ databaseChangeLog:
                     nullable: false
                   name: user_id
                   type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: event_type
+                  type: VARCHAR(255)
               - column:
                   constraints:
                     nullable: false

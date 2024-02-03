@@ -7,5 +7,5 @@ public record MeterModel (
         Long id,
         String factoryNumber,
         Long userId,
-        Long typeId) {
+        Long meterTypeId) {
 }

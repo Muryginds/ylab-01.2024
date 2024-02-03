@@ -9,6 +9,6 @@ public record MeterReadingModel(
         Long meterId,
         Long value) {
     public static class MeterReadingModelBuilder {
-        private final Long value = 0L;
+        private Long value = 0L;
     }
 }

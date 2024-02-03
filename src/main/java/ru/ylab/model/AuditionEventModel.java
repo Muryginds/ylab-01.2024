@@ -1,6 +1,7 @@
 package ru.ylab.model;
 
 import lombok.Builder;
+import ru.ylab.enumerated.AuditionEventType;
 
 import java.time.LocalDateTime;
 
@@ -8,11 +9,11 @@ import java.time.LocalDateTime;
 public record AuditionEventModel (
         Long id,
         Long userId,
-        Long typeId,
+        AuditionEventType eventType,
         String message,
         LocalDateTime date
 ) {
     public static class SubmissionModelBuilder {
-        private final LocalDateTime date = LocalDateTime.now();
+        private LocalDateTime date = LocalDateTime.now();
     }
 }
