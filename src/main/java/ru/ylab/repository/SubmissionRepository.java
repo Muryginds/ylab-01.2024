@@ -20,6 +20,12 @@ public interface SubmissionRepository {
      */
     Collection<SubmissionModel> getByUserId(Long userId);
 
+    /**
+     * Finds a submission by submission ID in the repository.
+     *
+     * @param submissionId The ID of submission.
+     * @return An optional containing the found submission model or empty if not found.
+     */
     Optional<SubmissionModel> getById(Long submissionId);
 
     /**
