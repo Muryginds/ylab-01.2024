@@ -1,26 +1,29 @@
 package ru.ylab.repository.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.MeterType;
 import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.MeterTypeModel;
 import ru.ylab.repository.MeterTypeRepository;
-import ru.ylab.utils.DbConnectionUtils;
+import ru.ylab.utils.DbConnectionFactory;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 
-@Slf4j
+@RequiredArgsConstructor
 public class JdbcMeterTypeRepository implements MeterTypeRepository {
+    private final DbConnectionFactory dbConnectionFactory;
 
     @Override
     public void save(MeterType meterType) {
         var insertQuery = "INSERT INTO private.meter_types (id, type_name) " +
                 "VALUES (nextval('private.meter_types_id_seq'), ?)";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery)) {
 
             preparedStatement.setString(1, meterType.getTypeName());
@@ -36,7 +39,7 @@ public class JdbcMeterTypeRepository implements MeterTypeRepository {
         var insertQuery = "INSERT INTO private.meter_types (id, type_name) " +
                 "VALUES (nextval('private.meter_types_id_seq'), ?)";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery)) {
 
             for (var meterType : meterTypes) {
@@ -55,7 +58,7 @@ public class JdbcMeterTypeRepository implements MeterTypeRepository {
     public Optional<MeterTypeModel> findById(Long meterTypeId) {
         String selectQuery = "SELECT * FROM private.meter_types WHERE id = ?";
 
-        try (Connection connection = DbConnectionUtils.getConnection();
+        try (Connection connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, meterTypeId);
@@ -78,7 +81,7 @@ public class JdbcMeterTypeRepository implements MeterTypeRepository {
     public boolean checkExistsByName(String typeName) {
         String selectQuery = "SELECT COUNT(*) FROM private.meter_types WHERE type_name = ?";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setString(1, typeName);
@@ -101,7 +104,7 @@ public class JdbcMeterTypeRepository implements MeterTypeRepository {
         var selectQuery = "SELECT * FROM private.meter_types";
         var meterTypes = new HashSet<MeterTypeModel>();
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             try (var resultSet = preparedStatement.executeQuery()) {

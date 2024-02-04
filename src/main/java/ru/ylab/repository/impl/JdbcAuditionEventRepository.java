@@ -1,26 +1,27 @@
 package ru.ylab.repository.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.AuditionEvent;
 import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.AuditionEventModel;
 import ru.ylab.repository.AuditionEventRepository;
-import ru.ylab.utils.DbConnectionUtils;
+import ru.ylab.utils.DbConnectionFactory;
 
 import java.sql.*;
 import java.util.Collection;
 import java.util.HashSet;
 
-@Slf4j
+@RequiredArgsConstructor
 public class JdbcAuditionEventRepository implements AuditionEventRepository {
+    private final DbConnectionFactory dbConnectionFactory;
 
     @Override
     public Collection<AuditionEventModel> getEventsByUserId(Long userId) {
         var selectQuery = "SELECT * FROM private.audition_events WHERE user_id = ?";
         var auditionEventModels = new HashSet<AuditionEventModel>();
 
-        try (Connection connection = DbConnectionUtils.getConnection();
+        try (Connection connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, userId);
@@ -43,7 +44,7 @@ public class JdbcAuditionEventRepository implements AuditionEventRepository {
         String insertQuery = "INSERT INTO private.audition_events (id, user_id, event_type, message, date) " +
                 "VALUES (nextval('private.audition_events_id_seq'), ?, ?, ?, ?)";
 
-        try (Connection connection = DbConnectionUtils.getConnection();
+        try (Connection connection = dbConnectionFactory.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
 
             preparedStatement.setLong(1, auditionEvent.getUser().getId());

@@ -1,27 +1,31 @@
 package ru.ylab.repository.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.Submission;
 import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.SubmissionModel;
 import ru.ylab.repository.SubmissionRepository;
-import ru.ylab.utils.DbConnectionUtils;
+import ru.ylab.utils.DbConnectionFactory;
 
-import java.sql.*;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 
-@Slf4j
+@RequiredArgsConstructor
 public class JdbcSubmissionRepository implements SubmissionRepository {
+    private final DbConnectionFactory dbConnectionFactory;
 
     @Override
     public Collection<SubmissionModel> getByUserId(Long userId) {
         var selectQuery = "SELECT * FROM private.submissions WHERE user_id = ?";
         var submissionModels = new HashSet<SubmissionModel>();
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, userId);
@@ -43,7 +47,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
     public Optional<SubmissionModel> getById(Long submissionId) {
         var selectQuery = "SELECT * FROM private.submissions WHERE id = ?";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, submissionId);
@@ -65,7 +69,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
         var insertQuery = "INSERT INTO private.submissions (id, user_id, date) " +
                 "VALUES (nextval('private.submissions_id_seq'), ?, ?) RETURNING id";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setLong(1, submission.getUser().getId());
@@ -87,7 +91,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
     public boolean checkExistsByUserIdAndDate(Long userId, LocalDate date) {
         var selectQuery = "SELECT COUNT(*) FROM private.submissions WHERE user_id = ? AND date = ?";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, userId);
@@ -110,7 +114,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
     public Optional<SubmissionModel> findSubmissionByUserIdAndDate(Long userId, LocalDate date) {
         var selectQuery = "SELECT * FROM private.submissions WHERE user_id = ? " +
                 "AND EXTRACT(MONTH FROM date) = ? AND EXTRACT(YEAR FROM date) = ?";
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, userId);
@@ -135,7 +139,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
     public Optional<SubmissionModel> findLastSubmissionByUserId(Long userId) {
         var selectQuery = "SELECT * FROM private.submissions WHERE user_id = ? ORDER BY date DESC LIMIT 1";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, userId);

@@ -29,6 +29,7 @@ ext {
     mockitoCoreVersion = '5.10.0'
     postgresqlVersion = '42.7.1'
     liquibaseVersion = '4.25.1'
+    testContainersPostgresVersion = '1.19.4'
 }
 
 dependencies {
@@ -49,6 +50,7 @@ dependencies {
     testImplementation platform("org.junit:junit-bom:${junitVersion}")
     testImplementation "org.junit.jupiter:junit-jupiter"
     testImplementation "org.mockito:mockito-core:${mockitoCoreVersion}"
+    testImplementation "org.testcontainers:postgresql:${testContainersPostgresVersion}"
 
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
 

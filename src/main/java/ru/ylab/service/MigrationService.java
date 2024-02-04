@@ -8,8 +8,9 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
+import lombok.RequiredArgsConstructor;
 import ru.ylab.exception.MigrationException;
-import ru.ylab.utils.DbConnectionUtils;
+import ru.ylab.utils.DbConnectionFactory;
 import ru.ylab.utils.PropertiesUtils;
 
 import java.sql.Connection;
@@ -18,14 +19,16 @@ import java.util.Properties;
 
 import static ru.ylab.utils.PropertiesUtils.PropertiesType.MIGRATIONS;
 
+@RequiredArgsConstructor
 public class MigrationService {
     private static final Properties migrationProperties = PropertiesUtils.getProperties(MIGRATIONS);
+    private final DbConnectionFactory dbConnectionFactory;
 
     public void updateMigrations() {
 
         var changelogFilePath = migrationProperties.getProperty("changeLogFile");
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var serviceSchemaCreatingPreparedStatement =
                      connection.prepareStatement("CREATE SCHEMA IF NOT EXISTS service");
              var privateSchemaCreatingPreparedStatement =

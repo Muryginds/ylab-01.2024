@@ -1,10 +1,11 @@
 package ru.ylab.repository.impl;
 
+import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.Meter;
 import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.MeterModel;
 import ru.ylab.repository.MeterRepository;
-import ru.ylab.utils.DbConnectionUtils;
+import ru.ylab.utils.DbConnectionFactory;
 
 import java.sql.*;
 import java.util.Collection;
@@ -12,14 +13,16 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+@RequiredArgsConstructor
 public class JdbcMeterRepository implements MeterRepository {
+    private final DbConnectionFactory dbConnectionFactory;
 
     @Override
     public Set<MeterModel> getByUserId(Long userId) {
         var selectQuery = "SELECT * FROM private.meters WHERE user_id = ?";
         var meterModels = new HashSet<MeterModel>();
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, userId);
@@ -44,7 +47,7 @@ public class JdbcMeterRepository implements MeterRepository {
                 "INSERT INTO private.meters (id, factory_number, user_id, meter_type_id) " +
                         "VALUES (nextval('private.meter_types_id_seq'), ?, ?, ?)";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery)) {
 
             preparedStatement.setString(1, meter.getFactoryNumber());
@@ -63,7 +66,7 @@ public class JdbcMeterRepository implements MeterRepository {
                 "INSERT INTO private.meters (id, factory_number, user_id, meter_type_id) " +
                         "VALUES (nextval('private.meter_types_id_seq'), ?, ?, ?)";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery)) {
 
             for (var meter : meters) {
@@ -84,7 +87,7 @@ public class JdbcMeterRepository implements MeterRepository {
     public Optional<MeterModel> findById(Long meterId) {
         var selectQuery = "SELECT * FROM private.meters WHERE id = ?";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, meterId);

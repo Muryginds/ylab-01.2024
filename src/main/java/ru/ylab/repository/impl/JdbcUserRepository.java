@@ -1,26 +1,27 @@
 package ru.ylab.repository.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.User;
 import ru.ylab.enumerated.UserRole;
 import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.UserModel;
 import ru.ylab.repository.UserRepository;
-import ru.ylab.utils.DbConnectionUtils;
+import ru.ylab.utils.DbConnectionFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
 
-@Slf4j
+@RequiredArgsConstructor
 public class JdbcUserRepository implements UserRepository {
+    private final DbConnectionFactory dbConnectionFactory;
 
     @Override
     public boolean checkUserExistsByName(String username) {
         var selectQuery = "SELECT COUNT(*) FROM private.users WHERE name = ?";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setString(1, username);
@@ -41,7 +42,7 @@ public class JdbcUserRepository implements UserRepository {
     public boolean checkUserExistsById(Long userId) {
         var selectQuery = "SELECT COUNT(*) FROM private.users WHERE id = ?";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, userId);
@@ -64,7 +65,7 @@ public class JdbcUserRepository implements UserRepository {
         var insertQuery = "INSERT INTO private.users (id, name, password, role) " +
                 "VALUES (nextval('private.users_id_seq'), ?, ?, ?) RETURNING id";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, user.getName());
@@ -87,7 +88,7 @@ public class JdbcUserRepository implements UserRepository {
     public Optional<UserModel> findUserByName(String name) {
         var selectQuery = "SELECT * FROM private.users WHERE name = ?";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setString(1, name);
@@ -110,7 +111,7 @@ public class JdbcUserRepository implements UserRepository {
     public Optional<UserModel> findUserById(Long userId) {
         var selectQuery = "SELECT * FROM private.users WHERE id = ?";
 
-        try (var connection = DbConnectionUtils.getConnection();
+        try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setLong(1, userId);
