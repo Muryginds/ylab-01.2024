@@ -3,8 +3,11 @@ package ru.ylab.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import ru.ylab.entity.Meter;
 import ru.ylab.entity.MeterReading;
-import ru.ylab.in.dto.MeterReadingDTO;
+import ru.ylab.dto.MeterReadingDTO;
+import ru.ylab.entity.Submission;
+import ru.ylab.model.MeterReadingModel;
 
 import java.util.Set;
 
@@ -17,4 +20,11 @@ public interface MeterReadingMapper {
     MeterReadingDTO toMeterReadingDTO(MeterReading meterReading);
 
     Set<MeterReadingDTO> toMeterReadingDTOSet(Set<MeterReading> meterReadings);
+
+    @Mapping(target = "id", source = "meterReadingModel.id")
+    MeterReading toMeterReading(MeterReadingModel meterReadingModel, Meter meter, Submission submission);
+
+    @Mapping(target = "submissionId", source = "meterReading.submission.id")
+    @Mapping(target = "meterId", source = "meterReading.meter.id")
+    MeterReadingModel toMeterReadingModel(MeterReading meterReading);
 }

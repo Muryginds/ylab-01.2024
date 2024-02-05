@@ -9,13 +9,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import ru.ylab.entity.Meter;
 import ru.ylab.entity.MeterType;
-import ru.ylab.in.dto.MeterDTO;
+import ru.ylab.entity.User;
 import ru.ylab.mapper.MeterMapper;
 import ru.ylab.repository.MeterRepository;
-import ru.ylab.repository.MeterTypeRepository;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -25,7 +23,10 @@ class MeterServiceTest {
     private MeterRepository meterRepository;
 
     @Mock
-    private MeterTypeRepository meterTypeRepository;
+    private MeterTypeService meterTypeService;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private MeterService meterService;
@@ -37,8 +38,8 @@ class MeterServiceTest {
 
     @Test
     void testSaveMeter_whenCorrect_thenDoNothing() {
-        MeterType typeElectricity = MeterType.builder().typeName("Electricity").build();
-        Meter meter = Meter.builder().factoryNumber("123456789012").type(typeElectricity).build();
+        var typeElectricity = MeterType.builder().typeName("Electricity").build();
+        var meter = Meter.builder().factoryNumber("123456789012").meterType(typeElectricity).build();
 
         meterService.save(meter);
 
@@ -47,11 +48,11 @@ class MeterServiceTest {
 
     @Test
     void testSaveMeter_whenCorrectInCollection_thenDoNothing() {
-        MeterType typeElectricity = MeterType.builder().typeName("Electricity").build();
-        MeterType typeGas = MeterType.builder().typeName("Gas").build();
-        Meter meter1 = Meter.builder().factoryNumber("123456789012").type(typeElectricity).build();
-        Meter meter2 = Meter.builder().factoryNumber("987654321098").type(typeGas).build();
-        Collection<Meter> meters = Arrays.asList(meter1, meter2);
+        var typeElectricity = MeterType.builder().typeName("Electricity").build();
+        var typeGas = MeterType.builder().typeName("Gas").build();
+        var meter1 = Meter.builder().factoryNumber("123456789012").meterType(typeElectricity).build();
+        var meter2 = Meter.builder().factoryNumber("987654321098").meterType(typeGas).build();
+        var meters = Arrays.asList(meter1, meter2);
 
         meterService.save(meters);
 
@@ -59,45 +60,59 @@ class MeterServiceTest {
     }
 
     @Test
-    void testGetMeterById_whenCorrect_thenReturnMeter() {
-        long meterId = 1L;
-        MeterType typeElectricity = MeterType.builder().typeName("Electricity").build();
-        Meter meter = Meter.builder().id(meterId).factoryNumber("123456789012").type(typeElectricity).build();
-        Mockito.when(meterRepository.findById(meterId)).thenReturn(Optional.of(meter));
+    void testGetById_whenCorrect_thenReturnMeter() {
+        var meterId = 1L;
+        var expectedMeter = Meter.builder().id(meterId).factoryNumber("123456789012").build();
+        var meterModel = MeterMapper.MAPPER.toMeterModel(expectedMeter);
+        Mockito.when(meterRepository.findById(meterId)).thenReturn(Optional.of(meterModel));
 
         Meter result = meterService.getById(meterId);
 
-        Assertions.assertEquals(meter, result);
+        Assertions.assertEquals(expectedMeter.getId(), result.getId());
     }
 
     @Test
     void testGetMeterDTOsByUserId_whenCorrect_thenReturnCollectionOfMeterDTOs() {
-        long userId = 1L;
-        MeterType typeElectricity = MeterType.builder().typeName("Electricity").build();
-        MeterType typeGas = MeterType.builder().typeName("Gas").build();
-        Meter meter1 = Meter.builder().factoryNumber("123456789012").type(typeElectricity).build();
-        Meter meter2 = Meter.builder().factoryNumber("987654321098").type(typeGas).build();
-        Set<Meter> meters = Set.of(meter1, meter2);
-        Mockito.when(meterRepository.getByUserId(userId)).thenReturn(meters);
+        var userId = 1L;
+        var meter1 = Meter.builder().factoryNumber("123456789012").build();
+        var meter2 = Meter.builder().factoryNumber("987654321098").build();
+        var meterModels = Set.of(
+                MeterMapper.MAPPER.toMeterModel(meter1),
+                MeterMapper.MAPPER.toMeterModel(meter2)
+        );
+        var meterDTOs = Set.of(
+                MeterMapper.MAPPER.toMeterDTO(meter1),
+                MeterMapper.MAPPER.toMeterDTO(meter2)
+        );
+        Mockito.when(meterRepository.getByUserId(userId)).thenReturn(meterModels);
 
-        Collection<MeterDTO> result = meterService.getMeterDTOsByUserId(userId);
+        var result = meterService.getMeterDTOsByUserId(userId);
 
-        Collection<MeterDTO> expected = MeterMapper.MAPPER.toMeterDTOs(meters);
-        Assertions.assertEquals(expected, result);
+        Assertions.assertTrue(result.containsAll(meterDTOs));
+        Assertions.assertEquals(result.size(), meterDTOs.size());
     }
 
     @Test
     void testGetMetersByUserId_whenCorrect_thenReturnCollectionOfMeters() {
         long userId = 1L;
-        MeterType typeElectricity = MeterType.builder().typeName("Electricity").build();
-        MeterType typeGas = MeterType.builder().typeName("Gas").build();
-        Meter meter1 = Meter.builder().factoryNumber("123456789012").type(typeElectricity).build();
-        Meter meter2 = Meter.builder().factoryNumber("987654321098").type(typeGas).build();
-        Set<Meter> meters = Set.of(meter1, meter2);
-        Mockito.when(meterRepository.getByUserId(userId)).thenReturn(meters);
+        var user = User.builder().id(userId).name("user").build();
+        var typeElectricity = MeterType.builder().id(1L).typeName("Electricity").build();
+        var typeGas = MeterType.builder().id(2L).typeName("Gas").build();
+        var meter1 = Meter.builder().id(1L).user(user).factoryNumber("123456789012").meterType(typeElectricity).build();
+        var meter2 = Meter.builder().id(2L).user(user).factoryNumber("987654321098").meterType(typeGas).build();
+        var meterModels = Set.of(
+                MeterMapper.MAPPER.toMeterModel(meter1),
+                MeterMapper.MAPPER.toMeterModel(meter2)
+        );
+        var expectedMeters = Set.of(meter1, meter2);
+        Mockito.when(userService.getUserById(userId)).thenReturn(user);
+        Mockito.when(meterTypeService.getMeterTypeById(1L)).thenReturn(typeElectricity);
+        Mockito.when(meterTypeService.getMeterTypeById(2L)).thenReturn(typeGas);
+        Mockito.when(meterRepository.getByUserId(userId)).thenReturn(meterModels);
 
-        Collection<Meter> result = meterService.getMetersByUserId(userId);
+        var result = meterService.getMetersByUserId(userId);
 
-        Assertions.assertEquals(meters, result);
+        Assertions.assertTrue(result.containsAll(expectedMeters));
+        Assertions.assertEquals(result.size(), expectedMeters.size());
     }
 }

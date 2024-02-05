@@ -1,6 +1,7 @@
 package ru.ylab.repository;
 
 import ru.ylab.entity.MeterType;
+import ru.ylab.model.MeterTypeModel;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -25,12 +26,12 @@ public interface MeterTypeRepository {
     void save(Collection<MeterType> meterTypes);
 
     /**
-     * Finds a meter type by its ID in the repository.
+     * Finds a meter type model by its ID in the repository.
      *
      * @param meterTypeId The ID of the meter type.
-     * @return An optional containing the found meter type or empty if not found.
+     * @return An optional containing the found meter type model or empty if not found.
      */
-    Optional<MeterType> findById(Long meterTypeId);
+    Optional<MeterTypeModel> findById(Long meterTypeId);
 
     /**
      * Checks if a meter type with a given name exists in the repository.
@@ -43,7 +44,7 @@ public interface MeterTypeRepository {
     /**
      * Gets all meter types stored in the repository.
      *
-     * @return A collection of all meter types.
+     * @return A collection of all meter type models.
      */
-    Collection<MeterType> getAll();
+    Collection<MeterTypeModel> getAll();
 }

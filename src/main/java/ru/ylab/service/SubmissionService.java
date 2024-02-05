@@ -1,26 +1,21 @@
 package ru.ylab.service;
 
 import lombok.RequiredArgsConstructor;
+import ru.ylab.dto.SubmissionDTO;
+import ru.ylab.dto.request.SubmissionByDateRequestDTO;
 import ru.ylab.entity.AuditionEvent;
-import ru.ylab.entity.Meter;
-import ru.ylab.entity.MeterReading;
 import ru.ylab.entity.Submission;
 import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.enumerated.UserRole;
-import ru.ylab.exception.MeterNotFoundException;
 import ru.ylab.exception.NoPermissionException;
 import ru.ylab.exception.NoSubmissionException;
-import ru.ylab.exception.SubmissionExistsException;
-import ru.ylab.in.dto.SubmissionDTO;
-import ru.ylab.in.dto.request.SubmissionRequestDTO;
-import ru.ylab.in.dto.request.SubmissionByDateRequestDTO;
 import ru.ylab.mapper.SubmissionMapper;
 import ru.ylab.repository.SubmissionRepository;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * The SubmissionService class provides functionality related to user submissions and meter readings.
@@ -32,8 +27,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SubmissionService {
     private final SubmissionRepository submissionRepository;
-    private final MeterReadingsService meterReadingsService;
-    private final MeterService meterService;
     private final UserService userService;
     private final AuditionEventService auditionEventService;
 
@@ -51,14 +44,19 @@ public class SubmissionService {
         }
         var event = AuditionEvent.builder()
                 .user(userService.getCurrentUser())
-                .type(AuditionEventType.SUBMISSION_HISTORY_ACQUIRE)
+                .eventType(AuditionEventType.SUBMISSION_HISTORY_ACQUIRE)
                 .message(String.format(
                         "Submission history acquired for user id '%s'",
                         userId))
                 .build();
         auditionEventService.addEvent(event);
-        var submissions = submissionRepository.getByUserId(userId);
-        return SubmissionMapper.MAPPER.toSubmissionDTOs(submissions);
+        var user = userService.getUserById(userId);
+        var submissionModels = submissionRepository.getByUserId(userId);
+        var collection = new HashSet<Submission>();
+        for (var submissionModel : submissionModels) {
+            collection.add(SubmissionMapper.MAPPER.toSubmission(submissionModel, user));
+        }
+        return SubmissionMapper.MAPPER.toSubmissionDTOs(collection);
     }
 
     /**
@@ -69,19 +67,25 @@ public class SubmissionService {
      * @return Optional<Submission> representing the last submission of the user.
      * @throws NoPermissionException If the current user does not have permission to access the submission.
      */
-    public Optional<Submission> findLastSubmissionByUserId(Long userId) {
+    private Optional<Submission> findLastSubmissionByUserId(Long userId) {
         if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
             throw new NoPermissionException();
         }
         var event = AuditionEvent.builder()
                 .user(userService.getCurrentUser())
-                .type(AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
+                .eventType(AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
                 .message(String.format(
                         "Last submission acquired for user id '%s'",
                         userId))
                 .build();
         auditionEventService.addEvent(event);
-        return submissionRepository.findLastByUserId(userId);
+        var submissionModelOptional
+                = submissionRepository.findLastSubmissionByUserId(userId);
+        if (submissionModelOptional.isPresent()) {
+            var user = userService.getUserById(userId);
+            return Optional.of(SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user));
+        }
+        return Optional.empty();
     }
 
     private boolean checkUserIsCurrentUser(Long userId) {
@@ -108,6 +112,13 @@ public class SubmissionService {
         return SubmissionMapper.MAPPER.toSubmissionDTO(submission);
     }
 
+    public Submission getSubmissionById(Long submissionId) {
+        var submissionModel = submissionRepository.getById(submissionId)
+                .orElseThrow(()-> new NoSubmissionException(submissionId));
+        var user = userService.getUserById(submissionModel.userId());
+        return SubmissionMapper.MAPPER.toSubmission(submissionModel, user);
+    }
+
     /**
      * Retrieves a submission for a given user and date.
      * Audits the action and logs an audition event.
@@ -130,7 +141,7 @@ public class SubmissionService {
         }
         var event = AuditionEvent.builder()
                 .user(userService.getCurrentUser())
-                .type(AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
+                .eventType(AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
                 .message(String.format(
                         "Submission acquired for user id '%s' and date '%s-%s'",
                         userId,
@@ -138,52 +149,24 @@ public class SubmissionService {
                         date.getMonthValue()))
                 .build();
         auditionEventService.addEvent(event);
-        return submissionRepository.findByUserIdAndDate(userId, date);
+        var submissionModelOptional = submissionRepository.findSubmissionByUserIdAndDate(userId, date);
+        if (submissionModelOptional.isPresent()) {
+            var user = userService.getUserById(userId);
+            return Optional.of(SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user));
+        }
+        return Optional.empty();
     }
 
     /**
-     * Saves a new submission with the provided meter readings.
-     * Audits the action, logs an audition event, and performs necessary validations.
+     * Saves a single submission.
      *
-     * @param request The request containing user ID and meter readings.
-     * @throws SubmissionExistsException If a submission already exists for the user on the current date.
-     * @throws MeterNotFoundException If a meter specified in the readings is not found.
+     * @param submission The meter to be saved.
      */
-    public void save(SubmissionRequestDTO request) {
-        var date = LocalDate.now();
-        var user = userService.getCurrentUser();
-        if (submissionRepository.checkExistsByUserIdAndDate(user.getId(), date)) {
-            throw new SubmissionExistsException(user.getName(), date);
-        }
-        var currentUserMetersMap = meterService.getMetersByUserId(user.getId()).stream()
-                .collect(Collectors.toMap(Meter::getId, m -> m));
-        var submission = Submission.builder().date(date).user(user).build();
-        var readings = request.meterReadings().entrySet().stream()
-                .map(entry -> MeterReading.builder()
-                        .meter(checkMeterIsFound(currentUserMetersMap.get(entry.getKey()), entry.getKey()))
-                        .value(entry.getValue())
-                        .submission(submission)
-                        .build()
-                )
-                .collect(Collectors.toSet());
+    public void save(Submission submission) {
         submissionRepository.save(submission);
-        meterReadingsService.saveAll(readings);
-        var event = AuditionEvent.builder()
-                .user(user)
-                .type(AuditionEventType.READINGS_SUBMISSION)
-                .message(String.format(
-                        "New submission by user id '%s' and date '%s-%s'",
-                        user.getId(),
-                        date.getYear(),
-                        date.getMonthValue()))
-                .build();
-        auditionEventService.addEvent(event);
     }
 
-    private Meter checkMeterIsFound(Meter meter, Long meterId) {
-        if (meter == null) {
-            throw new MeterNotFoundException(meterId);
-        }
-        return meter;
+    public boolean checkExistsByUserIdAndDate(Long id, LocalDate date) {
+        return submissionRepository.checkExistsByUserIdAndDate(id, date);
     }
 }

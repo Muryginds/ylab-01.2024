@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: Tables-preconfiguring
+      author: muryginds
+      changes:
+        - insert:
+            columns:
+              - column:
+                  name: name
+                  value: admin
+              - column:
+                  name: password
+                  value: $argon2id$v=19$m=1024,t=5,p=3$JWSH7mMDhBRytVFxEnx2TtgLkHmgLm6nmgerE95SV9/ww0JLyYHBhLguoOuredNtPRzhAzUpl57g92PArdLS/w$pO73Gls2Hj1q5M/IuhSXZADVHyV8DgSU78HT3vR0lUUdfAKWt3Nh6ub35IjMZJ/POklho7e/4JbbDYzrlLN5AA
+              - column:
+                  name: role
+                  value: ADMIN
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: type_name
+                  value: HOT_WATER
+            tableName: meter_types
+        - insert:
+            columns:
+              - column:
+                  name: type_name
+                  value: HEATING
+            tableName: meter_types
+        - insert:
+            columns:
+              - column:
+                  name: type_name
+                  value: COLD_WATER
+            tableName: meter_types

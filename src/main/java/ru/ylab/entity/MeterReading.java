@@ -6,12 +6,9 @@ import lombok.Data;
 @Builder
 @Data
 public final class MeterReading {
-    private static Long counter = 1L;
-
+    private Long id;
+    private Submission submission;
+    private Meter meter;
     @Builder.Default
-    private final Long id = counter++;
-    private final Submission submission;
-    private final Meter meter;
-    @Builder.Default
-    private final Long value = 0L;
+    private Long value = 0L;
 }

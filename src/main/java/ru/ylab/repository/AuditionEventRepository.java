@@ -1,6 +1,7 @@
 package ru.ylab.repository;
 
 import ru.ylab.entity.AuditionEvent;
+import ru.ylab.model.AuditionEventModel;
 
 import java.util.Collection;
 
@@ -13,9 +14,9 @@ public interface AuditionEventRepository {
      * Gets all audition events associated with a specific user.
      *
      * @param userId The ID of the user.
-     * @return A collection of audition events associated with the specified user.
+     * @return A collection of audition event models associated with the specified user.
      */
-    Collection<AuditionEvent> getEventsByUserId(Long userId);
+    Collection<AuditionEventModel> getEventsByUserId(Long userId);
 
     /**
      * Adds a new audition event to the repository.

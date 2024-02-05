@@ -6,9 +6,6 @@ import lombok.Data;
 @Builder
 @Data
 public final class MeterType {
-    private static Long counter = 1L;
-
-    @Builder.Default
-    private final Long id = counter++;
-    private final String typeName;
+    private Long id;
+    private String typeName;
 }

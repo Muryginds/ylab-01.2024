@@ -10,17 +10,18 @@ import org.mockito.MockitoAnnotations;
 import ru.ylab.entity.AuditionEvent;
 import ru.ylab.entity.User;
 import ru.ylab.enumerated.AuditionEventType;
-import ru.ylab.in.dto.AuditionEventDTO;
 import ru.ylab.mapper.AuditionEventMapper;
 import ru.ylab.repository.AuditionEventRepository;
 
-import java.util.Collection;
 import java.util.Set;
 
 class AuditionEventServiceTest {
 
     @Mock
     private AuditionEventRepository auditionEventRepository;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private AuditionEventService auditionEventService;
@@ -32,18 +33,27 @@ class AuditionEventServiceTest {
 
     @Test
     void testGetEventsByUserId_whenExistingUser_thenReturnCollectionOfAuditionEventDTOs() {
-        long userId = 1L;
-        User user = User.builder().build();
-        Set<AuditionEvent> auditionEvents = Set.of(
-                AuditionEvent.builder().id(1L).user(user).type(AuditionEventType.SESSION_START).message("User logged in").build(),
-                AuditionEvent.builder().id(2L).user(user).type(AuditionEventType.SESSION_END).message("User logged out").build()
+        var userId = 1L;
+        var user = User.builder().build();
+        var event1 =  AuditionEvent.builder().id(1L).user(user)
+                .eventType(AuditionEventType.SESSION_START).message("User logged in").build();
+        var event2 = AuditionEvent.builder().id(2L).user(user)
+                .eventType(AuditionEventType.SESSION_END).message("User logged out").build();
+        var auditionEventModels = Set.of(
+                AuditionEventMapper.MAPPER.toAuditionEventModel(event1),
+                AuditionEventMapper.MAPPER.toAuditionEventModel(event2)
         );
-        Mockito.when(auditionEventRepository.getEventsByUserId(userId)).thenReturn(auditionEvents);
+        var expectedEventDTOs = Set.of(
+                AuditionEventMapper.MAPPER.toAuditionEventDTO(event1),
+                AuditionEventMapper.MAPPER.toAuditionEventDTO(event2)
+        );
+        Mockito.when(auditionEventRepository.getEventsByUserId(userId)).thenReturn(auditionEventModels);
+        Mockito.when(userService.getUserById(userId)).thenReturn(user);
 
-        Collection<AuditionEventDTO> result = auditionEventService.getEventsByUserId(userId);
+        var result = auditionEventService.getEventsByUserId(userId);
 
-        Collection<AuditionEventDTO> expected = AuditionEventMapper.MAPPER.toAuditionEventDTOs(auditionEvents);
-        Assertions.assertEquals(expected, result);
+        Assertions.assertTrue(result.containsAll(expectedEventDTOs));
+        Assertions.assertEquals(result.size(), expectedEventDTOs.size());
     }
 
     @Test
@@ -51,7 +61,7 @@ class AuditionEventServiceTest {
         AuditionEvent auditionEvent = AuditionEvent.builder()
                 .id(1L)
                 .user(User.builder().build())
-                .type(AuditionEventType.REGISTRATION)
+                .eventType(AuditionEventType.REGISTRATION)
                 .message("User logged in")
                 .build();
 

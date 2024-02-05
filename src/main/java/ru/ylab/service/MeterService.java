@@ -4,10 +4,9 @@ import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.Meter;
 import ru.ylab.entity.User;
 import ru.ylab.exception.MeterNotFoundException;
-import ru.ylab.in.dto.MeterDTO;
+import ru.ylab.dto.MeterDTO;
 import ru.ylab.mapper.MeterMapper;
 import ru.ylab.repository.MeterRepository;
-import ru.ylab.repository.MeterTypeRepository;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -22,8 +21,9 @@ import java.util.Random;
 public class MeterService {
     private static final Random random = new Random();
 
-    private final MeterRepository repository;
-    private final MeterTypeRepository meterTypeRepository;
+    private final MeterRepository meterRepository;
+    private final MeterTypeService meterTypeService;
+    private final UserService userService;
 
     /**
      * Saves a single meter.
@@ -31,7 +31,7 @@ public class MeterService {
      * @param meter The meter to be saved.
      */
     public void save(Meter meter) {
-        repository.save(meter);
+        meterRepository.save(meter);
     }
 
     /**
@@ -40,7 +40,7 @@ public class MeterService {
      * @param meters The collection of meters to be saved.
      */
     public void save(Collection<Meter> meters) {
-        repository.save(meters);
+        meterRepository.save(meters);
     }
 
     /**
@@ -51,8 +51,11 @@ public class MeterService {
      * @throws MeterNotFoundException If no meter is found with the given ID.
      */
     public Meter getById(Long meterId) {
-        return repository.findById(meterId)
+        var meterModel =  meterRepository.findById(meterId)
                 .orElseThrow(() -> new MeterNotFoundException(meterId));
+        var meterType = meterTypeService.getMeterTypeById(meterModel.meterTypeId());
+        var user = userService.getUserById(meterModel.userId());
+        return MeterMapper.MAPPER.toMeter(meterModel, meterType, user);
     }
 
     /**
@@ -72,7 +75,14 @@ public class MeterService {
      * @return Collection of Meter representing meters associated with the user.
      */
     public Collection<Meter> getMetersByUserId(Long userId) {
-        return repository.getByUserId(userId);
+        var user = userService.getUserById(userId);
+        var meterModels = meterRepository.getByUserId(userId);
+        var collection = new HashSet<Meter>();
+        for (var meterModel : meterModels) {
+            var meterType = meterTypeService.getMeterTypeById(meterModel.meterTypeId());
+            collection.add(MeterMapper.MAPPER.toMeter(meterModel, meterType, user));
+        }
+        return collection;
     }
 
     /**
@@ -82,15 +92,15 @@ public class MeterService {
      */
     public void generateForNewUser(User user) {
         var set = new HashSet<Meter>();
-        var meterTypes = meterTypeRepository.getAll();
-        for (var type : meterTypes) {
+        var meterTypesModels = meterTypeService.getAll();
+        for (var typeModel : meterTypesModels) {
             set.add(Meter.builder()
                     .user(user)
                     .factoryNumber(String.format("%012d", random.nextInt(Integer.MAX_VALUE)))
-                    .type(type)
+                    .meterType(meterTypeService.getMeterTypeById(typeModel.getId()))
                     .build()
             );
         }
-        repository.save(set);
+        meterRepository.save(set);
     }
 }

@@ -1,7 +1,7 @@
 package ru.ylab.repository;
 
 import ru.ylab.entity.User;
-
+import ru.ylab.model.UserModel;
 import java.util.Optional;
 
 /**
@@ -36,15 +36,15 @@ public interface UserRepository {
      * Finds a user by their username in the repository.
      *
      * @param name The username of the user to find.
-     * @return An optional containing the found user or empty if not found.
+     * @return An optional containing the found userModel or empty if not found.
      */
-    Optional<User> findUserByName(String name);
+    Optional<UserModel> findUserByName(String name);
 
     /**
      * Finds a user by their user ID in the repository.
      *
      * @param userId The user ID of the user to find.
-     * @return An optional containing the found user or empty if not found.
+     * @return An optional containing the found userModel or empty if not found.
      */
-    Optional<User> findUserById(Long userId);
+    Optional<UserModel> findUserById(Long userId);
 }

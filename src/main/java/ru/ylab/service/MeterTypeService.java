@@ -6,7 +6,7 @@ import ru.ylab.entity.MeterType;
 import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.exception.MeterTypeExistException;
 import ru.ylab.exception.MeterTypeNotFoundException;
-import ru.ylab.in.dto.MeterTypeDTO;
+import ru.ylab.dto.MeterTypeDTO;
 import ru.ylab.mapper.MeterTypeMapper;
 import ru.ylab.repository.MeterTypeRepository;
 
@@ -38,7 +38,7 @@ public class MeterTypeService {
         meterTypeRepository.save(newType);
         var event = AuditionEvent.builder()
                 .user(userService.getCurrentUser())
-                .type(AuditionEventType.NEW_METER_TYPE_ADDITION)
+                .eventType(AuditionEventType.NEW_METER_TYPE_ADDITION)
                 .message(String.format(
                         "New meter type '%s' added",
                         typeName))
@@ -53,10 +53,22 @@ public class MeterTypeService {
      * @return MeterTypeDTO representing the retrieved meter type.
      * @throws MeterTypeNotFoundException If no meter type is found with the given ID.
      */
-    public MeterTypeDTO getById(Long meterTypeId) {
-        var meterType = meterTypeRepository.findById(meterTypeId)
-                .orElseThrow(() -> new MeterTypeNotFoundException(meterTypeId));
+    public MeterTypeDTO getMeterTypeDTOById(Long meterTypeId) {
+        var meterType = getMeterTypeById(meterTypeId);
         return MeterTypeMapper.MAPPER.toMeterTypeDTO(meterType);
+    }
+
+    /**
+     * Retrieves a meter type by its ID.
+     *
+     * @param meterTypeId The ID of the meter type to retrieve.
+     * @return MeterType entity representing the retrieved meter type.
+     * @throws MeterTypeNotFoundException If no meter type is found with the given ID.
+     */
+    public MeterType getMeterTypeById(Long meterTypeId) {
+        var meterTypeModel = meterTypeRepository.findById(meterTypeId)
+                .orElseThrow(() -> new MeterTypeNotFoundException(meterTypeId));
+        return MeterTypeMapper.MAPPER.toMeterType(meterTypeModel);
     }
 
     /**
@@ -65,7 +77,7 @@ public class MeterTypeService {
      * @return Collection of MeterType representing all existing meter types.
      */
     public Collection<MeterType> getAll() {
-        return meterTypeRepository.getAll();
+        return MeterTypeMapper.MAPPER.toMeterTypes(meterTypeRepository.getAll());
     }
 
     /**
