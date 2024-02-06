@@ -3,10 +3,10 @@ package ru.ylab.repository.impl;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.User;
 import ru.ylab.enumerated.UserRole;
-import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.UserModel;
 import ru.ylab.repository.UserRepository;
 import ru.ylab.utils.DbConnectionFactory;
+import ru.ylab.utils.ExceptionHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,7 +32,7 @@ public class JdbcUserRepository implements UserRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return false;
@@ -54,7 +54,7 @@ public class JdbcUserRepository implements UserRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return false;
@@ -80,7 +80,7 @@ public class JdbcUserRepository implements UserRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 
@@ -101,7 +101,7 @@ public class JdbcUserRepository implements UserRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();
@@ -124,7 +124,7 @@ public class JdbcUserRepository implements UserRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();

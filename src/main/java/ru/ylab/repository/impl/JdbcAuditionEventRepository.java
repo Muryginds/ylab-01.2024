@@ -3,10 +3,10 @@ package ru.ylab.repository.impl;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.AuditionEvent;
 import ru.ylab.enumerated.AuditionEventType;
-import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.AuditionEventModel;
 import ru.ylab.repository.AuditionEventRepository;
 import ru.ylab.utils.DbConnectionFactory;
+import ru.ylab.utils.ExceptionHandler;
 
 import java.sql.*;
 import java.util.Collection;
@@ -33,7 +33,7 @@ public class JdbcAuditionEventRepository implements AuditionEventRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return auditionEventModels;
@@ -54,7 +54,7 @@ public class JdbcAuditionEventRepository implements AuditionEventRepository {
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 

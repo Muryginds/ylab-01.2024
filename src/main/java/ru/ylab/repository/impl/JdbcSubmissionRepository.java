@@ -2,10 +2,10 @@ package ru.ylab.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.Submission;
-import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.SubmissionModel;
 import ru.ylab.repository.SubmissionRepository;
 import ru.ylab.utils.DbConnectionFactory;
+import ru.ylab.utils.ExceptionHandler;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -37,7 +37,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return submissionModels;
@@ -58,7 +58,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();
@@ -83,7 +83,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 
@@ -104,7 +104,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return false;
@@ -129,7 +129,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();
@@ -152,7 +152,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();

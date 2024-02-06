@@ -2,10 +2,10 @@ package ru.ylab.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.MeterReading;
-import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.MeterReadingModel;
 import ru.ylab.repository.MeterReadingsRepository;
 import ru.ylab.utils.DbConnectionFactory;
+import ru.ylab.utils.ExceptionHandler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,7 +37,7 @@ public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return meterReadingModels;
@@ -57,7 +57,7 @@ public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 
@@ -79,7 +79,7 @@ public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
             preparedStatement.executeBatch();
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 
