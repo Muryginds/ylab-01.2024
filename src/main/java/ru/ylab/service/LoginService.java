@@ -13,6 +13,9 @@ import ru.ylab.exception.UserNotFoundException;
 import ru.ylab.mapper.UserMapper;
 import ru.ylab.security.PasswordEncoder;
 
+/**
+ * Service responsible for user authentication, registration, and logout.
+ */
 @RequiredArgsConstructor
 public class LoginService {
     private final UserService userService;
@@ -38,13 +41,23 @@ public class LoginService {
                 .build();
         userService.save(user);
         meterService.generateForNewUser(user);
+        var auditionDescription = "user registered";
+        var eventType = AuditionEventType.REGISTRATION;
+        newUserAuditionEvent(
+                user,
+                eventType,
+                auditionDescription
+        );
+        return UserMapper.MAPPER.toUserDTO(user);
+    }
+
+    private void newUserAuditionEvent(User user, AuditionEventType eventType, String auditionDescription) {
         var event = AuditionEvent.builder()
                 .user(user)
-                .eventType(AuditionEventType.REGISTRATION)
-                .message("user registered")
+                .eventType(eventType)
+                .message(auditionDescription)
                 .build();
         auditionEventService.addEvent(event);
-        return UserMapper.MAPPER.toUserDTO(user);
     }
 
     /**
@@ -65,12 +78,11 @@ public class LoginService {
         if (!passwordEncoder.verify(requestDTO.password(), user.getPassword())) {
             throw new UserAuthenticationException();
         }
-        var event = AuditionEvent.builder()
-                .user(user)
-                .eventType(AuditionEventType.SESSION_START)
-                .message("user authorized")
-                .build();
-        auditionEventService.addEvent(event);
+        newUserAuditionEvent(
+                user,
+                AuditionEventType.SESSION_START,
+                "user authorized"
+        );
         userService.setCurrentUser(user);
         return UserMapper.MAPPER.toUserDTO(user);
     }
@@ -80,12 +92,11 @@ public class LoginService {
      * Adds an audition event for the logout.
      */
     public void logout() {
-        var event = AuditionEvent.builder()
-                .user(userService.getCurrentUser())
-                .eventType(AuditionEventType.SESSION_END)
-                .message("user logged out")
-                .build();
-        auditionEventService.addEvent(event);
+        newUserAuditionEvent(
+                userService.getCurrentUser(),
+                AuditionEventType.SESSION_END,
+                "user logged out"
+        );
         userService.setCurrentUser(null);
     }
 }

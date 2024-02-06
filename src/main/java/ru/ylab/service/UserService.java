@@ -11,9 +11,8 @@ import ru.ylab.repository.UserRepository;
 
 /**
  * The UserService class provides functionality related to user management.
- * It includes methods for user registration, user authentication, and other user-related operations.
- * This service interacts with the UserRepository, PasswordEncoder, AuditionEventService, and MeterService
- * to perform various user-related tasks.
+ * It includes methods for user-related operations.
+ * This service interacts with the UserRepository to perform various user-related tasks.
  */
 @RequiredArgsConstructor
 public class UserService {

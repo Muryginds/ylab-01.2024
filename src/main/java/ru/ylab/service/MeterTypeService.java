@@ -36,6 +36,10 @@ public class MeterTypeService {
         }
         var newType = MeterType.builder().typeName(typeName).build();
         meterTypeRepository.save(newType);
+        newMeterTypeAdditionAuditionEvent(typeName);
+    }
+
+    private void newMeterTypeAdditionAuditionEvent(String typeName) {
         var event = AuditionEvent.builder()
                 .user(userService.getCurrentUser())
                 .eventType(AuditionEventType.NEW_METER_TYPE_ADDITION)

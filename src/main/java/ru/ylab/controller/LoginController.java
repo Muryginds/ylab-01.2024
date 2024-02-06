@@ -6,6 +6,9 @@ import ru.ylab.dto.request.UserAuthorizationRequestDTO;
 import ru.ylab.dto.request.UserRegistrationRequestDTO;
 import ru.ylab.service.LoginService;
 
+/**
+ * Controller responsible for handling user authentication and registration.
+ */
 @RequiredArgsConstructor
 public class LoginController {
     private final LoginService loginService;

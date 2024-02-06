@@ -5,6 +5,7 @@ import ru.ylab.dto.SubmissionDTO;
 import ru.ylab.dto.request.SubmissionByDateRequestDTO;
 import ru.ylab.entity.AuditionEvent;
 import ru.ylab.entity.Submission;
+import ru.ylab.entity.User;
 import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.enumerated.UserRole;
 import ru.ylab.exception.NoPermissionException;
@@ -14,14 +15,14 @@ import ru.ylab.repository.SubmissionRepository;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The SubmissionService class provides functionality related to user submissions and meter readings.
  * It includes methods for retrieving submission history, finding the last submission,
  * saving new submissions, and other submission-related operations.
- * This service interacts with the SubmissionRepository, MeterReadingsService, MeterService,
+ * This service interacts with the SubmissionRepository,
  * UserService, and AuditionEventService to perform various submission-related tasks.
  */
 @RequiredArgsConstructor
@@ -42,21 +43,25 @@ public class SubmissionService {
         if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
             throw new NoPermissionException();
         }
+        var auditionMessage = String.format("Submission history acquired for user id '%s'", userId);
+        var currentUser = userService.getCurrentUser();
+        var eventType = AuditionEventType.SUBMISSION_HISTORY_ACQUIRE;
+        newSubmissionAuditionEvent(currentUser, eventType, auditionMessage);
+        var targetUser = userService.getUserById(userId);
+        var submissionModels = submissionRepository.getByUserId(userId);
+        var submissions = submissionModels.stream()
+                .map(sm -> SubmissionMapper.MAPPER.toSubmission(sm, targetUser))
+                .collect(Collectors.toSet());
+        return SubmissionMapper.MAPPER.toSubmissionDTOs(submissions);
+    }
+
+    private void newSubmissionAuditionEvent(User currentUser, AuditionEventType eventType, String auditionMessage) {
         var event = AuditionEvent.builder()
-                .user(userService.getCurrentUser())
-                .eventType(AuditionEventType.SUBMISSION_HISTORY_ACQUIRE)
-                .message(String.format(
-                        "Submission history acquired for user id '%s'",
-                        userId))
+                .user(currentUser)
+                .eventType(eventType)
+                .message(auditionMessage)
                 .build();
         auditionEventService.addEvent(event);
-        var user = userService.getUserById(userId);
-        var submissionModels = submissionRepository.getByUserId(userId);
-        var collection = new HashSet<Submission>();
-        for (var submissionModel : submissionModels) {
-            collection.add(SubmissionMapper.MAPPER.toSubmission(submissionModel, user));
-        }
-        return SubmissionMapper.MAPPER.toSubmissionDTOs(collection);
     }
 
     /**
@@ -71,19 +76,17 @@ public class SubmissionService {
         if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
             throw new NoPermissionException();
         }
-        var event = AuditionEvent.builder()
-                .user(userService.getCurrentUser())
-                .eventType(AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
-                .message(String.format(
-                        "Last submission acquired for user id '%s'",
-                        userId))
-                .build();
-        auditionEventService.addEvent(event);
+        newSubmissionAuditionEvent(
+                userService.getCurrentUser(),
+                AuditionEventType.SINGLE_SUBMISSION_ACQUIRE,
+                String.format("Last submission acquired for user id '%s'", userId)
+        );
         var submissionModelOptional
                 = submissionRepository.findLastSubmissionByUserId(userId);
         if (submissionModelOptional.isPresent()) {
             var user = userService.getUserById(userId);
-            return Optional.of(SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user));
+            var submission = SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user);
+            return Optional.of(submission);
         }
         return Optional.empty();
     }
@@ -114,7 +117,7 @@ public class SubmissionService {
 
     public Submission getSubmissionById(Long submissionId) {
         var submissionModel = submissionRepository.getById(submissionId)
-                .orElseThrow(()-> new NoSubmissionException(submissionId));
+                .orElseThrow(() -> new NoSubmissionException(submissionId));
         var user = userService.getUserById(submissionModel.userId());
         return SubmissionMapper.MAPPER.toSubmission(submissionModel, user);
     }
@@ -139,20 +142,17 @@ public class SubmissionService {
         if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
             throw new NoPermissionException();
         }
-        var event = AuditionEvent.builder()
-                .user(userService.getCurrentUser())
-                .eventType(AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
-                .message(String.format(
-                        "Submission acquired for user id '%s' and date '%s-%s'",
-                        userId,
-                        date.getYear(),
-                        date.getMonthValue()))
-                .build();
-        auditionEventService.addEvent(event);
+        newSubmissionAuditionEvent(
+                userService.getCurrentUser(),
+                AuditionEventType.SINGLE_SUBMISSION_ACQUIRE,
+                String.format("Submission acquired for user id '%s' and date '%s-%s'",
+                        userId, date.getYear(), date.getMonthValue())
+        );
         var submissionModelOptional = submissionRepository.findSubmissionByUserIdAndDate(userId, date);
         if (submissionModelOptional.isPresent()) {
             var user = userService.getUserById(userId);
-            return Optional.of(SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user));
+            var submission = SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user);
+            return Optional.of(submission);
         }
         return Optional.empty();
     }
