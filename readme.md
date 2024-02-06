@@ -10,6 +10,11 @@ and retrieve specific submissions by date. Administrative Actions: Administrator
 including adding new meter types, accessing audition event history, and retrieving submission information for
 specific users.
 
+#### Sprints:
+- <a href ="https://github.com/Muryginds/ylab-01.2024/pull/3"> sprint 1</a>
+- <a href ="https://github.com/Muryginds/ylab-01.2024/pull/4"> sprint 2</a>
+- <a href ="https://github.com/Muryginds/ylab-01.2024/pull/5"> sprint 3</a>
+
 #### Testing
     By default, added user 'admin' with password 'admin' and administrative role
 
