@@ -10,6 +10,7 @@ import ru.ylab.utils.ExceptionHandler;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
@@ -20,14 +21,20 @@ public class JdbcMeterTypeRepository implements MeterTypeRepository {
 
     @Override
     public void save(MeterType meterType) {
-        var insertQuery = "INSERT INTO private.meter_types (id, type_name) " +
-                "VALUES (nextval('private.meter_types_id_seq'), ?)";
+        var insertQuery = "INSERT INTO private.meter_types (type_name) VALUES (?)";
 
         try (var connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(insertQuery)) {
+             var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, meterType.getTypeName());
             preparedStatement.executeUpdate();
+
+            try (var resultSet = preparedStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    var generatedId = resultSet.getLong(1);
+                    meterType.setId(generatedId);
+                }
+            }
 
         } catch (SQLException e) {
             ExceptionHandler.handleSQLException(e);
@@ -36,8 +43,7 @@ public class JdbcMeterTypeRepository implements MeterTypeRepository {
 
     @Override
     public void save(Collection<MeterType> meterTypes) {
-        var insertQuery = "INSERT INTO private.meter_types (id, type_name) " +
-                "VALUES (nextval('private.meter_types_id_seq'), ?)";
+        var insertQuery = "INSERT INTO private.meter_types (type_name) VALUES (?)";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery)) {

@@ -45,13 +45,21 @@ public class JdbcAuditionEventRepository implements AuditionEventRepository {
                 "VALUES (?, ?, ?, ?)";
 
         try (Connection connection = dbConnectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+             PreparedStatement preparedStatement =
+                     connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setLong(1, auditionEvent.getUser().getId());
             preparedStatement.setString(2, auditionEvent.getEventType().name());
             preparedStatement.setString(3, auditionEvent.getMessage());
             preparedStatement.setTimestamp(4, Timestamp.valueOf(auditionEvent.getDate()));
             preparedStatement.executeUpdate();
+
+            try (var resultSet = preparedStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    var generatedId = resultSet.getLong(1);
+                    auditionEvent.setId(generatedId);
+                }
+            }
 
         } catch (SQLException e) {
             ExceptionHandler.handleSQLException(e);

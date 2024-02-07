@@ -42,16 +42,22 @@ public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
 
     @Override
     public void save(MeterReading meterReading) {
-        var insertQuery = "INSERT INTO private.meter_readings (id, submission_id, meter_id, value) " +
-                "VALUES (nextval('private.meter_readings_id_seq'), ?, ?, ?)";
+        var insertQuery = "INSERT INTO private.meter_readings (submission_id, meter_id, value) VALUES (?, ?, ?)";
 
         try (Connection connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(insertQuery)) {
+             var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setLong(1, meterReading.getSubmission().getId());
             preparedStatement.setLong(2, meterReading.getMeter().getId());
             preparedStatement.setLong(3, meterReading.getValue());
             preparedStatement.executeUpdate();
+
+            try (var resultSet = preparedStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    var generatedId = resultSet.getLong(1);
+                    meterReading.setId(generatedId);
+                }
+            }
 
         } catch (SQLException e) {
             ExceptionHandler.handleSQLException(e);

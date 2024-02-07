@@ -66,8 +66,8 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
 
     @Override
     public void save(Submission submission) {
-        var insertQuery = "INSERT INTO private.submissions (id, user_id, date) " +
-                "VALUES (nextval('private.submissions_id_seq'), ?, ?) RETURNING id";
+        var insertQuery = "INSERT INTO private.submissions (user_id, date) " +
+                "VALUES (?, ?)";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {

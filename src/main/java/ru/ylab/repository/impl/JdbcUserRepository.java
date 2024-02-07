@@ -62,8 +62,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public void save(User user) {
-        var insertQuery = "INSERT INTO private.users (id, name, password, role) " +
-                "VALUES (nextval('private.users_id_seq'), ?, ?, ?) RETURNING id";
+        var insertQuery = "INSERT INTO private.users (name, password, role) VALUES (?, ?, ?)";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
