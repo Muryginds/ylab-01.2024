@@ -40,9 +40,9 @@ public class JdbcAuditionEventRepository implements AuditionEventRepository {
     }
 
     @Override
-    public void addEvent(AuditionEvent auditionEvent) {
-        String insertQuery = "INSERT INTO private.audition_events (id, user_id, event_type, message, date) " +
-                "VALUES (nextval('private.audition_events_id_seq'), ?, ?, ?, ?)";
+    public void save(AuditionEvent auditionEvent) {
+        String insertQuery = "INSERT INTO private.audition_events (user_id, event_type, message, date) " +
+                "VALUES (?, ?, ?, ?)";
 
         try (Connection connection = dbConnectionFactory.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {

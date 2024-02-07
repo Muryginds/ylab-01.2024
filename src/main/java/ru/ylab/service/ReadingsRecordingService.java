@@ -64,7 +64,7 @@ public class ReadingsRecordingService {
                         date.getYear(),
                         date.getMonthValue()))
                 .build();
-        auditionEventService.addEvent(event);
+        auditionEventService.save(event);
     }
 
     private MeterReading createMeterReading(Meter meter, Long value, Submission submission) {

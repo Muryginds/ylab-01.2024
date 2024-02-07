@@ -36,11 +36,11 @@ public class AuditionEventService {
     }
 
     /**
-     * Adds a new audition event to the repository.
+     * Saves a new audition event to the repository.
      *
-     * @param auditionEvent The AuditionEvent to be added.
+     * @param auditionEvent The AuditionEvent to be saved.
      */
-    public void addEvent(AuditionEvent auditionEvent) {
-        auditionEventRepository.addEvent(auditionEvent);
+    public void save(AuditionEvent auditionEvent) {
+        auditionEventRepository.save(auditionEvent);
     }
 }

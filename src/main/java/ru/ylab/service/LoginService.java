@@ -43,7 +43,7 @@ public class LoginService {
         meterService.generateForNewUser(user);
         var auditionDescription = "user registered";
         var eventType = AuditionEventType.REGISTRATION;
-        newUserAuditionEvent(
+        saveNewUserAuditionEvent(
                 user,
                 eventType,
                 auditionDescription
@@ -51,13 +51,13 @@ public class LoginService {
         return UserMapper.MAPPER.toUserDTO(user);
     }
 
-    private void newUserAuditionEvent(User user, AuditionEventType eventType, String auditionDescription) {
+    private void saveNewUserAuditionEvent(User user, AuditionEventType eventType, String auditionDescription) {
         var event = AuditionEvent.builder()
                 .user(user)
                 .eventType(eventType)
                 .message(auditionDescription)
                 .build();
-        auditionEventService.addEvent(event);
+        auditionEventService.save(event);
     }
 
     /**
@@ -78,7 +78,7 @@ public class LoginService {
         if (!passwordEncoder.verify(requestDTO.password(), user.getPassword())) {
             throw new UserAuthenticationException();
         }
-        newUserAuditionEvent(
+        saveNewUserAuditionEvent(
                 user,
                 AuditionEventType.SESSION_START,
                 "user authorized"
@@ -92,7 +92,7 @@ public class LoginService {
      * Adds an audition event for the logout.
      */
     public void logout() {
-        newUserAuditionEvent(
+        saveNewUserAuditionEvent(
                 userService.getCurrentUser(),
                 AuditionEventType.SESSION_END,
                 "user logged out"

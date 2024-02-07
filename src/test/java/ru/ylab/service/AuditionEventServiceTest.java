@@ -57,7 +57,7 @@ class AuditionEventServiceTest {
     }
 
     @Test
-    void testAddEvent_whenValid_thenDoNothing() {
+    void testSave_whenValid_thenDoNothing() {
         AuditionEvent auditionEvent = AuditionEvent.builder()
                 .id(1L)
                 .user(User.builder().build())
@@ -65,8 +65,8 @@ class AuditionEventServiceTest {
                 .message("User logged in")
                 .build();
 
-        auditionEventService.addEvent(auditionEvent);
+        auditionEventService.save(auditionEvent);
 
-        Mockito.verify(auditionEventRepository, Mockito.times(1)).addEvent(auditionEvent);
+        Mockito.verify(auditionEventRepository, Mockito.times(1)).save(auditionEvent);
     }
 }

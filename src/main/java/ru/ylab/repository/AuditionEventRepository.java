@@ -19,9 +19,9 @@ public interface AuditionEventRepository {
     Collection<AuditionEventModel> getEventsByUserId(Long userId);
 
     /**
-     * Adds a new audition event to the repository.
+     * Saves a new audition event to the repository.
      *
-     * @param auditionEvent The audition event to be added.
+     * @param auditionEvent The audition event to be saved.
      */
-    void addEvent(AuditionEvent auditionEvent);
+    void save(AuditionEvent auditionEvent);
 }

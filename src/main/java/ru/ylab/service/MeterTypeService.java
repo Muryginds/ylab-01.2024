@@ -47,7 +47,7 @@ public class MeterTypeService {
                         "New meter type '%s' added",
                         typeName))
                 .build();
-        auditionEventService.addEvent(event);
+        auditionEventService.save(event);
     }
 
     /**

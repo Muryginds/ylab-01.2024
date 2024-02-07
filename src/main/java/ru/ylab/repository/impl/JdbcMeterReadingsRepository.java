@@ -7,10 +7,7 @@ import ru.ylab.repository.MeterReadingsRepository;
 import ru.ylab.utils.DbConnectionFactory;
 import ru.ylab.utils.ExceptionHandler;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,8 +60,7 @@ public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
 
     @Override
     public void saveAll(Collection<MeterReading> meterReadings) {
-        String insertQuery = "INSERT INTO private.meter_readings (id, submission_id, meter_id, value) " +
-                "VALUES (nextval('private.meter_readings_id_seq'), ?, ?, ?)";
+        String insertQuery = "INSERT INTO private.meter_readings (submission_id, meter_id, value) VALUES (?, ?, ?)";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery)) {

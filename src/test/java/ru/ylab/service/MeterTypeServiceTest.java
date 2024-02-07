@@ -45,7 +45,7 @@ class MeterTypeServiceTest {
         meterTypeService.save(typeName);
 
         Mockito.verify(meterTypeRepository, Mockito.times(1)).save(Mockito.any(MeterType.class));
-        Mockito.verify(auditionEventService, Mockito.times(1)).addEvent(Mockito.any());
+        Mockito.verify(auditionEventService, Mockito.times(1)).save(Mockito.any());
     }
 
     @Test
@@ -55,7 +55,7 @@ class MeterTypeServiceTest {
 
         Assertions.assertThrows(MeterTypeExistException.class, () -> meterTypeService.save(typeName));
         Mockito.verify(meterTypeRepository, Mockito.times(0)).save(Mockito.any(MeterType.class));
-        Mockito.verify(auditionEventService, Mockito.times(0)).addEvent(Mockito.any());
+        Mockito.verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
     }
 
     @Test

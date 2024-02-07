@@ -46,7 +46,7 @@ public class SubmissionService {
         var auditionMessage = String.format("Submission history acquired for user id '%s'", userId);
         var currentUser = userService.getCurrentUser();
         var eventType = AuditionEventType.SUBMISSION_HISTORY_ACQUIRE;
-        newSubmissionAuditionEvent(currentUser, eventType, auditionMessage);
+        saveNewSubmissionAuditionEvent(currentUser, eventType, auditionMessage);
         var targetUser = userService.getUserById(userId);
         var submissionModels = submissionRepository.getByUserId(userId);
         var submissions = submissionModels.stream()
@@ -55,13 +55,13 @@ public class SubmissionService {
         return SubmissionMapper.MAPPER.toSubmissionDTOs(submissions);
     }
 
-    private void newSubmissionAuditionEvent(User currentUser, AuditionEventType eventType, String auditionMessage) {
+    private void saveNewSubmissionAuditionEvent(User currentUser, AuditionEventType eventType, String auditionMessage) {
         var event = AuditionEvent.builder()
                 .user(currentUser)
                 .eventType(eventType)
                 .message(auditionMessage)
                 .build();
-        auditionEventService.addEvent(event);
+        auditionEventService.save(event);
     }
 
     /**
@@ -76,7 +76,7 @@ public class SubmissionService {
         if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
             throw new NoPermissionException();
         }
-        newSubmissionAuditionEvent(
+        saveNewSubmissionAuditionEvent(
                 userService.getCurrentUser(),
                 AuditionEventType.SINGLE_SUBMISSION_ACQUIRE,
                 String.format("Last submission acquired for user id '%s'", userId)
@@ -142,7 +142,7 @@ public class SubmissionService {
         if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
             throw new NoPermissionException();
         }
-        newSubmissionAuditionEvent(
+        saveNewSubmissionAuditionEvent(
                 userService.getCurrentUser(),
                 AuditionEventType.SINGLE_SUBMISSION_ACQUIRE,
                 String.format("Submission acquired for user id '%s' and date '%s-%s'",
