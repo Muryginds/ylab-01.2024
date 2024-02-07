@@ -62,7 +62,7 @@ public class JdbcMeterTypeRepository implements MeterTypeRepository {
 
     @Override
     public Optional<MeterTypeModel> findById(Long meterTypeId) {
-        String selectQuery = "SELECT * FROM private.meter_types WHERE id = ?";
+        String selectQuery = "SELECT id, type_name FROM private.meter_types WHERE id = ?";
 
         try (Connection connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -85,7 +85,7 @@ public class JdbcMeterTypeRepository implements MeterTypeRepository {
 
     @Override
     public boolean checkExistsByName(String typeName) {
-        String selectQuery = "SELECT COUNT(*) FROM private.meter_types WHERE type_name = ?";
+        String selectQuery = "SELECT COUNT(id) FROM private.meter_types WHERE type_name = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -107,7 +107,7 @@ public class JdbcMeterTypeRepository implements MeterTypeRepository {
 
     @Override
     public Collection<MeterTypeModel> getAll() {
-        var selectQuery = "SELECT * FROM private.meter_types";
+        var selectQuery = "SELECT id, type_name FROM private.meter_types";
         var meterTypes = new HashSet<MeterTypeModel>();
 
         try (var connection = dbConnectionFactory.getConnection();

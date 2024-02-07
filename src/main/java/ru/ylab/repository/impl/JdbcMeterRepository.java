@@ -21,7 +21,7 @@ public class JdbcMeterRepository implements MeterRepository {
 
     @Override
     public Set<MeterModel> getByUserId(Long userId) {
-        var selectQuery = "SELECT * FROM private.meters WHERE user_id = ?";
+        var selectQuery = "SELECT id, user_id, factory_number, meter_type_id FROM private.meters WHERE user_id = ?";
         var meterModels = new HashSet<MeterModel>();
 
         try (var connection = dbConnectionFactory.getConnection();
@@ -92,7 +92,7 @@ public class JdbcMeterRepository implements MeterRepository {
 
     @Override
     public Optional<MeterModel> findById(Long meterId) {
-        var selectQuery = "SELECT * FROM private.meters WHERE id = ?";
+        var selectQuery = "SELECT id, user_id, factory_number, meter_type_id FROM private.meters WHERE id = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {

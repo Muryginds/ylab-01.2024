@@ -19,7 +19,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public boolean checkUserExistsByName(String username) {
-        var selectQuery = "SELECT COUNT(*) FROM private.users WHERE name = ?";
+        var selectQuery = "SELECT COUNT(id) FROM private.users WHERE name = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -40,7 +40,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public boolean checkUserExistsById(Long userId) {
-        var selectQuery = "SELECT COUNT(*) FROM private.users WHERE id = ?";
+        var selectQuery = "SELECT COUNT(id) FROM private.users WHERE id = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -85,7 +85,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<UserModel> findUserByName(String name) {
-        var selectQuery = "SELECT * FROM private.users WHERE name = ?";
+        var selectQuery = "SELECT id, name, password, role FROM private.users WHERE name = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -108,7 +108,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<UserModel> findUserById(Long userId) {
-        var selectQuery = "SELECT * FROM private.users WHERE id = ?";
+        var selectQuery = "SELECT id, name, password, role FROM private.users WHERE id = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {

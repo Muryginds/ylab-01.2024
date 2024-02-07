@@ -18,7 +18,8 @@ public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
 
     @Override
     public Set<MeterReadingModel> getAllBySubmissionId(Long submissionId) {
-        var selectQuery = "SELECT * FROM private.meter_readings WHERE submission_id = ?";
+        var selectQuery = "SELECT id, meter_id, value, submission_id FROM private.meter_readings " +
+                "WHERE submission_id = ?";
         var meterReadingModels = new HashSet<MeterReadingModel>();
 
         try (Connection connection = dbConnectionFactory.getConnection();
