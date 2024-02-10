@@ -67,9 +67,9 @@ class UserServiceTest {
 
         userService.setCurrentUser(user);
 
-        var result = userService.getCurrentUserDTO();
+        var result = userService.getCurrentUser();
 
-        Assertions.assertEquals(userModel.name(), result.name());
+        Assertions.assertEquals(userModel.name(), result.getName());
     }
 
     @Test

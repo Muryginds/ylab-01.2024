@@ -1,12 +1,13 @@
 package ru.ylab.service;
 
 import lombok.RequiredArgsConstructor;
+import ru.ylab.dto.request.NewMeterTypeRequestDTO;
 import ru.ylab.entity.AuditionEvent;
 import ru.ylab.entity.MeterType;
 import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.exception.MeterTypeExistException;
 import ru.ylab.exception.MeterTypeNotFoundException;
-import ru.ylab.dto.MeterTypeDTO;
+import ru.ylab.dto.response.MeterTypeDTO;
 import ru.ylab.mapper.MeterTypeMapper;
 import ru.ylab.repository.MeterTypeRepository;
 
@@ -27,10 +28,11 @@ public class MeterTypeService {
      * Saves a new meter type with the provided type name.
      * Audits the action and logs an audition event.
      *
-     * @param typeName The name of the new meter type to be added.
+     * @param request Contains the name of the new meter type to be added.
      * @throws MeterTypeExistException If a meter type with the same name already exists.
      */
-    public void save(String typeName) {
+    public void save(NewMeterTypeRequestDTO request) {
+        var typeName = request.typeName();
         if (meterTypeRepository.checkExistsByName(typeName)) {
             throw new MeterTypeExistException(typeName);
         }

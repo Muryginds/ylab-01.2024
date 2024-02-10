@@ -12,14 +12,14 @@ import ru.ylab.entity.MeterReading;
 import ru.ylab.entity.MeterType;
 import ru.ylab.entity.Submission;
 import ru.ylab.mapper.MeterReadingMapper;
-import ru.ylab.repository.MeterReadingsRepository;
+import ru.ylab.repository.MeterReadingRepository;
 
 import java.util.Set;
 
 class MeterReadingsServiceTest {
 
     @Mock
-    private MeterReadingsRepository meterReadingsRepository;
+    private MeterReadingRepository meterReadingRepository;
 
     @Mock
     private SubmissionService submissionService;
@@ -51,7 +51,7 @@ class MeterReadingsServiceTest {
                 MeterReadingMapper.MAPPER.toMeterReadingModel(meterReading1),
                 MeterReadingMapper.MAPPER.toMeterReadingModel(meterReading2)
         );
-        Mockito.when(meterReadingsRepository.getAllBySubmissionId(submissionId)).thenReturn(meterReadingsModels);
+        Mockito.when(meterReadingRepository.getAllBySubmissionId(submissionId)).thenReturn(meterReadingsModels);
         Mockito.when(submissionService.getSubmissionById(submissionId)).thenReturn(submission);
         Mockito.when(meterService.getById(1L)).thenReturn(meter1);
         Mockito.when(meterService.getById(2L)).thenReturn(meter2);
@@ -73,7 +73,7 @@ class MeterReadingsServiceTest {
 
         meterReadingsService.save(meterReading);
 
-        Mockito.verify(meterReadingsRepository, Mockito.times(1)).save(meterReading);
+        Mockito.verify(meterReadingRepository, Mockito.times(1)).save(meterReading);
     }
 
     @Test
@@ -86,6 +86,6 @@ class MeterReadingsServiceTest {
 
         meterReadingsService.saveAll(meterReadings);
 
-        Mockito.verify(meterReadingsRepository, Mockito.times(1)).saveAll(meterReadings);
+        Mockito.verify(meterReadingRepository, Mockito.times(1)).saveAll(meterReadings);
     }
 }

@@ -1,5 +1,7 @@
 package ru.ylab.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 /**
@@ -9,7 +11,11 @@ import lombok.Builder;
  */
 @Builder
 public record UserAuthorizationRequestDTO(
+        @NotBlank
+        @JsonProperty("name")
         String name,
+        @NotBlank
+        @JsonProperty("password")
         String password
 ) {
 }

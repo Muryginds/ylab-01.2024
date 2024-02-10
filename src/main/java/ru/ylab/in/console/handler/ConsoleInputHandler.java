@@ -3,17 +3,16 @@ package ru.ylab.in.console.handler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.ylab.controller.*;
-import ru.ylab.dto.MeterReadingDTO;
-import ru.ylab.dto.request.SubmissionRequestDTO;
-import ru.ylab.dto.request.UserAuthorizationRequestDTO;
-import ru.ylab.dto.request.UserRegistrationRequestDTO;
+import ru.ylab.dto.response.MeterReadingDTO;
+import ru.ylab.dto.request.*;
 import ru.ylab.exception.NoSubmissionException;
 import ru.ylab.exception.SubmissionExistsException;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.lang.System.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,17 +22,17 @@ public class ConsoleInputHandler extends Handler {
     private final UserController userController;
     private final MeterTypeController meterTypeController;
     private final SubmissionController submissionController;
-    private final MeterReadingsController meterReadingsController;
+    private final MeterReadingController meterReadingController;
     private final MeterController meterController;
 
     public String handleMeterType() {
-        log.info("Enter new meter name:");
+        out.println("Enter new meter name:");
         var name = SCANNER.nextLine();
         while (name.isBlank() || meterTypeController.checkExistsByName(name)) {
             if (name.isBlank()) {
-                log.info("Name must not be blank");
+                out.println("Name must not be blank");
             } else {
-                log.info("Meter type with this name already exists");
+                out.println("Meter type with this name already exists");
             }
             name = SCANNER.nextLine();
         }
@@ -41,16 +40,16 @@ public class ConsoleInputHandler extends Handler {
     }
 
     public UserRegistrationRequestDTO handleRegistration() {
-        log.info("Enter name:");
+        out.println("Enter name:");
         var name = SCANNER.nextLine();
         while (userController.checkUserExistsByName(name)) {
-            log.info("Current name is already taken. Try another one");
+            out.println("Current name is already taken. Try another one");
             name = SCANNER.nextLine();
         }
-        log.info("Enter password:");
+        out.println("Enter password:");
         var password = SCANNER.nextLine();
         while (password.isBlank()) {
-            log.info("Password must not be blank. Try another one");
+            out.println("Password must not be blank. Try another one");
             password = SCANNER.nextLine();
         }
         return UserRegistrationRequestDTO.builder()
@@ -60,16 +59,16 @@ public class ConsoleInputHandler extends Handler {
     }
 
     public UserAuthorizationRequestDTO handleAuthorization() {
-        log.info("Enter name:");
+        out.println("Enter name:");
         var name = SCANNER.nextLine();
         while (name.isBlank()) {
-            log.info("Username must not be blank. Please try again");
+            out.println("Username must not be blank. Please try again");
             name = SCANNER.nextLine();
         }
-        log.info("Enter password:");
+        out.println("Enter password:");
         var password = SCANNER.nextLine();
         while (password.isBlank()) {
-            log.info("Password must not be blank. Try another one");
+            out.println("Password must not be blank. Try another one");
             password = SCANNER.nextLine();
         }
         return UserAuthorizationRequestDTO.builder()
@@ -79,61 +78,63 @@ public class ConsoleInputHandler extends Handler {
     }
 
     public LocalDate handleDate() {
-        log.info("Enter month:");
+        out.println("Enter month:");
         var month = -1;
         while (month < 0) {
             try {
                 var answer = SCANNER.nextLine();
                 month = Integer.parseInt(answer);
                 if (month > 12 || month < 1) {
-                    log.info("Input must be between 1 and 12");
+                    out.println("Input must be between 1 and 12");
                     month = -1;
                 }
             } catch (NumberFormatException ex) {
-                log.info(INPUT_MUST_BE_NUMBER);
+                out.println(INPUT_MUST_BE_NUMBER);
             }
         }
-        log.info("Enter year:");
+        out.println("Enter year:");
         var year = -1;
         while (year < 0) {
             try {
                 var answer = SCANNER.nextLine();
                 year = Integer.parseInt(answer);
             } catch (NumberFormatException ex) {
-                log.info(INPUT_MUST_BE_NUMBER);
+                out.println(INPUT_MUST_BE_NUMBER);
             }
         }
         return LocalDate.of(year, month, 1);
     }
 
     public Long handleUserId() {
-        log.info("Enter user id:");
+        out.println("Enter user id:");
         var id = -1L;
         while (id < 0) {
             try {
                 var answer = SCANNER.nextLine();
                 id = Long.parseLong(answer);
                 if (!userController.checkUserExistsById(id)) {
-                    log.info("User with id '{}' not found", id);
+                    out.printf("User with id '%s' not found%n", id);
                     id = -1;
                 }
             } catch (NumberFormatException ex) {
-                log.info(INPUT_MUST_BE_NUMBER);
+                out.println(INPUT_MUST_BE_NUMBER);
             }
         }
         return id;
     }
 
-    public SubmissionRequestDTO handleSubmission() {
+    public NewReadingsSubmissionRequestDTO handleSubmission() {
         var userDTO = userController.getCurrentUser();
         Set<MeterReadingDTO> meterReadingDTOs;
         try {
-            var submissionDTO = submissionController.getLastSubmissionByUserId(userDTO.id());
-            var submissionDate = submissionDTO.date().withDayOfMonth(1);
+            var request = SubmissionRequestDTO.builder().userId(userDTO.id()).build();
+            var submissionDTO = submissionController.getSubmissionDTO(request);
+            var date = LocalDate.parse(submissionDTO.date());
+            var submissionDate = date.withDayOfMonth(1);
             if (!submissionDate.isBefore(LocalDate.now().withDayOfMonth(1))) {
                 throw new SubmissionExistsException(userDTO.name(), LocalDate.now());
             }
-            meterReadingDTOs = meterReadingsController.getAllBySubmissionId(submissionDTO.id());
+            meterReadingDTOs = meterReadingController.getAllBySubmissionId(submissionDTO.id());
         } catch (NoSubmissionException ex) {
             meterReadingDTOs = meterController.getAllByUserId(userDTO.id()).stream()
                     .map(m -> MeterReadingDTO.builder()
@@ -142,10 +143,10 @@ public class ConsoleInputHandler extends Handler {
                             .build())
                     .collect(Collectors.toSet());
         }
-        var newReadings = new HashMap<Long, Long>();
+        var newReadings = new ArrayList<ReadingRequestDTO>();
         for (var readingDTO : meterReadingDTOs) {
-            log.info(
-                    "Enter meter value for '{}' meter #'{}'",
+            out.printf(
+                    "Enter meter value for '%s' meter #'%s'%n",
                     readingDTO.meterDTO().meterTypeDTO().typeName(),
                     readingDTO.meterDTO().factoryNumber()
             );
@@ -155,19 +156,21 @@ public class ConsoleInputHandler extends Handler {
                     var answer = SCANNER.nextLine();
                     value = Long.parseLong(answer);
                     if (value < readingDTO.value()) {
-                        log.info(
-                                "Meter value must not be less then previous. Last value:'{}'",
+                        out.printf(
+                                "Meter value must not be less then previous. Last value:'%s'%n",
                                 readingDTO.value()
                         );
                     } else {
-                        newReadings.put(readingDTO.meterDTO().id(), value);
+                        newReadings.add(
+                                ReadingRequestDTO.builder().meterId(readingDTO.meterDTO().id()).value(value).build()
+                        );
                     }
                 } catch (NumberFormatException ex) {
-                    log.info(INPUT_MUST_BE_NUMBER);
+                    out.println(INPUT_MUST_BE_NUMBER);
                 }
             }
         }
-        return SubmissionRequestDTO.builder()
+        return NewReadingsSubmissionRequestDTO.builder()
                 .meterReadings(newReadings)
                 .build();
     }

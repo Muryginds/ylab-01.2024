@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.ylab.entity.AuditionEvent;
-import ru.ylab.dto.AuditionEventDTO;
+import ru.ylab.dto.response.AuditionEventDTO;
 import ru.ylab.entity.User;
 import ru.ylab.model.AuditionEventModel;
 

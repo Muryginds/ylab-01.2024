@@ -3,13 +3,15 @@ package ru.ylab.in.console;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.ylab.controller.*;
-import ru.ylab.dto.request.SubmissionByDateRequestDTO;
+import ru.ylab.dto.request.AllSubmissionsRequestDTO;
+import ru.ylab.dto.request.SubmissionRequestDTO;
 import ru.ylab.in.console.handler.ConsoleInputHandler;
 import ru.ylab.utils.ConsoleUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.System.*;
 import static ru.ylab.in.console.CommonUserMenu.MenuAction.*;
 
 /**
@@ -21,11 +23,9 @@ import static ru.ylab.in.console.CommonUserMenu.MenuAction.*;
 @RequiredArgsConstructor
 public class CommonUserMenu extends Menu {
     private static final Map<String, MenuAction> ACTIONS = generateActions();
-    private final UserController userController;
     private final LoginController loginController;
     private final SubmissionController submissionController;
     private final ReadingsRecordingController readingsRecordingController;
-    private final MeterReadingsController meterReadingsController;
     private final ConsoleInputHandler consoleInputHandler;
 
     private static Map<String, MenuAction> generateActions() {
@@ -50,25 +50,20 @@ public class CommonUserMenu extends Menu {
     }
 
     private boolean getSubmissionByDate() {
-        var userDTO = userController.getCurrentUser();
-        var request = new SubmissionByDateRequestDTO(consoleInputHandler.handleDate(), userDTO.id());
-        var submissionDTO = submissionController.getSubmissionByDate(request);
+        var request = SubmissionRequestDTO.builder().date(consoleInputHandler.handleDate()).build();
+        var submissionDTO = submissionController.getSubmissionDTO(request);
         var sb = new StringBuilder();
         ConsoleUtils.submissionFormattedOutput(submissionDTO, sb);
-        meterReadingsController.getAllBySubmissionId(submissionDTO.id())
-                .forEach(mr -> ConsoleUtils.meterReadingFormattedOutput(mr, sb));
-        log.info(sb.toString());
+        out.println(sb);
         return false;
     }
 
     private boolean getMyLastSubmission() {
-        var userDTO = userController.getCurrentUser();
-        var submissionDTO = submissionController.getLastSubmissionByUserId(userDTO.id());
+        var request = SubmissionRequestDTO.builder().build();
+        var submissionDTO = submissionController.getSubmissionDTO(request);
         var sb = new StringBuilder();
         ConsoleUtils.submissionFormattedOutput(submissionDTO, sb);
-        meterReadingsController.getAllBySubmissionId(submissionDTO.id())
-                .forEach(mr -> ConsoleUtils.meterReadingFormattedOutput(mr, sb));
-        log.info(sb.toString());
+        out.println(sb);
         return false;
     }
 
@@ -78,18 +73,15 @@ public class CommonUserMenu extends Menu {
     }
 
     private boolean getMySubmissions() {
-        var userDTO = userController.getCurrentUser();
+        var request = AllSubmissionsRequestDTO.builder().build();
         var sb = new StringBuilder();
-        submissionController.getAllByUserId(userDTO.id()).forEach(
+        submissionController.getAllSubmissionDTOs(request).forEach(
                 s -> {
                     ConsoleUtils.submissionFormattedOutput(s, sb);
-                    meterReadingsController.getAllBySubmissionId(s.id()).forEach(
-                            mr -> ConsoleUtils.meterReadingFormattedOutput(mr, sb)
-                    );
                     sb.append("---------------------------");
                 }
         );
-        log.info(sb.toString());
+        out.println(sb);
         return false;
     }
 

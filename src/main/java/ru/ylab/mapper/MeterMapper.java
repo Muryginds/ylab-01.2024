@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.ylab.entity.Meter;
-import ru.ylab.dto.MeterDTO;
+import ru.ylab.dto.response.MeterDTO;
 import ru.ylab.entity.MeterType;
 import ru.ylab.entity.User;
 import ru.ylab.model.MeterModel;

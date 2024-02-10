@@ -1,7 +1,7 @@
 package ru.ylab.service;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.dto.request.SubmissionRequestDTO;
+import ru.ylab.dto.request.NewReadingsSubmissionRequestDTO;
 import ru.ylab.entity.*;
 import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.exception.MeterNotFoundException;
@@ -30,7 +30,7 @@ public class ReadingsRecordingService {
      * @throws SubmissionExistsException If a submission already exists for the user on the current date.
      * @throws MeterNotFoundException If a meter specified in the readings is not found.
      */
-    public void saveNewSubmission(SubmissionRequestDTO request) {
+    public void saveNewSubmission(NewReadingsSubmissionRequestDTO request) {
         var date = LocalDate.now();
         var user = userService.getCurrentUser();
         if (submissionService.checkExistsByUserIdAndDate(user.getId(), date)) {
@@ -43,10 +43,10 @@ public class ReadingsRecordingService {
                 .user(user)
                 .build();
         submissionService.save(submission);
-        var readings = request.meterReadings().entrySet().stream()
-                .map(newMeterReadingEntry -> {
-                    var meter = getUserMeterById(newMeterReadingEntry.getKey(), currentUserMetersMap);
-                    return createMeterReading(meter, newMeterReadingEntry.getValue(), submission);
+        var readings = request.meterReadings().stream()
+                .map(newReadingRequest -> {
+                    var meter = getUserMeterById(newReadingRequest.meterId(), currentUserMetersMap);
+                    return createMeterReading(meter, newReadingRequest.value(), submission);
                 })
                 .collect(Collectors.toSet());
         meterReadingsService.saveAll(readings);

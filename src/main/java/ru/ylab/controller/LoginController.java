@@ -1,9 +1,11 @@
 package ru.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.dto.UserDTO;
+import ru.ylab.dto.response.UserDTO;
 import ru.ylab.dto.request.UserAuthorizationRequestDTO;
 import ru.ylab.dto.request.UserRegistrationRequestDTO;
+import ru.ylab.exception.UserAuthenticationException;
+import ru.ylab.exception.UserNotAuthorizedException;
 import ru.ylab.service.LoginService;
 
 /**
@@ -28,6 +30,7 @@ public class LoginController {
      *
      * @param request The authorization request containing user credentials.
      * @return The UserDTO representing the authorized user.
+     * @throws UserAuthenticationException If authentication fails.
      */
     public UserDTO authorize(UserAuthorizationRequestDTO request) {
         return loginService.authorize(request);
@@ -35,6 +38,7 @@ public class LoginController {
 
     /**
      * Logs out the currently logged-in user.
+     * @throws UserNotAuthorizedException if user not authorized.
      */
     public void logout() {
         loginService.logout();

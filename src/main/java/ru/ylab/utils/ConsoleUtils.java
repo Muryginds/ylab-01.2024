@@ -1,8 +1,8 @@
 package ru.ylab.utils;
 
 import lombok.experimental.UtilityClass;
-import ru.ylab.dto.MeterReadingDTO;
-import ru.ylab.dto.SubmissionDTO;
+import ru.ylab.dto.response.MeterReadingDTO;
+import ru.ylab.dto.response.SubmissionDTO;
 
 @UtilityClass
 public class ConsoleUtils {
@@ -15,6 +15,7 @@ public class ConsoleUtils {
                 .append("' at ")
                 .append(submissionDTO.date())
                 .append("\n");
+        submissionDTO.readings().forEach(mr -> ConsoleUtils.meterReadingFormattedOutput(mr, sb));
     }
 
     public void meterReadingFormattedOutput(MeterReadingDTO meterReadingDTO, StringBuilder sb) {

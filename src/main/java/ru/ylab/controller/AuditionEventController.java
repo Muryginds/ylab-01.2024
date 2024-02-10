@@ -1,7 +1,8 @@
 package ru.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.dto.AuditionEventDTO;
+import ru.ylab.dto.request.AuditionEventsRequestDTO;
+import ru.ylab.dto.response.AuditionEventDTO;
 import ru.ylab.service.AuditionEventService;
 
 import java.util.Collection;
@@ -16,10 +17,10 @@ public class AuditionEventController {
     /**
      * Retrieves audition events associated with a specific user ID.
      *
-     * @param userId The ID of the user.
+     * @param request Contains the ID of the user.
      * @return A collection of AuditionEventDTO representing the audition events.
      */
-    public Collection<AuditionEventDTO> getEventsByUserId(Long userId){
-        return auditionEventService.getEventsByUserId(userId);
+    public Collection<AuditionEventDTO> getEvents(AuditionEventsRequestDTO request){
+        return auditionEventService.getEvents(request);
     }
 }

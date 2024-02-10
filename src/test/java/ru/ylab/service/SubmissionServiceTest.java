@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import ru.ylab.dto.request.AllSubmissionsRequestDTO;
+import ru.ylab.dto.request.SubmissionRequestDTO;
 import ru.ylab.entity.Submission;
 import ru.ylab.entity.User;
 import ru.ylab.enumerated.UserRole;
@@ -47,18 +49,18 @@ class SubmissionServiceTest {
 
         var submission1 = Submission.builder().id(1L).user(targetUser).date(LocalDate.now()).build();
         var submission2 = Submission.builder().id(2L).user(targetUser).date(LocalDate.now()).build();
-        var submissions = Set.of(submission1, submission2);
+        var expectedSubmissions = Set.of(submission1, submission2);
         var submissionModels = Set.of(
                 SubmissionMapper.MAPPER.toSubmissionModel(submission1),
                 SubmissionMapper.MAPPER.toSubmissionModel(submission2)
         );
         Mockito.when(submissionRepository.getByUserId(targetUserId)).thenReturn(submissionModels);
 
-        var result = submissionService.getAllByUserId(targetUserId);
+        var request = AllSubmissionsRequestDTO.builder().userId(targetUserId).build();
+        var result = submissionService.getAll(request);
 
-        var expected = SubmissionMapper.MAPPER.toSubmissionDTOs(submissions);
-        Assertions.assertTrue(result.containsAll(expected));
-        Assertions.assertEquals(result.size(), expected.size());
+        Assertions.assertTrue(result.containsAll(expectedSubmissions));
+        Assertions.assertEquals(result.size(), expectedSubmissions.size());
     }
 
     @Test
@@ -70,14 +72,14 @@ class SubmissionServiceTest {
         Mockito.when(userService.getCurrentUser()).thenReturn(adminUser);
         Mockito.when(userService.getUserById(targetUserId)).thenReturn(targetUser);
 
-        var submission = Submission.builder().id(1L).user(targetUser).date(LocalDate.now()).build();
-        var submissionModel = SubmissionMapper.MAPPER.toSubmissionModel(submission);
+        var expectedSubmission = Submission.builder().id(1L).user(targetUser).date(LocalDate.now()).build();
+        var submissionModel = SubmissionMapper.MAPPER.toSubmissionModel(expectedSubmission);
 
         Mockito.when(submissionRepository.findLastSubmissionByUserId(targetUserId))
                 .thenReturn(Optional.of(submissionModel));
-        var expected = SubmissionMapper.MAPPER.toSubmissionDTO(submission);
-        var result = submissionService.getLastSubmissionByUserId(targetUserId);
+        var request = SubmissionRequestDTO.builder().userId(targetUserId).build();
+        var result = submissionService.getSubmission(request);
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expectedSubmission, result);
     }
 }

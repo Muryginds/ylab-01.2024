@@ -10,6 +10,7 @@ import ru.ylab.in.console.handler.MenuHandlerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.System.*;
 import static ru.ylab.in.console.EntranceMenu.MenuAction.*;
 
 /**
@@ -42,33 +43,33 @@ public class EntranceMenu extends Menu {
                 default -> throw new IllegalArgumentException("No suitable ACTION");
             };
         } catch (BaseMonitoringServiceException ex) {
-            log.info(ex.getMessage());
+            out.println(ex.getMessage());
         } catch (NullPointerException ex) {
-            log.info("Invalid command. Please try again.");
+            out.println("Invalid command. Please try again.");
         }
         return false;
     }
 
     private boolean exitApplication() {
-        log.info("Exiting the Monitoring Service. Goodbye!");
+        out.println("Exiting the Monitoring Service. Goodbye!");
         return true;
     }
 
     private boolean registerUser() {
         var registrationRequest = consoleInputHandler.handleRegistration();
         var userDTO = loginController.register(registrationRequest);
-        log.info(String.format(
-                "You are registered as '%s' with id '%s', please authorize",
+        out.printf(
+                "You are registered as '%s' with id '%s', please authorize%n",
                 userDTO.name(),
                 userDTO.id()
-        ));
+        );
         return false;
     }
 
     private boolean authorizeUser() {
         var authorizationRequest = consoleInputHandler.handleAuthorization();
         var userDTO = loginController.authorize(authorizationRequest);
-        log.info(String.format("You are successfully authorized as '%s'", userDTO.name()));
+        out.printf("You are successfully authorized as '%s'%n", userDTO.name());
         menuHandlerFactory.getMenuHandler().handleMenu();
         return false;
     }

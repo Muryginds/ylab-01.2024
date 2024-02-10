@@ -1,8 +1,11 @@
 package ru.ylab.service;
 
 import lombok.RequiredArgsConstructor;
+import ru.ylab.dto.request.AuditionEventsRequestDTO;
 import ru.ylab.entity.AuditionEvent;
-import ru.ylab.dto.AuditionEventDTO;
+import ru.ylab.dto.response.AuditionEventDTO;
+import ru.ylab.enumerated.UserRole;
+import ru.ylab.exception.NoPermissionException;
 import ru.ylab.mapper.AuditionEventMapper;
 import ru.ylab.repository.AuditionEventRepository;
 
@@ -22,15 +25,22 @@ public class AuditionEventService {
     /**
      * Retrieves a collection of audition events associated with a specific user.
      *
-     * @param userId The ID of the user for whom audition events are retrieved.
+     * @param request Contains the ID of the user for whom audition events are retrieved.
      * @return Collection of AuditionEventDTO representing the user's audition events.
      */
-    public Collection<AuditionEventDTO> getEventsByUserId(Long userId) {
+    public Collection<AuditionEventDTO> getEvents(AuditionEventsRequestDTO request) {
+        var userId = request.userId();
+        var currentUser = userService.getCurrentUser();
+        if (currentUser == null || !currentUser.getRole().equals(UserRole.ADMIN)) {
+            throw new NoPermissionException();
+        }
         var eventModels = auditionEventRepository.getEventsByUserId(userId);
-        var user = userService.getUserById(userId);
         var collection = new HashSet<AuditionEvent>();
-        for (var eventModel : eventModels) {
-            collection.add(AuditionEventMapper.MAPPER.toAuditionEvent(eventModel, user));
+        if (!eventModels.isEmpty()) {
+            var targetUser = userService.getUserById(userId);
+            for (var eventModel : eventModels) {
+                collection.add(AuditionEventMapper.MAPPER.toAuditionEvent(eventModel, targetUser));
+            }
         }
         return AuditionEventMapper.MAPPER.toAuditionEventDTOs(collection);
     }

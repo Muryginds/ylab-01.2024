@@ -3,7 +3,7 @@ package ru.ylab.repository.impl;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.MeterReading;
 import ru.ylab.model.MeterReadingModel;
-import ru.ylab.repository.MeterReadingsRepository;
+import ru.ylab.repository.MeterReadingRepository;
 import ru.ylab.utils.DbConnectionFactory;
 import ru.ylab.utils.ExceptionHandler;
 
@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
+public class JdbcMeterReadingRepository implements MeterReadingRepository {
     private final DbConnectionFactory dbConnectionFactory;
 
     @Override

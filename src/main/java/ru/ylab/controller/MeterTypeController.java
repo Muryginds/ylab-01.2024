@@ -1,6 +1,8 @@
 package ru.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
+import ru.ylab.dto.request.NewMeterTypeRequestDTO;
+import ru.ylab.exception.MeterTypeExistException;
 import ru.ylab.service.MeterTypeService;
 
 /**
@@ -29,9 +31,10 @@ public class MeterTypeController {
     /**
      * Saves a new meter type with the specified name.
      *
-     * @param typeName The name of the new meter type to be saved.
+     * @param request Contains the name of the new meter type to be saved.
+     * @throws MeterTypeExistException If a meter type with the same name already exists.
      */
-    public void save(String typeName) {
-        meterTypeService.save(typeName);
+    public void save(NewMeterTypeRequestDTO request) {
+        meterTypeService.save(request);
     }
 }

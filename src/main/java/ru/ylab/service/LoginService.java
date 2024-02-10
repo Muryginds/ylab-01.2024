@@ -1,7 +1,7 @@
 package ru.ylab.service;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.dto.UserDTO;
+import ru.ylab.dto.response.UserDTO;
 import ru.ylab.dto.request.UserAuthorizationRequestDTO;
 import ru.ylab.dto.request.UserRegistrationRequestDTO;
 import ru.ylab.entity.AuditionEvent;
@@ -9,6 +9,7 @@ import ru.ylab.entity.User;
 import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.exception.UserAlreadyExistException;
 import ru.ylab.exception.UserAuthenticationException;
+import ru.ylab.exception.UserNotAuthorizedException;
 import ru.ylab.exception.UserNotFoundException;
 import ru.ylab.mapper.UserMapper;
 import ru.ylab.security.PasswordEncoder;
@@ -90,10 +91,12 @@ public class LoginService {
     /**
      * Logs out the currently authenticated user.
      * Adds an audition event for the logout.
+     * @throws UserNotAuthorizedException if user not authorized.
      */
     public void logout() {
+        var user = userService.getCurrentUser();
         saveNewUserAuditionEvent(
-                userService.getCurrentUser(),
+                user,
                 AuditionEventType.SESSION_END,
                 "user logged out"
         );

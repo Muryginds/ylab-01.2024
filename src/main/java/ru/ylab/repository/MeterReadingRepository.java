@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Repository interface for managing meter reading-related data operations.
  */
-public interface MeterReadingsRepository {
+public interface MeterReadingRepository {
 
     /**
      * Gets all meter readings associated with a specific submission.

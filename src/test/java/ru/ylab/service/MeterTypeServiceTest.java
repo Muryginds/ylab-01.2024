@@ -7,7 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import ru.ylab.dto.MeterTypeDTO;
+import ru.ylab.dto.request.NewMeterTypeRequestDTO;
+import ru.ylab.dto.response.MeterTypeDTO;
 import ru.ylab.entity.MeterType;
 import ru.ylab.exception.MeterTypeExistException;
 import ru.ylab.exception.MeterTypeNotFoundException;
@@ -41,8 +42,9 @@ class MeterTypeServiceTest {
     void testSaveMeterType_whenNonExistingType_thenDoNothing() {
         String typeName = "Electricity";
         Mockito.when(meterTypeRepository.checkExistsByName(typeName)).thenReturn(false);
+        var request = NewMeterTypeRequestDTO.builder().typeName(typeName).build();
 
-        meterTypeService.save(typeName);
+        meterTypeService.save(request);
 
         Mockito.verify(meterTypeRepository, Mockito.times(1)).save(Mockito.any(MeterType.class));
         Mockito.verify(auditionEventService, Mockito.times(1)).save(Mockito.any());
@@ -52,8 +54,9 @@ class MeterTypeServiceTest {
     void testSaveMeterType_whenExistingType_thenThrowMeterTypeExistException() {
         String typeName = "Electricity";
         Mockito.when(meterTypeRepository.checkExistsByName(typeName)).thenReturn(true);
+        var request = NewMeterTypeRequestDTO.builder().typeName(typeName).build();
 
-        Assertions.assertThrows(MeterTypeExistException.class, () -> meterTypeService.save(typeName));
+        Assertions.assertThrows(MeterTypeExistException.class, () -> meterTypeService.save(request));
         Mockito.verify(meterTypeRepository, Mockito.times(0)).save(Mockito.any(MeterType.class));
         Mockito.verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
     }
