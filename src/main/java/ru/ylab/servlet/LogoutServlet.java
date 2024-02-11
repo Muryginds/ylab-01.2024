@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Setter;
 import ru.ylab.controller.LoginController;
 import ru.ylab.dto.response.MessageDTO;
 import ru.ylab.exception.BaseMonitoringServiceException;
@@ -18,6 +19,7 @@ import java.io.IOException;
 
 @WebServlet("/api/v1/auth/logout")
 public class LogoutServlet extends HttpServlet {
+    @Setter
     private LoginController loginController;
 
     @Override

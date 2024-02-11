@@ -227,7 +227,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                   name: date
-                  type: DATE
+                  type: timestamp
             tableName: audition_events
         - addForeignKeyConstraint:
             baseColumnNames: user_id

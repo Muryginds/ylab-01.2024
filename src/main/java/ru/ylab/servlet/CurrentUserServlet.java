@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import ru.ylab.controller.UserController;
 import ru.ylab.exception.BaseMonitoringServiceException;
 import ru.ylab.exception.UserNotAuthorizedException;
@@ -19,6 +20,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @WebServlet("/api/v1/users/me")
 public class CurrentUserServlet extends HttpServlet {
+    @Setter
     private UserController userController;
 
     @Override

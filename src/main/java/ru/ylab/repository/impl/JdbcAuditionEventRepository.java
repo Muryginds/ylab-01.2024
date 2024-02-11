@@ -19,7 +19,7 @@ public class JdbcAuditionEventRepository implements AuditionEventRepository {
     @Override
     public Collection<AuditionEventModel> getEventsByUserId(Long userId) {
         var selectQuery = "SELECT id, user_id, event_type, message, date FROM private.audition_events " +
-                "WHERE user_id = ?";
+                "WHERE user_id = ? ORDER BY date DESC";
         var auditionEventModels = new HashSet<AuditionEventModel>();
 
         try (Connection connection = dbConnectionFactory.getConnection();

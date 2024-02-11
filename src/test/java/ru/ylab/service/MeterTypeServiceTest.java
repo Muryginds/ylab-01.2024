@@ -47,7 +47,6 @@ class MeterTypeServiceTest {
         meterTypeService.save(request);
 
         Mockito.verify(meterTypeRepository, Mockito.times(1)).save(Mockito.any(MeterType.class));
-        Mockito.verify(auditionEventService, Mockito.times(1)).save(Mockito.any());
     }
 
     @Test

@@ -33,24 +33,25 @@ public class ApplicationComponentsFactory {
             new JdbcAuditionEventRepository(dbConnectionFactory);
 
     private static final PasswordEncoder passwordEncoder = new Password4jPasswordEncoder();
-
+    @Getter
     private static final UserService userService =
             new UserService(userRepository);
+    @Getter
     private static final AuditionEventService auditionEventService =
             new AuditionEventService(auditionEventRepository, userService);
     private static final SubmissionService submissionService =
-            new SubmissionService(submissionRepository, userService, auditionEventService);
+            new SubmissionService(submissionRepository, userService);
     private static final MeterTypeService meterTypeService =
-            new MeterTypeService(meterTypeRepository, auditionEventService, userService);
+            new MeterTypeService(meterTypeRepository);
     private static final MeterService meterService =
             new MeterService(meterRepository, meterTypeService, userService);
     private static final MeterReadingsService meterReadingService =
             new MeterReadingsService(METER_READING_REPOSITORY, submissionService, meterService);
     private static final ReadingsRecordingService readingsRecordingService =
             new ReadingsRecordingService(
-                    meterReadingService, meterService, submissionService, userService, auditionEventService);
+                    meterReadingService, meterService, submissionService, userService);
     private static final LoginService loginService =
-            new LoginService(userService, passwordEncoder, auditionEventService, meterService);
+            new LoginService(userService, passwordEncoder, meterService);
     private static final SubmissionRepresentationService submissionRepresentationService =
             new SubmissionRepresentationService(meterReadingService, submissionService);
 
@@ -78,4 +79,7 @@ public class ApplicationComponentsFactory {
     @Getter
     private static final LoginController loginController =
             new LoginController(loginService);
+    @Getter
+    private static final RequestValidator requestValidator =
+            new RequestValidator();
 }

@@ -1,6 +1,7 @@
 package ru.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
+import ru.ylab.annotation.Loggable;
 import ru.ylab.dto.request.NewReadingsSubmissionRequestDTO;
 import ru.ylab.service.ReadingsRecordingService;
 
@@ -18,6 +19,7 @@ public class ReadingsRecordingController {
      *
      * @param request The SubmissionRequestDTO containing data for the new submission.
      */
+    @Loggable
     public void saveNewSubmission(NewReadingsSubmissionRequestDTO request) {
         readingsRecordingService.saveNewSubmission(request);
     }

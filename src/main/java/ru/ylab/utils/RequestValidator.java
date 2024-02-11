@@ -3,13 +3,11 @@ package ru.ylab.utils;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import lombok.experimental.UtilityClass;
 import ru.ylab.exception.DtoValidationException;
 
 import java.util.stream.Collectors;
 
-@UtilityClass
-public class ValidationUtils {
+public class RequestValidator {
     private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = validatorFactory.getValidator();
 

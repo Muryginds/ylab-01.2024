@@ -1,13 +1,13 @@
 package ru.ylab.service;
 
 import lombok.RequiredArgsConstructor;
+import ru.ylab.annotation.Auditable;
 import ru.ylab.dto.request.NewMeterTypeRequestDTO;
-import ru.ylab.entity.AuditionEvent;
+import ru.ylab.dto.response.MeterTypeDTO;
 import ru.ylab.entity.MeterType;
 import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.exception.MeterTypeExistException;
 import ru.ylab.exception.MeterTypeNotFoundException;
-import ru.ylab.dto.response.MeterTypeDTO;
 import ru.ylab.mapper.MeterTypeMapper;
 import ru.ylab.repository.MeterTypeRepository;
 
@@ -21,16 +21,14 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class MeterTypeService {
     private final MeterTypeRepository meterTypeRepository;
-    private final AuditionEventService auditionEventService;
-    private final UserService userService;
 
     /**
      * Saves a new meter type with the provided type name.
-     * Audits the action and logs an audition event.
      *
      * @param request Contains the name of the new meter type to be added.
      * @throws MeterTypeExistException If a meter type with the same name already exists.
      */
+    @Auditable(eventType = AuditionEventType.NEW_METER_TYPE_ADDITION)
     public void save(NewMeterTypeRequestDTO request) {
         var typeName = request.typeName();
         if (meterTypeRepository.checkExistsByName(typeName)) {
@@ -38,18 +36,6 @@ public class MeterTypeService {
         }
         var newType = MeterType.builder().typeName(typeName).build();
         meterTypeRepository.save(newType);
-        newMeterTypeAdditionAuditionEvent(typeName);
-    }
-
-    private void newMeterTypeAdditionAuditionEvent(String typeName) {
-        var event = AuditionEvent.builder()
-                .user(userService.getCurrentUser())
-                .eventType(AuditionEventType.NEW_METER_TYPE_ADDITION)
-                .message(String.format(
-                        "New meter type '%s' added",
-                        typeName))
-                .build();
-        auditionEventService.save(event);
     }
 
     /**

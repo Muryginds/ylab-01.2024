@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'war'
+    id "io.freefair.aspectj.post-compile-weaving" version "8.4" apply false
 }
 
 group = 'ru.ylab'
@@ -17,6 +18,7 @@ repositories {
 }
 
 ext {
+    isTest = System.properties['env'] == 'test'
     password4jVersion = '1.7.3'
     mapstructVersion = '1.5.5.Final'
     mapstructProcessorVersion = '1.5.5.Final'
@@ -34,6 +36,13 @@ ext {
     jakartaServletApiVersion = '6.1.0-M1'
     jacksonVersion = '2.16.1'
     hibernameValidatorVersion = '8.0.1.Final'
+    aspectjrtVersion = '1.9.21'
+}
+
+apply {
+    if (!isTest) {
+        apply plugin: 'io.freefair.aspectj.post-compile-weaving'
+    }
 }
 
 dependencies {
@@ -48,6 +57,7 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}"
     implementation "org.hibernate.validator:hibernate-validator:${hibernameValidatorVersion}"
+    implementation "org.aspectj:aspectjrt:${aspectjrtVersion}"
 
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     compileOnly "jakarta.servlet:jakarta.servlet-api:${jakartaServletApiVersion}"
@@ -60,6 +70,7 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter"
     testImplementation "org.mockito:mockito-core:${mockitoCoreVersion}"
     testImplementation "org.testcontainers:postgresql:${testContainersPostgresVersion}"
+    testImplementation "jakarta.servlet:jakarta.servlet-api:${jakartaServletApiVersion}"
 
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
 

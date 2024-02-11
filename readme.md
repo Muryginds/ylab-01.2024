@@ -36,6 +36,8 @@ POST: /api/v1/meter-types - add new meter type with {NewMeterTypeRequestDTO}
 #### Testing
     By default, added user 'admin' with password 'admin' and administrative role
 
+    to run tests, add -Denv=test
+
 ### Run the Project:
 
 - Clone the repository
