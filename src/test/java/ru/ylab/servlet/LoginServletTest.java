@@ -49,20 +49,16 @@ class LoginServletTest {
 
     @Test
     void testDoPost_whenValidRequest_returnStatusOK() throws Exception {
-        // Prepare test data
         UserAuthorizationRequestDTO requestDTO = new UserAuthorizationRequestDTO("name", "password");
         UserDTO userDTO = new UserDTO(1L, "user", UserRole.USER);
         byte[] responseBody = JsonUtils.writeJsonAsBytes(userDTO);
 
-        // Mock request behavior
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(new String(JsonUtils.writeJsonAsBytes(requestDTO)))));
         when(loginController.authorize(requestDTO)).thenReturn(userDTO);
         when(response.getOutputStream()).thenReturn(outputStream);
 
-        // Execute the servlet method
         servlet.doPost(request, response);
 
-        // Verify interactions
         verify(response).setStatus(HttpServletResponse.SC_OK);
         verify(response).setContentType("application/json");
         verify(response).getOutputStream();
@@ -71,18 +67,14 @@ class LoginServletTest {
 
     @Test
     void testDoPost_whenAuthorizationFails_returnStatusBadRequest() throws Exception {
-        // Prepare test data
         UserAuthorizationRequestDTO requestDTO = new UserAuthorizationRequestDTO("name", "password");
 
-        // Mock behavior to throw UserNotAuthorizedException
         doThrow(new UserNotAuthorizedException()).when(loginController).authorize(requestDTO);
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(new String(JsonUtils.writeJsonAsBytes((requestDTO))))));
         when(response.getOutputStream()).thenReturn(outputStream);
 
-        // Execute the servlet method
         servlet.doPost(request, response);
 
-        // Verify interactions
         verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
         verify(response).setContentType("application/json");
         verify(response).getOutputStream();

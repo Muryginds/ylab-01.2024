@@ -1,7 +1,5 @@
 package ru.ylab.servlet;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,15 +11,11 @@ import org.mockito.MockitoAnnotations;
 import ru.ylab.controller.MeterTypeController;
 import ru.ylab.dto.request.NewMeterTypeRequestDTO;
 import ru.ylab.dto.response.MessageDTO;
-import ru.ylab.exception.BaseMonitoringServiceException;
 import ru.ylab.exception.UserNotAuthorizedException;
-import ru.ylab.servlet.MeterTypesServlet;
 import ru.ylab.utils.JsonUtils;
 import ru.ylab.utils.RequestValidator;
-import ru.ylab.utils.ResponseUtils;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.StringReader;
 
 import static org.mockito.Mockito.*;
