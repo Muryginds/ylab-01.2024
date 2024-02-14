@@ -1,0 +1,123 @@
+package io.ylab.repository.impl;
+
+import lombok.RequiredArgsConstructor;
+import io.ylab.entity.Meter;
+import io.ylab.model.MeterModel;
+import io.ylab.repository.MeterRepository;
+import io.ylab.utils.DbConnectionFactory;
+import io.ylab.utils.ExceptionHandler;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+@RequiredArgsConstructor
+public class JdbcMeterRepository implements MeterRepository {
+    private final DbConnectionFactory dbConnectionFactory;
+
+    @Override
+    public Set<MeterModel> getByUserId(Long userId) {
+        var selectQuery = "SELECT id, user_id, factory_number, meter_type_id FROM private.meters WHERE user_id = ?";
+        var meterModels = new HashSet<MeterModel>();
+
+        try (var connection = dbConnectionFactory.getConnection();
+             var preparedStatement = connection.prepareStatement(selectQuery)) {
+
+            preparedStatement.setLong(1, userId);
+
+            try (var resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    var meterModel = mapResultSetToMeterModel(resultSet);
+                    meterModels.add(meterModel);
+                }
+            }
+
+        } catch (SQLException e) {
+            ExceptionHandler.handleSQLException(e);
+        }
+
+        return meterModels;
+    }
+
+    @Override
+    public void save(Meter meter) {
+        var insertQuery =
+                "INSERT INTO private.meters (factory_number, user_id, meter_type_id) VALUES (?, ?, ?)";
+
+        try (var connection = dbConnectionFactory.getConnection();
+             var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
+
+            preparedStatement.setString(1, meter.getFactoryNumber());
+            preparedStatement.setLong(2, meter.getUser().getId());
+            preparedStatement.setLong(3, meter.getMeterType().getId());
+            preparedStatement.executeUpdate();
+
+            try (var resultSet = preparedStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    var generatedId = resultSet.getLong(1);
+                    meter.setId(generatedId);
+                }
+            }
+
+        } catch (SQLException e) {
+            ExceptionHandler.handleSQLException(e);
+        }
+    }
+
+    @Override
+    public void save(Collection<Meter> meters) {
+        var insertQuery =
+                "INSERT INTO private.meters (factory_number, user_id, meter_type_id) VALUES (?, ?, ?)";
+
+        try (var connection = dbConnectionFactory.getConnection();
+             var preparedStatement = connection.prepareStatement(insertQuery)) {
+
+            for (var meter : meters) {
+                preparedStatement.setString(1, meter.getFactoryNumber());
+                preparedStatement.setLong(2, meter.getUser().getId());
+                preparedStatement.setLong(3, meter.getMeterType().getId());
+                preparedStatement.addBatch();
+            }
+
+            preparedStatement.executeBatch();
+
+        } catch (SQLException e) {
+            ExceptionHandler.handleSQLException(e);
+        }
+    }
+
+    @Override
+    public Optional<MeterModel> findById(Long meterId) {
+        var selectQuery = "SELECT id, user_id, factory_number, meter_type_id FROM private.meters WHERE id = ?";
+
+        try (var connection = dbConnectionFactory.getConnection();
+             var preparedStatement = connection.prepareStatement(selectQuery)) {
+
+            preparedStatement.setLong(1, meterId);
+            var resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                var meterModel = mapResultSetToMeterModel(resultSet);
+                return Optional.of(meterModel);
+            }
+
+        } catch (SQLException e) {
+            ExceptionHandler.handleSQLException(e);
+        }
+
+        return Optional.empty();
+    }
+
+    private MeterModel mapResultSetToMeterModel(ResultSet resultSet) throws SQLException {
+        return MeterModel.builder()
+                .id(resultSet.getLong("id"))
+                .factoryNumber(resultSet.getString("factory_number"))
+                .userId(resultSet.getLong("user_id"))
+                .meterTypeId(resultSet.getLong("meter_type_id"))
+                .build();
+    }
+}
