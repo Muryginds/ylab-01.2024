@@ -32,7 +32,8 @@ class AllEventsServletTest {
     @Mock
     private AuditionEventController auditionEventController;
 
-    @Mock private RequestValidator requestValidator;
+    @Mock
+    private RequestValidator requestValidator;
 
     @Mock
     private ServletInputStream inputStream;
