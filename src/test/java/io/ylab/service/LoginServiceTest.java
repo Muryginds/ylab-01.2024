@@ -14,6 +14,10 @@ import io.ylab.exception.UserAlreadyExistException;
 import io.ylab.exception.UserAuthenticationException;
 import io.ylab.security.PasswordEncoder;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 class LoginServiceTest {
 
     @Mock
@@ -39,64 +43,64 @@ class LoginServiceTest {
     @Test
     void testRegisterUser_whenNonExistingUser_thenReturnUserDTO() {
         var requestDTO = new UserRegistrationRequestDto("testUser", "password");
-        Mockito.when(userService.checkUserExistsByName(requestDTO.name())).thenReturn(false);
-        Mockito.when(passwordEncoder.encode(requestDTO.password())).thenReturn("encodedPassword");
+        when(userService.checkUserExistsByName(requestDTO.name())).thenReturn(false);
+        when(passwordEncoder.encode(requestDTO.password())).thenReturn("encodedPassword");
 
         var result = loginService.registerUser(requestDTO);
 
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(requestDTO.name(), result.name());
-        Mockito.verify(userService, Mockito.times(1)).save(Mockito.any(User.class));
-        Mockito.verify(meterService, Mockito.times(1)).generateForNewUser(Mockito.any(User.class));
+        assertNotNull(result);
+        assertEquals(requestDTO.name(), result.name());
+        verify(userService, Mockito.times(1)).save(Mockito.any(User.class));
+        verify(meterService, Mockito.times(1)).generateForNewUser(Mockito.any(User.class));
     }
 
     @Test
     void testRegisterUser_whenExistingUserName_throwUserAlreadyExistException() {
         var requestDTO = new UserRegistrationRequestDto("existingUser", "password");
-        Mockito.when(userService.checkUserExistsByName(requestDTO.name())).thenReturn(true);
+        when(userService.checkUserExistsByName(requestDTO.name())).thenReturn(true);
 
-        Assertions.assertThrows(UserAlreadyExistException.class, () -> loginService.registerUser(requestDTO));
-        Mockito.verify(userService, Mockito.times(0)).save(Mockito.any());
-        Mockito.verify(meterService, Mockito.times(0)).generateForNewUser(Mockito.any());
-        Mockito.verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
+        assertThrows(UserAlreadyExistException.class, () -> loginService.registerUser(requestDTO));
+        verify(userService, Mockito.times(0)).save(Mockito.any());
+        verify(meterService, Mockito.times(0)).generateForNewUser(Mockito.any());
+        verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
     }
 
     @Test
     void testAuthorize_whenExistingUser_thenReturnUserDTO() {
         var requestDTO = new UserAuthorizationRequestDto("testUser", "password");
         var user = User.builder().name("testUser").password("encodedPassword").build();
-        Mockito.when(userService.getUserByName(requestDTO.name())).thenReturn(user);
-        Mockito.when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(true);
+        when(userService.getUserByName(requestDTO.name())).thenReturn(user);
+        when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(true);
 
         var result = loginService.authorize(requestDTO);
 
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(requestDTO.name(), result.name());
+        assertNotNull(result);
+        assertEquals(requestDTO.name(), result.name());
     }
 
     @Test
     void testAuthorize_whenNonExistingUser_throwUserAuthenticationException() {
         var requestDTO = new UserAuthorizationRequestDto("nonExistingUser", "password");
-        Mockito.when(userService.getUserByName(requestDTO.name())).thenThrow(new UserAuthenticationException());
+        when(userService.getUserByName(requestDTO.name())).thenThrow(new UserAuthenticationException());
 
         Assertions.assertThrows(UserAuthenticationException.class, () -> loginService.authorize(requestDTO));
-        Mockito.verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
+        verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
     }
 
     @Test
     void testAuthorize_whenWrongPassword_throwUserAuthenticationException() {
         var requestDTO = new UserAuthorizationRequestDto("testUser", "wrongPassword");
         var user = User.builder().name("testUser").password("encodedPassword").build();
-        Mockito.when(userService.getUserByName(requestDTO.name())).thenThrow(new UserAuthenticationException());
-        Mockito.when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(false);
+        when(userService.getUserByName(requestDTO.name())).thenThrow(new UserAuthenticationException());
+        when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(false);
 
         Assertions.assertThrows(UserAuthenticationException.class, () -> loginService.authorize(requestDTO));
-        Mockito.verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
+        verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
     }
 
-//    @Test
-//    void testLogout() {
-//        loginService.logout();
-//        asserTrue(userService.getCurrentUser())
-//    }
+    @Test
+    void testLogout() {
+        loginService.logout();
+        assertNull(userService.getCurrentUser());
+    }
 }
