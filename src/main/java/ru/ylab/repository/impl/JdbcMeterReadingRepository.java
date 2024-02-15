@@ -2,26 +2,24 @@ package ru.ylab.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.MeterReading;
-import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.MeterReadingModel;
-import ru.ylab.repository.MeterReadingsRepository;
+import ru.ylab.repository.MeterReadingRepository;
 import ru.ylab.utils.DbConnectionFactory;
+import ru.ylab.utils.ExceptionHandler;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
+public class JdbcMeterReadingRepository implements MeterReadingRepository {
     private final DbConnectionFactory dbConnectionFactory;
 
     @Override
     public Set<MeterReadingModel> getAllBySubmissionId(Long submissionId) {
-        var selectQuery = "SELECT * FROM private.meter_readings WHERE submission_id = ?";
+        var selectQuery = "SELECT id, meter_id, value, submission_id FROM private.meter_readings " +
+                "WHERE submission_id = ?";
         var meterReadingModels = new HashSet<MeterReadingModel>();
 
         try (Connection connection = dbConnectionFactory.getConnection();
@@ -37,7 +35,7 @@ public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return meterReadingModels;
@@ -45,26 +43,31 @@ public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
 
     @Override
     public void save(MeterReading meterReading) {
-        var insertQuery = "INSERT INTO private.meter_readings (id, submission_id, meter_id, value) " +
-                "VALUES (nextval('private.meter_readings_id_seq'), ?, ?, ?)";
+        var insertQuery = "INSERT INTO private.meter_readings (submission_id, meter_id, value) VALUES (?, ?, ?)";
 
         try (Connection connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(insertQuery)) {
+             var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setLong(1, meterReading.getSubmission().getId());
             preparedStatement.setLong(2, meterReading.getMeter().getId());
             preparedStatement.setLong(3, meterReading.getValue());
             preparedStatement.executeUpdate();
 
+            try (var resultSet = preparedStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    var generatedId = resultSet.getLong(1);
+                    meterReading.setId(generatedId);
+                }
+            }
+
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 
     @Override
     public void saveAll(Collection<MeterReading> meterReadings) {
-        String insertQuery = "INSERT INTO private.meter_readings (id, submission_id, meter_id, value) " +
-                "VALUES (nextval('private.meter_readings_id_seq'), ?, ?, ?)";
+        String insertQuery = "INSERT INTO private.meter_readings (submission_id, meter_id, value) VALUES (?, ?, ?)";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery)) {
@@ -79,7 +82,7 @@ public class JdbcMeterReadingsRepository implements MeterReadingsRepository {
             preparedStatement.executeBatch();
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 

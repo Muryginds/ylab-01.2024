@@ -2,12 +2,14 @@ package ru.ylab.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.Meter;
-import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.MeterModel;
 import ru.ylab.repository.MeterRepository;
 import ru.ylab.utils.DbConnectionFactory;
+import ru.ylab.utils.ExceptionHandler;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
@@ -19,7 +21,7 @@ public class JdbcMeterRepository implements MeterRepository {
 
     @Override
     public Set<MeterModel> getByUserId(Long userId) {
-        var selectQuery = "SELECT * FROM private.meters WHERE user_id = ?";
+        var selectQuery = "SELECT id, user_id, factory_number, meter_type_id FROM private.meters WHERE user_id = ?";
         var meterModels = new HashSet<MeterModel>();
 
         try (var connection = dbConnectionFactory.getConnection();
@@ -35,7 +37,7 @@ public class JdbcMeterRepository implements MeterRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return meterModels;
@@ -44,27 +46,32 @@ public class JdbcMeterRepository implements MeterRepository {
     @Override
     public void save(Meter meter) {
         var insertQuery =
-                "INSERT INTO private.meters (id, factory_number, user_id, meter_type_id) " +
-                        "VALUES (nextval('private.meter_types_id_seq'), ?, ?, ?)";
+                "INSERT INTO private.meters (factory_number, user_id, meter_type_id) VALUES (?, ?, ?)";
 
         try (var connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(insertQuery)) {
+             var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, meter.getFactoryNumber());
             preparedStatement.setLong(2, meter.getUser().getId());
             preparedStatement.setLong(3, meter.getMeterType().getId());
             preparedStatement.executeUpdate();
 
+            try (var resultSet = preparedStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    var generatedId = resultSet.getLong(1);
+                    meter.setId(generatedId);
+                }
+            }
+
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 
     @Override
     public void save(Collection<Meter> meters) {
         var insertQuery =
-                "INSERT INTO private.meters (id, factory_number, user_id, meter_type_id) " +
-                        "VALUES (nextval('private.meter_types_id_seq'), ?, ?, ?)";
+                "INSERT INTO private.meters (factory_number, user_id, meter_type_id) VALUES (?, ?, ?)";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery)) {
@@ -79,13 +86,13 @@ public class JdbcMeterRepository implements MeterRepository {
             preparedStatement.executeBatch();
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 
     @Override
     public Optional<MeterModel> findById(Long meterId) {
-        var selectQuery = "SELECT * FROM private.meters WHERE id = ?";
+        var selectQuery = "SELECT id, user_id, factory_number, meter_type_id FROM private.meters WHERE id = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -99,7 +106,7 @@ public class JdbcMeterRepository implements MeterRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();

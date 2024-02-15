@@ -1,27 +1,39 @@
 package ru.ylab.service;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import ru.ylab.dto.UserDTO;
 import ru.ylab.entity.User;
+import ru.ylab.exception.UserNotAuthorizedException;
 import ru.ylab.exception.UserNotFoundException;
 import ru.ylab.mapper.UserMapper;
 import ru.ylab.repository.UserRepository;
 
 /**
  * The UserService class provides functionality related to user management.
- * It includes methods for user registration, user authentication, and other user-related operations.
- * This service interacts with the UserRepository, PasswordEncoder, AuditionEventService, and MeterService
- * to perform various user-related tasks.
+ * It includes methods for user-related operations.
+ * This service interacts with the UserRepository to perform various user-related tasks.
  */
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private User sessionedUser;
 
-    @Getter
-    @Setter
-    private User currentUser;
+    /**
+     * Retrieves the current authorized User entity representing the user.
+     *
+     * @return User entity representing the user with the specified username.
+     * @throws UserNotAuthorizedException If user is not authorized.
+     */
+    public User getCurrentUser() {
+        if (sessionedUser == null) {
+            throw new UserNotAuthorizedException();
+        }
+        return sessionedUser;
+    }
+
+    public void setCurrentUser(User user) {
+        sessionedUser = user;
+    }
+
     /**
      * Checks if a user with the given username already exists.
      *
@@ -40,15 +52,6 @@ public class UserService {
      */
     public boolean checkUserExistsById(Long userId) {
         return userRepository.checkUserExistsById(userId);
-    }
-
-    /**
-     * Retrieves the UserDTO representing the currently authenticated user.
-     *
-     * @return UserDTO representing the currently authenticated user.
-     */
-    public UserDTO getCurrentUserDTO() {
-        return UserMapper.MAPPER.toUserDTO(currentUser);
     }
 
     /**

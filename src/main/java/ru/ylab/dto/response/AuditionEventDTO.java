@@ -1,9 +1,7 @@
-package ru.ylab.dto;
+package ru.ylab.dto.response;
 
 import lombok.Builder;
 import ru.ylab.enumerated.AuditionEventType;
-
-import java.time.LocalDateTime;
 
 /**
  * Data Transfer Object (DTO) representing an audition event.
@@ -17,6 +15,6 @@ public record AuditionEventDTO(
         UserDTO userDTO,
         AuditionEventType eventType,
         String message,
-        LocalDateTime date
+        String date
 ) {
 }

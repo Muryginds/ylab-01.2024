@@ -3,14 +3,18 @@ package ru.ylab.in.console;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.ylab.controller.*;
-import ru.ylab.dto.SubmissionDTO;
-import ru.ylab.dto.request.SubmissionByDateRequestDTO;
+import ru.ylab.dto.request.AuditionEventsRequestDTO;
+import ru.ylab.dto.request.NewMeterTypeRequestDTO;
+import ru.ylab.dto.response.SubmissionDTO;
+import ru.ylab.dto.request.AllSubmissionsRequestDTO;
+import ru.ylab.dto.request.SubmissionRequestDTO;
 import ru.ylab.in.console.handler.ConsoleInputHandler;
 import ru.ylab.utils.ConsoleUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.System.*;
 import static ru.ylab.in.console.AdminUserMenu.MenuAction.*;
 
 /**
@@ -24,7 +28,6 @@ public class AdminUserMenu extends Menu {
     private static final Map<String, MenuAction> ACTIONS = generateActions();
     private final LoginController loginController;
     private final SubmissionController submissionController;
-    private final MeterReadingsController meterReadingsController;
     private final AuditionEventController auditionEventController;
     private final MeterTypeController meterTypeController;
     private final ConsoleInputHandler consoleInputHandler;
@@ -54,21 +57,24 @@ public class AdminUserMenu extends Menu {
 
     private boolean getAllSubmissionsByUserId() {
         var userId = consoleInputHandler.handleUserId();
+        var request = AllSubmissionsRequestDTO.builder().userId(userId).build();
         var sb = new StringBuilder();
-        submissionController.getAllByUserId(userId).forEach(
+        submissionController.getAllSubmissionDTOs(request).forEach(
                 s -> {
                     sb.append(prepareSubmissionInfoOutput(s));
                     sb.append("---------------------------");
                 }
         );
-        log.info(sb.toString());
+        out.println(sb);
         return false;
     }
 
     private boolean getAuditionHistoryByUserId() {
         var userId = consoleInputHandler.handleUserId();
-        var events = auditionEventController.getEventsByUserId(userId);
-        events.forEach(e -> log.info("User: #'{}' event: '{}' date: '{} message: '{}'",
+        var request = AuditionEventsRequestDTO.builder().userId(userId).build();
+        var events = auditionEventController.getEvents(request);
+        events.forEach(e -> out.printf(
+                "User: #'%s' event: '%s' date: '%s message: '%s'%n",
                 e.userDTO().id(), e.eventType().name(), e.date(), e.message()));
         return false;
     }
@@ -76,24 +82,26 @@ public class AdminUserMenu extends Menu {
     private boolean getSubmissionsByUserIdAndDate() {
         var userId = consoleInputHandler.handleUserId();
         var date = consoleInputHandler.handleDate();
-        var request = new SubmissionByDateRequestDTO(date, userId);
-        var submissionDTO = submissionController.getSubmissionByDate(request);
+        var request = new SubmissionRequestDTO(date, userId);
+        var submissionDTO = submissionController.getSubmissionDTO(request);
         var outputString = prepareSubmissionInfoOutput(submissionDTO).toString();
-        log.info(outputString);
+        out.println(outputString);
         return false;
     }
 
     private boolean submitMeterType() {
         var meterTypeName = consoleInputHandler.handleMeterType();
-        meterTypeController.save(meterTypeName);
+        var request = NewMeterTypeRequestDTO.builder().typeName(meterTypeName).build();
+        meterTypeController.save(request);
         return false;
     }
 
     private boolean getLastSubmissionByUserId() {
         var userId = consoleInputHandler.handleUserId();
-        var submissionDTO = submissionController.getLastSubmissionByUserId(userId);
+        var request = SubmissionRequestDTO.builder().userId(userId).build();
+        var submissionDTO = submissionController.getSubmissionDTO(request);
         var outputString = prepareSubmissionInfoOutput(submissionDTO).toString();
-        log.info(outputString);
+        out.println(outputString);
         return false;
     }
 
@@ -105,8 +113,6 @@ public class AdminUserMenu extends Menu {
     private StringBuilder prepareSubmissionInfoOutput(SubmissionDTO submissionDTO) {
         var sb = new StringBuilder();
         ConsoleUtils.submissionFormattedOutput(submissionDTO, sb);
-        meterReadingsController.getAllBySubmissionId(submissionDTO.id())
-                .forEach(mr -> ConsoleUtils.meterReadingFormattedOutput(mr, sb));
         return sb;
     }
 

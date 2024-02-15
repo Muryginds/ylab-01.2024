@@ -1,7 +1,9 @@
 package ru.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.dto.UserDTO;
+import ru.ylab.dto.response.UserDTO;
+import ru.ylab.exception.UserNotAuthorizedException;
+import ru.ylab.mapper.UserMapper;
 import ru.ylab.service.UserService;
 
 /**
@@ -14,15 +16,17 @@ public class UserController {
     /**
      * The associated service for user-related operations.
      */
-    public final UserService userService;
+    private final UserService userService;
 
     /**
      * Retrieves the details of the currently logged-in user.
      *
      * @return The UserDTO representing the current user.
+     * @throws UserNotAuthorizedException If user is not authorized.
      */
     public UserDTO getCurrentUser() {
-        return userService.getCurrentUserDTO();
+        var user = userService.getCurrentUser();
+        return UserMapper.MAPPER.toUserDTO(user);
     }
 
     /**

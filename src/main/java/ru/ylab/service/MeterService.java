@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.Meter;
 import ru.ylab.entity.User;
 import ru.ylab.exception.MeterNotFoundException;
-import ru.ylab.dto.MeterDTO;
+import ru.ylab.dto.response.MeterDTO;
 import ru.ylab.mapper.MeterMapper;
 import ru.ylab.repository.MeterRepository;
 

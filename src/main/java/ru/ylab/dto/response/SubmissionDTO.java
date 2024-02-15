@@ -1,8 +1,8 @@
-package ru.ylab.dto;
+package ru.ylab.dto.response;
 
 import lombok.Builder;
 
-import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * Data Transfer Object (DTO) representing a submission.
@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public record SubmissionDTO(
         Long id,
         UserDTO userDTO,
-        LocalDate date
+        String date,
+        Set<MeterReadingDTO> readings
 ) {
 }

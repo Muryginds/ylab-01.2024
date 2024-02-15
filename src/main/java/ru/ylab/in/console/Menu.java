@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
+import static java.lang.System.*;
+
 @Slf4j
 public abstract class Menu {
 
@@ -12,7 +14,7 @@ public abstract class Menu {
 
     public void printMenuOptions() {
         for (var entry : getMenuOptions().entrySet()) {
-            log.info("[{}]: {}", entry.getKey(), entry.getValue().getOptionName());
+            out.printf("[%s]: %s%n", entry.getKey(), entry.getValue().getOptionName());
         }
     }
 

@@ -1,9 +1,9 @@
 package ru.ylab.service;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.dto.SubmissionDTO;
-import ru.ylab.dto.request.SubmissionByDateRequestDTO;
-import ru.ylab.entity.AuditionEvent;
+import ru.ylab.annotation.Auditable;
+import ru.ylab.dto.request.AllSubmissionsRequestDTO;
+import ru.ylab.dto.request.SubmissionRequestDTO;
 import ru.ylab.entity.Submission;
 import ru.ylab.enumerated.AuditionEventType;
 import ru.ylab.enumerated.UserRole;
@@ -14,145 +14,104 @@ import ru.ylab.repository.SubmissionRepository;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The SubmissionService class provides functionality related to user submissions and meter readings.
  * It includes methods for retrieving submission history, finding the last submission,
  * saving new submissions, and other submission-related operations.
- * This service interacts with the SubmissionRepository, MeterReadingsService, MeterService,
+ * This service interacts with the SubmissionRepository,
  * UserService, and AuditionEventService to perform various submission-related tasks.
  */
 @RequiredArgsConstructor
 public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final UserService userService;
-    private final AuditionEventService auditionEventService;
 
     /**
      * Retrieves all submissions for a given user based on user ID.
-     * Audits the action and logs an audition event.
      *
-     * @param userId The ID of the user to retrieve submissions for.
-     * @return Collection of SubmissionDTO representing the user's submission history.
-     * @throws NoPermissionException If the current user does not have permission to access the history.
+     * @param request The request containing ID of the user for whom submissions are retrieved.
+     * @return Collection of Submission entities representing the user's submission history.
+     * @throws NoPermissionException                   If the current user does not have permission to access the history.
+     * @throws ru.ylab.exception.UserNotFoundException If user is not found with given ID.
      */
-    public Collection<SubmissionDTO> getAllByUserId(Long userId) {
-        if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
+    @Auditable(eventType = AuditionEventType.SUBMISSION_HISTORY_ACQUIRE)
+    public Collection<Submission> getAll(AllSubmissionsRequestDTO request) {
+        var userId = request.userId();
+        var currentUser = userService.getCurrentUser();
+        var targetUser = userId == null ? currentUser : userService.getUserById(userId);
+        if (!(currentUser.equals(targetUser) || currentUser.getRole().equals(UserRole.ADMIN))) {
             throw new NoPermissionException();
         }
-        var event = AuditionEvent.builder()
-                .user(userService.getCurrentUser())
-                .eventType(AuditionEventType.SUBMISSION_HISTORY_ACQUIRE)
-                .message(String.format(
-                        "Submission history acquired for user id '%s'",
-                        userId))
-                .build();
-        auditionEventService.addEvent(event);
-        var user = userService.getUserById(userId);
-        var submissionModels = submissionRepository.getByUserId(userId);
-        var collection = new HashSet<Submission>();
-        for (var submissionModel : submissionModels) {
-            collection.add(SubmissionMapper.MAPPER.toSubmission(submissionModel, user));
-        }
-        return SubmissionMapper.MAPPER.toSubmissionDTOs(collection);
+        var submissionModels = submissionRepository.getByUserId(targetUser.getId());
+        return submissionModels.stream()
+                .map(sm -> SubmissionMapper.MAPPER.toSubmission(sm, targetUser))
+                .collect(Collectors.toSet());
     }
 
     /**
-     * Retrieves the last submission for a given user based on user ID.
-     * Audits the action and logs an audition event.
+     * Retrieves a submission for a given submission ID.
      *
-     * @param userId The ID of the user to retrieve the last submission for.
-     * @return Optional<Submission> representing the last submission of the user.
-     * @throws NoPermissionException If the current user does not have permission to access the submission.
+     * @param submissionId Containing submission ID.
+     * @return Submission by given ID.
+     * @throws NoSubmissionException If no submissions with given ID exists.
      */
-    private Optional<Submission> findLastSubmissionByUserId(Long userId) {
-        if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
-            throw new NoPermissionException();
-        }
-        var event = AuditionEvent.builder()
-                .user(userService.getCurrentUser())
-                .eventType(AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
-                .message(String.format(
-                        "Last submission acquired for user id '%s'",
-                        userId))
-                .build();
-        auditionEventService.addEvent(event);
-        var submissionModelOptional
-                = submissionRepository.findLastSubmissionByUserId(userId);
-        if (submissionModelOptional.isPresent()) {
-            var user = userService.getUserById(userId);
-            return Optional.of(SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user));
-        }
-        return Optional.empty();
-    }
-
-    private boolean checkUserIsCurrentUser(Long userId) {
-        return userService.getCurrentUser().getId().equals(userId);
-    }
-
-    private boolean checkCurrentUserIsAdmin() {
-        return userService.getCurrentUser().getRole().equals(UserRole.ADMIN);
-    }
-
-    /**
-     * Retrieves the last submission for a given user based on user ID and converts it to a DTO.
-     * Audits the action and logs an audition event.
-     *
-     * @param userId The ID of the user to retrieve the last submission for.
-     * @return SubmissionDTO representing the last submission of the user.
-     * @throws NoPermissionException If the current user does not have permission to access the submission.
-     * @throws NoSubmissionException If no submissions are found for the user.
-     */
-    public SubmissionDTO getLastSubmissionByUserId(Long userId) {
-        var user = userService.getUserById(userId);
-        var submission = findLastSubmissionByUserId(user.getId())
-                .orElseThrow(() -> new NoSubmissionException(user.getName()));
-        return SubmissionMapper.MAPPER.toSubmissionDTO(submission);
-    }
-
     public Submission getSubmissionById(Long submissionId) {
         var submissionModel = submissionRepository.getById(submissionId)
-                .orElseThrow(()-> new NoSubmissionException(submissionId));
+                .orElseThrow(() -> new NoSubmissionException(submissionId));
         var user = userService.getUserById(submissionModel.userId());
         return SubmissionMapper.MAPPER.toSubmission(submissionModel, user);
     }
 
     /**
      * Retrieves a submission for a given user and date.
-     * Audits the action and logs an audition event.
      *
      * @param request The request containing user ID and submission date.
-     * @return SubmissionDTO representing the submission for the user and date.
+     * @return Submission for the user and date.
      * @throws NoPermissionException If the current user does not have permission to access the submission.
      * @throws NoSubmissionException If no submissions are found for the user and date.
      */
-    public SubmissionDTO getSubmissionByDateAndUserId(SubmissionByDateRequestDTO request) {
-        var user = userService.getUserById(request.userId());
-        var submission = findByUserIdAndDate(user.getId(), request.date())
-                .orElseThrow(() -> new NoSubmissionException(user.getName()));
-        return SubmissionMapper.MAPPER.toSubmissionDTO(submission);
+    @Auditable(eventType = AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
+    public Submission getSubmission(SubmissionRequestDTO request) {
+        var userId = request.userId();
+        var date = request.date();
+        var currentUser = userService.getCurrentUser();
+        var targetUser = userId == null ? currentUser : userService.getUserById(userId);
+        if (!(currentUser.equals(targetUser) || currentUser.getRole().equals(UserRole.ADMIN))) {
+            throw new NoPermissionException();
+        }
+
+        Optional<Submission> submissionOptional;
+
+        if (date == null) {
+            submissionOptional = findLastSubmissionByUserId(targetUser.getId());
+        } else {
+            submissionOptional = findByUserIdAndDate(targetUser.getId(), date);
+        }
+
+        return submissionOptional
+                .orElseThrow(() -> new NoSubmissionException(targetUser.getName()));
+    }
+
+    private Optional<Submission> findLastSubmissionByUserId(Long userId) {
+        var submissionModelOptional
+                = submissionRepository.findLastSubmissionByUserId(userId);
+        if (submissionModelOptional.isPresent()) {
+            var user = userService.getUserById(userId);
+            var submission = SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user);
+            return Optional.of(submission);
+        }
+        return Optional.empty();
     }
 
     private Optional<Submission> findByUserIdAndDate(Long userId, LocalDate date) {
-        if (!(checkUserIsCurrentUser(userId) || checkCurrentUserIsAdmin())) {
-            throw new NoPermissionException();
-        }
-        var event = AuditionEvent.builder()
-                .user(userService.getCurrentUser())
-                .eventType(AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
-                .message(String.format(
-                        "Submission acquired for user id '%s' and date '%s-%s'",
-                        userId,
-                        date.getYear(),
-                        date.getMonthValue()))
-                .build();
-        auditionEventService.addEvent(event);
         var submissionModelOptional = submissionRepository.findSubmissionByUserIdAndDate(userId, date);
         if (submissionModelOptional.isPresent()) {
             var user = userService.getUserById(userId);
-            return Optional.of(SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user));
+            var submission = SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user);
+            return Optional.of(submission);
         }
         return Optional.empty();
     }

@@ -1,6 +1,7 @@
 package ru.ylab.utils;
 
 import lombok.experimental.UtilityClass;
+import ru.ylab.exception.BaseMonitoringServiceException;
 import ru.ylab.exception.PropertiesNotLoadedException;
 
 import java.io.IOException;
@@ -19,7 +20,14 @@ public class PropertiesUtils {
 
         Properties props = new Properties();
         var fileName = getPropertiesFileNameByPropertiesType(type);
-        try (var inputStream = ClassLoader.getSystemResourceAsStream(fileName)) {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new BaseMonitoringServiceException("Driver not found %s".formatted(e.getMessage()));
+        }
+
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try (var inputStream = loader.getResourceAsStream(fileName)) {
             props.load(inputStream);
             properties.put(type, props);
         } catch (IOException e) {

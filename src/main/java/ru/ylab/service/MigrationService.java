@@ -19,11 +19,19 @@ import java.util.Properties;
 
 import static ru.ylab.utils.PropertiesUtils.PropertiesType.MIGRATIONS;
 
+/**
+ * Service responsible for managing database migrations using Liquibase.
+ */
 @RequiredArgsConstructor
 public class MigrationService {
     private static final Properties migrationProperties = PropertiesUtils.getProperties(MIGRATIONS);
     private final DbConnectionFactory dbConnectionFactory;
 
+    /**
+     * Performs database migrations by updating the database schema according to the Liquibase changelog.
+     *
+     * @throws MigrationException If an error occurs during the migration process.
+     */
     public void updateMigrations() {
 
         var changelogFilePath = migrationProperties.getProperty("changeLogFile");

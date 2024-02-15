@@ -1,4 +1,4 @@
-package ru.ylab.dto;
+package ru.ylab.dto.response;
 
 import lombok.Builder;
 
@@ -12,7 +12,6 @@ import lombok.Builder;
 public record MeterReadingDTO(
         Long id,
         MeterDTO meterDTO,
-        SubmissionDTO submissionDTO,
         Long value
 ) {
 }

@@ -2,10 +2,10 @@ package ru.ylab.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.Submission;
-import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.SubmissionModel;
 import ru.ylab.repository.SubmissionRepository;
 import ru.ylab.utils.DbConnectionFactory;
+import ru.ylab.utils.ExceptionHandler;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -22,7 +22,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
 
     @Override
     public Collection<SubmissionModel> getByUserId(Long userId) {
-        var selectQuery = "SELECT * FROM private.submissions WHERE user_id = ?";
+        var selectQuery = "SELECT id, user_id, date FROM private.submissions WHERE user_id = ?";
         var submissionModels = new HashSet<SubmissionModel>();
 
         try (var connection = dbConnectionFactory.getConnection();
@@ -37,7 +37,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return submissionModels;
@@ -45,7 +45,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
 
     @Override
     public Optional<SubmissionModel> getById(Long submissionId) {
-        var selectQuery = "SELECT * FROM private.submissions WHERE id = ?";
+        var selectQuery = "SELECT id, user_id, date FROM private.submissions WHERE id = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -58,7 +58,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();
@@ -66,8 +66,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
 
     @Override
     public void save(Submission submission) {
-        var insertQuery = "INSERT INTO private.submissions (id, user_id, date) " +
-                "VALUES (nextval('private.submissions_id_seq'), ?, ?) RETURNING id";
+        var insertQuery = "INSERT INTO private.submissions (user_id, date) VALUES (?, ?)";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
@@ -83,13 +82,13 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 
     @Override
     public boolean checkExistsByUserIdAndDate(Long userId, LocalDate date) {
-        var selectQuery = "SELECT COUNT(*) FROM private.submissions WHERE user_id = ? AND date = ?";
+        var selectQuery = "SELECT COUNT(id) FROM private.submissions WHERE user_id = ? AND date = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -104,7 +103,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return false;
@@ -112,7 +111,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
 
     @Override
     public Optional<SubmissionModel> findSubmissionByUserIdAndDate(Long userId, LocalDate date) {
-        var selectQuery = "SELECT * FROM private.submissions WHERE user_id = ? " +
+        var selectQuery = "SELECT id, user_id, date FROM private.submissions WHERE user_id = ? " +
                 "AND EXTRACT(MONTH FROM date) = ? AND EXTRACT(YEAR FROM date) = ?";
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -129,7 +128,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();
@@ -137,7 +136,8 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
 
     @Override
     public Optional<SubmissionModel> findLastSubmissionByUserId(Long userId) {
-        var selectQuery = "SELECT * FROM private.submissions WHERE user_id = ? ORDER BY date DESC LIMIT 1";
+        var selectQuery = "SELECT id, user_id, date FROM private.submissions " +
+                "WHERE user_id = ? ORDER BY date DESC LIMIT 1";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -152,7 +152,7 @@ public class JdbcSubmissionRepository implements SubmissionRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();

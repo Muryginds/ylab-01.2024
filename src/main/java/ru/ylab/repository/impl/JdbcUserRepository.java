@@ -3,10 +3,10 @@ package ru.ylab.repository.impl;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.User;
 import ru.ylab.enumerated.UserRole;
-import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.UserModel;
 import ru.ylab.repository.UserRepository;
 import ru.ylab.utils.DbConnectionFactory;
+import ru.ylab.utils.ExceptionHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,7 +19,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public boolean checkUserExistsByName(String username) {
-        var selectQuery = "SELECT COUNT(*) FROM private.users WHERE name = ?";
+        var selectQuery = "SELECT COUNT(id) FROM private.users WHERE name = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -32,7 +32,7 @@ public class JdbcUserRepository implements UserRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return false;
@@ -40,7 +40,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public boolean checkUserExistsById(Long userId) {
-        var selectQuery = "SELECT COUNT(*) FROM private.users WHERE id = ?";
+        var selectQuery = "SELECT COUNT(id) FROM private.users WHERE id = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -54,7 +54,7 @@ public class JdbcUserRepository implements UserRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return false;
@@ -62,8 +62,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public void save(User user) {
-        var insertQuery = "INSERT INTO private.users (id, name, password, role) " +
-                "VALUES (nextval('private.users_id_seq'), ?, ?, ?) RETURNING id";
+        var insertQuery = "INSERT INTO private.users (name, password, role) VALUES (?, ?, ?)";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
@@ -80,13 +79,13 @@ public class JdbcUserRepository implements UserRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 
     @Override
     public Optional<UserModel> findUserByName(String name) {
-        var selectQuery = "SELECT * FROM private.users WHERE name = ?";
+        var selectQuery = "SELECT id, name, password, role FROM private.users WHERE name = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -101,7 +100,7 @@ public class JdbcUserRepository implements UserRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();
@@ -109,7 +108,7 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public Optional<UserModel> findUserById(Long userId) {
-        var selectQuery = "SELECT * FROM private.users WHERE id = ?";
+        var selectQuery = "SELECT id, name, password, role FROM private.users WHERE id = ?";
 
         try (var connection = dbConnectionFactory.getConnection();
              var preparedStatement = connection.prepareStatement(selectQuery)) {
@@ -124,7 +123,7 @@ public class JdbcUserRepository implements UserRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return Optional.empty();

@@ -1,7 +1,7 @@
 package ru.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.dto.MeterReadingDTO;
+import ru.ylab.dto.response.MeterReadingDTO;
 import ru.ylab.service.MeterReadingsService;
 
 import java.util.Set;
@@ -13,7 +13,7 @@ import java.util.Set;
  * related to meter readings.
  */
 @RequiredArgsConstructor
-public class MeterReadingsController {
+public class MeterReadingController {
     /**
      * The associated service for meter readings-related operations.
      */

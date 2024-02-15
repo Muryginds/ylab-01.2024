@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import ru.ylab.exception.BaseMonitoringServiceException;
 import ru.ylab.in.console.Menu;
 
+import static java.lang.System.out;
+
 @Slf4j
 @RequiredArgsConstructor
 public class MenuHandler extends Handler {
@@ -19,9 +21,9 @@ public class MenuHandler extends Handler {
             try {
                 finished = menu.executeCommand(answer);
             } catch (BaseMonitoringServiceException ex) {
-                log.info(ex.getMessage());
+                out.println(ex.getMessage());
             } catch (NullPointerException ex) {
-                log.info("Invalid command. Please try again.");
+                out.println("Invalid command. Please try again.");
             }
         }
     }

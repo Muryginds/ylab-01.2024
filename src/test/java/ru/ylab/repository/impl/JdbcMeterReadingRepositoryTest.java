@@ -18,8 +18,8 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class JdbcMeterReadingsRepositoryTest extends CommonContainerBasedTest {
-    private static JdbcMeterReadingsRepository meterReadingsRepository;
+class JdbcMeterReadingRepositoryTest extends CommonContainerBasedTest {
+    private static JdbcMeterReadingRepository meterReadingsRepository;
     private static MeterRepository meterRepository;
     private static SubmissionRepository submissionRepository;
     private static UserRepository userRepository;
@@ -27,7 +27,7 @@ class JdbcMeterReadingsRepositoryTest extends CommonContainerBasedTest {
 
     @BeforeAll
     static void setUp() {
-        meterReadingsRepository = new JdbcMeterReadingsRepository(dbConnectionFactory);
+        meterReadingsRepository = new JdbcMeterReadingRepository(dbConnectionFactory);
         meterRepository = new JdbcMeterRepository(dbConnectionFactory);
         submissionRepository = new JdbcSubmissionRepository(dbConnectionFactory);
         userRepository = new JdbcUserRepository(dbConnectionFactory);

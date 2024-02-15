@@ -3,10 +3,10 @@ package ru.ylab.repository.impl;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.AuditionEvent;
 import ru.ylab.enumerated.AuditionEventType;
-import ru.ylab.exception.MonitoringServiceSQLExceptionException;
 import ru.ylab.model.AuditionEventModel;
 import ru.ylab.repository.AuditionEventRepository;
 import ru.ylab.utils.DbConnectionFactory;
+import ru.ylab.utils.ExceptionHandler;
 
 import java.sql.*;
 import java.util.Collection;
@@ -18,7 +18,8 @@ public class JdbcAuditionEventRepository implements AuditionEventRepository {
 
     @Override
     public Collection<AuditionEventModel> getEventsByUserId(Long userId) {
-        var selectQuery = "SELECT * FROM private.audition_events WHERE user_id = ?";
+        var selectQuery = "SELECT id, user_id, event_type, message, date FROM private.audition_events " +
+                "WHERE user_id = ? ORDER BY date DESC";
         var auditionEventModels = new HashSet<AuditionEventModel>();
 
         try (Connection connection = dbConnectionFactory.getConnection();
@@ -33,19 +34,20 @@ public class JdbcAuditionEventRepository implements AuditionEventRepository {
             }
 
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
 
         return auditionEventModels;
     }
 
     @Override
-    public void addEvent(AuditionEvent auditionEvent) {
-        String insertQuery = "INSERT INTO private.audition_events (id, user_id, event_type, message, date) " +
-                "VALUES (nextval('private.audition_events_id_seq'), ?, ?, ?, ?)";
+    public void save(AuditionEvent auditionEvent) {
+        String insertQuery = "INSERT INTO private.audition_events (user_id, event_type, message, date) " +
+                "VALUES (?, ?, ?, ?)";
 
         try (Connection connection = dbConnectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+             PreparedStatement preparedStatement =
+                     connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setLong(1, auditionEvent.getUser().getId());
             preparedStatement.setString(2, auditionEvent.getEventType().name());
@@ -53,8 +55,15 @@ public class JdbcAuditionEventRepository implements AuditionEventRepository {
             preparedStatement.setTimestamp(4, Timestamp.valueOf(auditionEvent.getDate()));
             preparedStatement.executeUpdate();
 
+            try (var resultSet = preparedStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    var generatedId = resultSet.getLong(1);
+                    auditionEvent.setId(generatedId);
+                }
+            }
+
         } catch (SQLException e) {
-            throw new MonitoringServiceSQLExceptionException(e);
+            ExceptionHandler.handleSQLException(e);
         }
     }
 

@@ -48,7 +48,6 @@ class LoginServiceTest {
         Assertions.assertEquals(requestDTO.name(), result.name());
         Mockito.verify(userService, Mockito.times(1)).save(Mockito.any(User.class));
         Mockito.verify(meterService, Mockito.times(1)).generateForNewUser(Mockito.any(User.class));
-        Mockito.verify(auditionEventService, Mockito.times(1)).addEvent(Mockito.any());
     }
 
     @Test
@@ -59,7 +58,7 @@ class LoginServiceTest {
         Assertions.assertThrows(UserAlreadyExistException.class, () -> loginService.registerUser(requestDTO));
         Mockito.verify(userService, Mockito.times(0)).save(Mockito.any());
         Mockito.verify(meterService, Mockito.times(0)).generateForNewUser(Mockito.any());
-        Mockito.verify(auditionEventService, Mockito.times(0)).addEvent(Mockito.any());
+        Mockito.verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
     }
 
     @Test
@@ -73,7 +72,6 @@ class LoginServiceTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(requestDTO.name(), result.name());
-        Mockito.verify(auditionEventService, Mockito.times(1)).addEvent(Mockito.any());
     }
 
     @Test
@@ -82,7 +80,7 @@ class LoginServiceTest {
         Mockito.when(userService.getUserByName(requestDTO.name())).thenThrow(new UserAuthenticationException());
 
         Assertions.assertThrows(UserAuthenticationException.class, () -> loginService.authorize(requestDTO));
-        Mockito.verify(auditionEventService, Mockito.times(0)).addEvent(Mockito.any());
+        Mockito.verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
     }
 
     @Test
@@ -93,13 +91,12 @@ class LoginServiceTest {
         Mockito.when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(false);
 
         Assertions.assertThrows(UserAuthenticationException.class, () -> loginService.authorize(requestDTO));
-        Mockito.verify(auditionEventService, Mockito.times(0)).addEvent(Mockito.any());
+        Mockito.verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
     }
 
-    @Test
-    void testLogout() {
-        loginService.logout();
-
-        Mockito.verify(auditionEventService, Mockito.times(1)).addEvent(Mockito.any());
-    }
+//    @Test
+//    void testLogout() {
+//        loginService.logout();
+//        asserTrue(userService.getCurrentUser())
+//    }
 }

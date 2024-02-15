@@ -1,9 +1,10 @@
 package ru.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
-import ru.ylab.dto.SubmissionDTO;
-import ru.ylab.dto.request.SubmissionByDateRequestDTO;
-import ru.ylab.service.SubmissionService;
+import ru.ylab.dto.response.SubmissionDTO;
+import ru.ylab.dto.request.AllSubmissionsRequestDTO;
+import ru.ylab.dto.request.SubmissionRequestDTO;
+import ru.ylab.service.SubmissionRepresentationService;
 
 import java.util.Collection;
 
@@ -18,16 +19,16 @@ public class SubmissionController {
     /**
      * The associated service for submission-related operations.
      */
-    private final SubmissionService submissionService;
+    private final SubmissionRepresentationService submissionRepresentationService;
 
     /**
      * Retrieves all submissions for a user with the specified ID.
      *
-     * @param userId The ID of the user for whom submissions are retrieved.
+     * @param request The request containing ID of the user for whom submissions are retrieved.
      * @return A collection of SubmissionDTO representing the user's submissions.
      */
-    public Collection<SubmissionDTO> getAllByUserId(Long userId) {
-        return submissionService.getAllByUserId(userId);
+    public Collection<SubmissionDTO> getAllSubmissionDTOs(AllSubmissionsRequestDTO request) {
+        return submissionRepresentationService.getAllSubmissionDTOs(request);
     }
 
     /**
@@ -36,17 +37,7 @@ public class SubmissionController {
      * @param request The request containing the user ID and submission date.
      * @return The SubmissionDTO representing the user's submission on the specified date.
      */
-    public SubmissionDTO getSubmissionByDate(SubmissionByDateRequestDTO request) {
-        return submissionService.getSubmissionByDateAndUserId(request);
-    }
-
-    /**
-     * Retrieves the last submission for a user with the specified ID.
-     *
-     * @param userId The ID of the user for whom the last submission is retrieved.
-     * @return The SubmissionDTO representing the user's last submission.
-     */
-    public SubmissionDTO getLastSubmissionByUserId(Long userId) {
-        return submissionService.getLastSubmissionByUserId(userId);
+    public SubmissionDTO getSubmissionDTO(SubmissionRequestDTO request) {
+        return submissionRepresentationService.getSubmissionDTO(request);
     }
 }

@@ -52,7 +52,7 @@ class JdbcAuditionEventRepositoryTest extends CommonContainerBasedTest {
                 .date(date)
                 .build();
 
-        auditionEventRepository.addEvent(newAuditionEvent);
+        auditionEventRepository.save(newAuditionEvent);
 
         var savedEventOptional = auditionEventRepository.getEventsByUserId(userId).stream()
                 .filter(event -> event.eventType().equals(eventType))
@@ -73,7 +73,7 @@ class JdbcAuditionEventRepositoryTest extends CommonContainerBasedTest {
     private static void createTestAuditionEvents() {
         var user1 = UserMapper.MAPPER.toUser(userRepository.findUserByName("user1").orElseThrow());
 
-        auditionEventRepository.addEvent(AuditionEvent.builder()
+        auditionEventRepository.save(AuditionEvent.builder()
                 .user(user1)
                 .eventType(AuditionEventType.SESSION_START)
                 .message("Session started")
@@ -81,7 +81,7 @@ class JdbcAuditionEventRepositoryTest extends CommonContainerBasedTest {
                 .build()
         );
 
-        auditionEventRepository.addEvent(AuditionEvent.builder()
+        auditionEventRepository.save(AuditionEvent.builder()
                 .user(user1)
                 .eventType(AuditionEventType.SESSION_END)
                 .message("Session ended")

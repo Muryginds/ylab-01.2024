@@ -2,9 +2,10 @@ package ru.ylab.service;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.entity.MeterReading;
-import ru.ylab.dto.MeterReadingDTO;
+import ru.ylab.dto.response.MeterReadingDTO;
+import ru.ylab.entity.Submission;
 import ru.ylab.mapper.MeterReadingMapper;
-import ru.ylab.repository.MeterReadingsRepository;
+import ru.ylab.repository.MeterReadingRepository;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,7 +18,7 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 public class MeterReadingsService {
-    private final MeterReadingsRepository meterReadingsRepository;
+    private final MeterReadingRepository meterReadingRepository;
     private final SubmissionService submissionService;
     private final MeterService meterService;
 
@@ -29,7 +30,7 @@ public class MeterReadingsService {
      */
     public Set<MeterReadingDTO> getAllBySubmissionId(Long submissionId) {
         var submission = submissionService.getSubmissionById(submissionId);
-        var meterReadingModels = meterReadingsRepository.getAllBySubmissionId(submissionId);
+        var meterReadingModels = meterReadingRepository.getAllBySubmissionId(submissionId);
         var collection = new HashSet<MeterReading>();
         for (var meterReadingModel : meterReadingModels) {
             var meter = meterService.getById(meterReadingModel.meterId());
@@ -40,12 +41,29 @@ public class MeterReadingsService {
     }
 
     /**
+     * Retrieves all meter readings associated with a submission ID.
+     *
+     * @param submissionId The ID of the submission for which readings are retrieved.
+     * @return Set of MeterReadingDTO representing all readings associated with the submission.
+     */
+    public Set<MeterReading> getBySubmission(Submission submission) {
+        var meterReadingModels = meterReadingRepository.getAllBySubmissionId(submission.getId());
+        var collection = new HashSet<MeterReading>();
+        for (var meterReadingModel : meterReadingModels) {
+            var meter = meterService.getById(meterReadingModel.meterId());
+            collection.add(MeterReadingMapper.MAPPER.toMeterReading(meterReadingModel, meter, submission));
+        }
+
+        return collection;
+    }
+
+    /**
      * Saves a single meter reading.
      *
      * @param meterReading The meter reading to be saved.
      */
     public void save(MeterReading meterReading) {
-        meterReadingsRepository.save(meterReading);
+        meterReadingRepository.save(meterReading);
     }
 
     /**
@@ -54,6 +72,6 @@ public class MeterReadingsService {
      * @param meterReadings The collection of meter readings to be saved.
      */
     public void saveAll(Collection<MeterReading> meterReadings) {
-        meterReadingsRepository.saveAll(meterReadings);
+        meterReadingRepository.saveAll(meterReadings);
     }
 }
