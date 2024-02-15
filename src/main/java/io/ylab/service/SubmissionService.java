@@ -2,8 +2,8 @@ package io.ylab.service;
 
 import lombok.RequiredArgsConstructor;
 import io.ylab.annotation.Auditable;
-import io.ylab.dto.request.AllSubmissionsRequestDTO;
-import io.ylab.dto.request.SubmissionRequestDTO;
+import io.ylab.dto.request.AllSubmissionsRequestDto;
+import io.ylab.dto.request.SubmissionRequestDto;
 import io.ylab.entity.Submission;
 import io.ylab.enumerated.AuditionEventType;
 import io.ylab.enumerated.UserRole;
@@ -32,14 +32,14 @@ public class SubmissionService {
     /**
      * Retrieves all submissions for a given user based on user ID.
      *
-     * @param request The request containing ID of the user for whom submissions are retrieved.
+     * @param requestDto The request containing ID of the user for whom submissions are retrieved.
      * @return Collection of Submission entities representing the user's submission history.
      * @throws NoPermissionException                   If the current user does not have permission to access the history.
      * @throws io.ylab.exception.UserNotFoundException If user is not found with given ID.
      */
     @Auditable(eventType = AuditionEventType.SUBMISSION_HISTORY_ACQUIRE)
-    public Collection<Submission> getAll(AllSubmissionsRequestDTO request) {
-        var userId = request.userId();
+    public Collection<Submission> getAll(AllSubmissionsRequestDto requestDto) {
+        var userId = requestDto.userId();
         var currentUser = userService.getCurrentUser();
         var targetUser = userId == null ? currentUser : userService.getUserById(userId);
         if (!(currentUser.equals(targetUser) || currentUser.getRole().equals(UserRole.ADMIN))) {
@@ -68,15 +68,15 @@ public class SubmissionService {
     /**
      * Retrieves a submission for a given user and date.
      *
-     * @param request The request containing user ID and submission date.
+     * @param requestDto The request containing user ID and submission date.
      * @return Submission for the user and date.
      * @throws NoPermissionException If the current user does not have permission to access the submission.
      * @throws NoSubmissionException If no submissions are found for the user and date.
      */
     @Auditable(eventType = AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
-    public Submission getSubmission(SubmissionRequestDTO request) {
-        var userId = request.userId();
-        var date = request.date();
+    public Submission getSubmission(SubmissionRequestDto requestDto) {
+        var userId = requestDto.userId();
+        var date = requestDto.date();
         var currentUser = userService.getCurrentUser();
         var targetUser = userId == null ? currentUser : userService.getUserById(userId);
         if (!(currentUser.equals(targetUser) || currentUser.getRole().equals(UserRole.ADMIN))) {

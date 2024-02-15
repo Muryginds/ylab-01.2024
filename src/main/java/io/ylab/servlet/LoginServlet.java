@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
 import io.ylab.controller.LoginController;
-import io.ylab.dto.request.UserAuthorizationRequestDTO;
+import io.ylab.dto.request.UserAuthorizationRequestDto;
 import io.ylab.exception.BaseMonitoringServiceException;
 import io.ylab.utils.ApplicationComponentsFactory;
 import io.ylab.utils.ResponseUtils;
@@ -27,7 +27,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            var requestDTO = JsonUtils.readJson(req.getReader(), UserAuthorizationRequestDTO.class);
+            var requestDTO = JsonUtils.readJson(req.getReader(), UserAuthorizationRequestDto.class);
             requestValidator.validateRequest(requestDTO);
             var userDTO = loginController.authorize(requestDTO);
             var output = JsonUtils.writeJsonAsBytes(userDTO);

@@ -1,7 +1,7 @@
 package io.ylab.controller;
 
+import io.ylab.dto.response.MeterReadingDto;
 import lombok.RequiredArgsConstructor;
-import io.ylab.dto.response.MeterReadingDTO;
 import io.ylab.service.MeterReadingsService;
 
 import java.util.Set;
@@ -25,7 +25,7 @@ public class MeterReadingController {
      * @param submissionId The ID of the submission for which to retrieve meter readings.
      * @return A set of meter reading DTOs associated with the specified submission.
      */
-    public Set<MeterReadingDTO> getAllBySubmissionId(Long submissionId) {
+    public Set<MeterReadingDto> getAllBySubmissionId(Long submissionId) {
         return meterReadingsService.getAllBySubmissionId(submissionId);
     }
 }

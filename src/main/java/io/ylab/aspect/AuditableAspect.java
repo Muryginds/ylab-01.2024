@@ -7,7 +7,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import io.ylab.annotation.Auditable;
-import io.ylab.dto.response.UserDTO;
+import io.ylab.dto.response.UserDto;
 import io.ylab.entity.AuditionEvent;
 import io.ylab.entity.User;
 import io.ylab.exception.UserNotAuthorizedException;
@@ -58,7 +58,7 @@ public class AuditableAspect {
         var methodName = joinPoint.getSignature().getName();
         log.info("AUDITING " + methodName);
         var type = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(Auditable.class).eventType();
-        var proceed = (UserDTO)joinPoint.proceed();
+        var proceed = (UserDto)joinPoint.proceed();
         var user = userService.getUserById(proceed.id());
         var event = AuditionEvent.builder()
                 .user(user)

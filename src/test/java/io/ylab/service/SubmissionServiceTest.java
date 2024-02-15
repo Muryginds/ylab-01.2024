@@ -7,8 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import io.ylab.dto.request.AllSubmissionsRequestDTO;
-import io.ylab.dto.request.SubmissionRequestDTO;
+import io.ylab.dto.request.AllSubmissionsRequestDto;
+import io.ylab.dto.request.SubmissionRequestDto;
 import io.ylab.entity.Submission;
 import io.ylab.entity.User;
 import io.ylab.enumerated.UserRole;
@@ -56,7 +56,7 @@ class SubmissionServiceTest {
         );
         Mockito.when(submissionRepository.getByUserId(targetUserId)).thenReturn(submissionModels);
 
-        var request = AllSubmissionsRequestDTO.builder().userId(targetUserId).build();
+        var request = AllSubmissionsRequestDto.builder().userId(targetUserId).build();
         var result = submissionService.getAll(request);
 
         Assertions.assertTrue(result.containsAll(expectedSubmissions));
@@ -77,7 +77,7 @@ class SubmissionServiceTest {
 
         Mockito.when(submissionRepository.findLastSubmissionByUserId(targetUserId))
                 .thenReturn(Optional.of(submissionModel));
-        var request = SubmissionRequestDTO.builder().userId(targetUserId).build();
+        var request = SubmissionRequestDto.builder().userId(targetUserId).build();
         var result = submissionService.getSubmission(request);
 
         Assertions.assertEquals(expectedSubmission, result);

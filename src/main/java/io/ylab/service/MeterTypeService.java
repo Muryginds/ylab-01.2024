@@ -2,8 +2,8 @@ package io.ylab.service;
 
 import lombok.RequiredArgsConstructor;
 import io.ylab.annotation.Auditable;
-import io.ylab.dto.request.NewMeterTypeRequestDTO;
-import io.ylab.dto.response.MeterTypeDTO;
+import io.ylab.dto.request.NewMeterTypeRequestDto;
+import io.ylab.dto.response.MeterTypeDto;
 import io.ylab.entity.MeterType;
 import io.ylab.enumerated.AuditionEventType;
 import io.ylab.exception.MeterTypeExistException;
@@ -25,12 +25,12 @@ public class MeterTypeService {
     /**
      * Saves a new meter type with the provided type name.
      *
-     * @param request Contains the name of the new meter type to be added.
+     * @param requestDto Contains the name of the new meter type to be added.
      * @throws MeterTypeExistException If a meter type with the same name already exists.
      */
     @Auditable(eventType = AuditionEventType.NEW_METER_TYPE_ADDITION)
-    public void save(NewMeterTypeRequestDTO request) {
-        var typeName = request.typeName();
+    public void save(NewMeterTypeRequestDto requestDto) {
+        var typeName = requestDto.typeName();
         if (meterTypeRepository.checkExistsByName(typeName)) {
             throw new MeterTypeExistException(typeName);
         }
@@ -45,7 +45,7 @@ public class MeterTypeService {
      * @return MeterTypeDTO representing the retrieved meter type.
      * @throws MeterTypeNotFoundException If no meter type is found with the given ID.
      */
-    public MeterTypeDTO getMeterTypeDTOById(Long meterTypeId) {
+    public MeterTypeDto getMeterTypeDTOById(Long meterTypeId) {
         var meterType = getMeterTypeById(meterTypeId);
         return MeterTypeMapper.MAPPER.toMeterTypeDTO(meterType);
     }

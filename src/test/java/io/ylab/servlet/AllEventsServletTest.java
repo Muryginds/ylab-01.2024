@@ -1,5 +1,6 @@
 package io.ylab.servlet;
 
+import io.ylab.dto.response.AuditionEventDto;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import io.ylab.controller.AuditionEventController;
-import io.ylab.dto.request.AuditionEventsRequestDTO;
-import io.ylab.dto.response.AuditionEventDTO;
+import io.ylab.dto.request.AuditionEventsRequestDto;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.JsonUtils;
 import io.ylab.utils.RequestValidator;
@@ -53,8 +53,8 @@ class AllEventsServletTest {
     @Test
     void testDoGet_whenValidRequest_returnStatusOK() throws Exception {
 
-        AuditionEventsRequestDTO requestDTO = new AuditionEventsRequestDTO(1L);
-        AuditionEventDTO responseDTO = AuditionEventDTO.builder().build();
+        AuditionEventsRequestDto requestDTO = new AuditionEventsRequestDto(1L);
+        AuditionEventDto responseDTO = AuditionEventDto.builder().build();
         BufferedReader value = new BufferedReader(new StringReader(new String(JsonUtils.writeJsonAsBytes(requestDTO))));
         when(request.getReader()).thenReturn(value);
         when(request.getInputStream()).thenReturn(inputStream);

@@ -7,8 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import io.ylab.dto.request.NewMeterTypeRequestDTO;
-import io.ylab.dto.response.MeterTypeDTO;
+import io.ylab.dto.request.NewMeterTypeRequestDto;
+import io.ylab.dto.response.MeterTypeDto;
 import io.ylab.entity.MeterType;
 import io.ylab.exception.MeterTypeExistException;
 import io.ylab.exception.MeterTypeNotFoundException;
@@ -42,7 +42,7 @@ class MeterTypeServiceTest {
     void testSaveMeterType_whenNonExistingType_thenDoNothing() {
         String typeName = "Electricity";
         Mockito.when(meterTypeRepository.checkExistsByName(typeName)).thenReturn(false);
-        var request = NewMeterTypeRequestDTO.builder().typeName(typeName).build();
+        var request = NewMeterTypeRequestDto.builder().typeName(typeName).build();
 
         meterTypeService.save(request);
 
@@ -53,7 +53,7 @@ class MeterTypeServiceTest {
     void testSaveMeterType_whenExistingType_thenThrowMeterTypeExistException() {
         String typeName = "Electricity";
         Mockito.when(meterTypeRepository.checkExistsByName(typeName)).thenReturn(true);
-        var request = NewMeterTypeRequestDTO.builder().typeName(typeName).build();
+        var request = NewMeterTypeRequestDto.builder().typeName(typeName).build();
 
         Assertions.assertThrows(MeterTypeExistException.class, () -> meterTypeService.save(request));
         Mockito.verify(meterTypeRepository, Mockito.times(0)).save(Mockito.any(MeterType.class));
@@ -66,7 +66,7 @@ class MeterTypeServiceTest {
         var meterTypeModel = MeterTypeModel.builder().id(meterTypeId).typeName("Electricity").build();
         Mockito.when(meterTypeRepository.findById(meterTypeId)).thenReturn(Optional.of(meterTypeModel));
 
-        MeterTypeDTO result = meterTypeService.getMeterTypeDTOById(meterTypeId);
+        MeterTypeDto result = meterTypeService.getMeterTypeDTOById(meterTypeId);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(meterTypeModel.typeName(), result.typeName());

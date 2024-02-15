@@ -2,7 +2,7 @@ package io.ylab.service;
 
 import lombok.RequiredArgsConstructor;
 import io.ylab.entity.MeterReading;
-import io.ylab.dto.response.MeterReadingDTO;
+import io.ylab.dto.response.MeterReadingDto;
 import io.ylab.entity.Submission;
 import io.ylab.mapper.MeterReadingMapper;
 import io.ylab.repository.MeterReadingRepository;
@@ -28,7 +28,7 @@ public class MeterReadingsService {
      * @param submissionId The ID of the submission for which readings are retrieved.
      * @return Set of MeterReadingDTO representing all readings associated with the submission.
      */
-    public Set<MeterReadingDTO> getAllBySubmissionId(Long submissionId) {
+    public Set<MeterReadingDto> getAllBySubmissionId(Long submissionId) {
         var submission = submissionService.getSubmissionById(submissionId);
         var meterReadingModels = meterReadingRepository.getAllBySubmissionId(submissionId);
         var collection = new HashSet<MeterReading>();
@@ -43,7 +43,7 @@ public class MeterReadingsService {
     /**
      * Retrieves all meter readings associated with a submission ID.
      *
-     * @param submissionId The ID of the submission for which readings are retrieved.
+     * @param submission The submission for which readings are retrieved.
      * @return Set of MeterReadingDTO representing all readings associated with the submission.
      */
     public Set<MeterReading> getBySubmission(Submission submission) {

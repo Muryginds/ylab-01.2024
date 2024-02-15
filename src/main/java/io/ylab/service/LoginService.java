@@ -1,10 +1,10 @@
 package io.ylab.service;
 
+import io.ylab.dto.response.UserDto;
 import lombok.RequiredArgsConstructor;
 import io.ylab.annotation.Auditable;
-import io.ylab.dto.response.UserDTO;
-import io.ylab.dto.request.UserAuthorizationRequestDTO;
-import io.ylab.dto.request.UserRegistrationRequestDTO;
+import io.ylab.dto.request.UserAuthorizationRequestDto;
+import io.ylab.dto.request.UserRegistrationRequestDto;
 import io.ylab.entity.User;
 import io.ylab.enumerated.AuditionEventType;
 import io.ylab.exception.UserAlreadyExistException;
@@ -27,18 +27,18 @@ public class LoginService {
      * Registers a new user with the specified registration details.
      * Generates user-specific meters.
      *
-     * @param requestDTO The registration details of the new user.
+     * @param requestDto The registration details of the new user.
      * @return UserDTO representing the registered user.
      * @throws UserAlreadyExistException If a user with the same name already exists.
      */
     @Auditable(eventType = AuditionEventType.REGISTRATION)
-    public UserDTO registerUser(UserRegistrationRequestDTO requestDTO) {
-        if (userService.checkUserExistsByName(requestDTO.name())) {
-            throw new UserAlreadyExistException(requestDTO.name());
+    public UserDto registerUser(UserRegistrationRequestDto requestDto) {
+        if (userService.checkUserExistsByName(requestDto.name())) {
+            throw new UserAlreadyExistException(requestDto.name());
         }
         var user = User.builder()
-                .name(requestDTO.name())
-                .password(passwordEncoder.encode(requestDTO.password()))
+                .name(requestDto.name())
+                .password(passwordEncoder.encode(requestDto.password()))
                 .build();
         userService.save(user);
         meterService.generateForNewUser(user);
@@ -48,19 +48,19 @@ public class LoginService {
     /**
      * Authenticates a user with the provided credentials.
      *
-     * @param requestDTO The user's authorization credentials.
+     * @param requestDto The user's authorization credentials.
      * @return UserDTO representing the authenticated user.
      * @throws UserAuthenticationException If authentication fails.
      */
     @Auditable(eventType = AuditionEventType.SESSION_START)
-    public UserDTO authorize(UserAuthorizationRequestDTO requestDTO) {
+    public UserDto authorize(UserAuthorizationRequestDto requestDto) {
         User user;
         try {
-            user = userService.getUserByName(requestDTO.name());
+            user = userService.getUserByName(requestDto.name());
         } catch (UserNotFoundException ex) {
             throw new UserAuthenticationException();
         }
-        if (!passwordEncoder.verify(requestDTO.password(), user.getPassword())) {
+        if (!passwordEncoder.verify(requestDto.password(), user.getPassword())) {
             throw new UserAuthenticationException();
         }
         userService.setCurrentUser(user);

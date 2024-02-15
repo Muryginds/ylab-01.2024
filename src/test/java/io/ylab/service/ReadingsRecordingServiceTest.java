@@ -7,8 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import io.ylab.dto.request.ReadingRequestDTO;
-import io.ylab.dto.request.NewReadingsSubmissionRequestDTO;
+import io.ylab.dto.request.ReadingRequestDto;
+import io.ylab.dto.request.NewReadingsSubmissionRequestDto;
 import io.ylab.entity.Meter;
 import io.ylab.entity.MeterType;
 import io.ylab.entity.User;
@@ -49,7 +49,7 @@ class ReadingsRecordingServiceTest {
         var userId = 1L;
         var date = LocalDate.now();
         var user = User.builder().id(userId).name("user").password("user").role(UserRole.USER).build();
-        var requestDTO = new NewReadingsSubmissionRequestDTO(Collections.emptyList());
+        var requestDTO = new NewReadingsSubmissionRequestDto(Collections.emptyList());
         Mockito.when(userService.getCurrentUser()).thenReturn(user);
         Mockito.when(userService.getUserById(userId)).thenReturn(user);
         Mockito.when(submissionService.checkExistsByUserIdAndDate(userId, date)).thenReturn(true);
@@ -63,8 +63,8 @@ class ReadingsRecordingServiceTest {
         var userId = 1L;
         var date = LocalDate.now();
         var user = User.builder().id(userId).name("user").password("user").role(UserRole.USER).build();
-        var requestDTO = new NewReadingsSubmissionRequestDTO(
-                Collections.singletonList(ReadingRequestDTO.builder().meterId(1L).value(10L).build())
+        var requestDTO = new NewReadingsSubmissionRequestDto(
+                Collections.singletonList(ReadingRequestDto.builder().meterId(1L).value(10L).build())
         );
         Mockito.when(userService.getCurrentUser()).thenReturn(user);
         Mockito.when(userService.getUserById(userId)).thenReturn(user);
@@ -82,8 +82,8 @@ class ReadingsRecordingServiceTest {
         var user = User.builder().id(userId).name("user").password("user").role(UserRole.USER).build();
         var meterType = MeterType.builder().typeName("Electricity").build();
         var meter = Meter.builder().factoryNumber("123456789").user(user).meterType(meterType).build();
-        var requestDTO = new NewReadingsSubmissionRequestDTO(
-                Collections.singletonList(ReadingRequestDTO.builder().meterId(meter.getId()).value(10L).build())
+        var requestDTO = new NewReadingsSubmissionRequestDto(
+                Collections.singletonList(ReadingRequestDto.builder().meterId(meter.getId()).value(10L).build())
         );
         Mockito.when(userService.getCurrentUser()).thenReturn(user);
         Mockito.when(userService.getUserById(userId)).thenReturn(user);

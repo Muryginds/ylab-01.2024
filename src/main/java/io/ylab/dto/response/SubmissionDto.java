@@ -11,10 +11,10 @@ import java.util.Set;
  * such as between service and controller layers.
  */
 @Builder
-public record SubmissionDTO(
+public record SubmissionDto(
         Long id,
-        UserDTO userDTO,
+        UserDto userDTO,
         String date,
-        Set<MeterReadingDTO> readings
+        Set<MeterReadingDto> readings
 ) {
 }

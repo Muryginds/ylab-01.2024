@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import io.ylab.controller.LoginController;
-import io.ylab.dto.response.MessageDTO;
+import io.ylab.dto.response.MessageDto;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.JsonUtils;
 
@@ -38,7 +38,7 @@ class LogoutServletTest {
 
     @Test
     void testDoPost_whenLogoutSuccessful_returnStatusOK() throws Exception {
-        MessageDTO responseDTO = new MessageDTO("user logged out");
+        MessageDto responseDTO = new MessageDto("user logged out");
         byte[] responseBody = JsonUtils.writeJsonAsBytes(responseDTO);
 
         doNothing().when(loginController).logout();

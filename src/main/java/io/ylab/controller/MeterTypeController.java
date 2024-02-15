@@ -1,7 +1,7 @@
 package io.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
-import io.ylab.dto.request.NewMeterTypeRequestDTO;
+import io.ylab.dto.request.NewMeterTypeRequestDto;
 import io.ylab.exception.MeterTypeExistException;
 import io.ylab.service.MeterTypeService;
 
@@ -34,7 +34,7 @@ public class MeterTypeController {
      * @param request Contains the name of the new meter type to be saved.
      * @throws MeterTypeExistException If a meter type with the same name already exists.
      */
-    public void save(NewMeterTypeRequestDTO request) {
+    public void save(NewMeterTypeRequestDto request) {
         meterTypeService.save(request);
     }
 }

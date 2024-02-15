@@ -9,9 +9,9 @@ import lombok.Builder;
  * such as between service and controller layers.
  */
 @Builder
-public record MeterReadingDTO(
+public record MeterReadingDto(
         Long id,
-        MeterDTO meterDTO,
+        MeterDto meterDTO,
         Long value
 ) {
 }

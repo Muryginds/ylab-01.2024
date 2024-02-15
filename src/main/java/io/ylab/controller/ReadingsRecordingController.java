@@ -2,7 +2,7 @@ package io.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
 import io.ylab.annotation.Loggable;
-import io.ylab.dto.request.NewReadingsSubmissionRequestDTO;
+import io.ylab.dto.request.NewReadingsSubmissionRequestDto;
 import io.ylab.service.ReadingsRecordingService;
 
 /**
@@ -17,10 +17,10 @@ public class ReadingsRecordingController {
      * Saves a new submission based on the provided SubmissionRequestDTO.
      * Delegates the task to the ReadingsRecordingService.
      *
-     * @param request The SubmissionRequestDTO containing data for the new submission.
+     * @param requestDto The SubmissionRequestDTO containing data for the new submission.
      */
     @Loggable
-    public void saveNewSubmission(NewReadingsSubmissionRequestDTO request) {
-        readingsRecordingService.saveNewSubmission(request);
+    public void saveNewSubmission(NewReadingsSubmissionRequestDto requestDto) {
+        readingsRecordingService.saveNewSubmission(requestDto);
     }
 }

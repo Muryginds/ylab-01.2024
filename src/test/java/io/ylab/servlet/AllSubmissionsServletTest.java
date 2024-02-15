@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import io.ylab.controller.SubmissionController;
-import io.ylab.dto.request.AllSubmissionsRequestDTO;
-import io.ylab.dto.response.SubmissionDTO;
+import io.ylab.dto.request.AllSubmissionsRequestDto;
+import io.ylab.dto.response.SubmissionDto;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.JsonUtils;
 import io.ylab.utils.RequestValidator;
@@ -54,8 +54,8 @@ class AllSubmissionsServletTest {
 
     @Test
     void testDoGet_whenValidRequest_returnStatusOK() throws Exception {
-        AllSubmissionsRequestDTO requestDTO = new AllSubmissionsRequestDTO(1L);
-        Collection<SubmissionDTO> responseDTO = new ArrayList<>();
+        AllSubmissionsRequestDto requestDTO = new AllSubmissionsRequestDto(1L);
+        Collection<SubmissionDto> responseDTO = new ArrayList<>();
         byte[] requestBody = JsonUtils.writeJsonAsBytes(requestDTO);
         BufferedReader reader = new BufferedReader(new StringReader(new String(requestBody)));
 

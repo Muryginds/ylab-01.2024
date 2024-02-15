@@ -1,7 +1,7 @@
 package io.ylab.controller;
 
+import io.ylab.dto.response.MeterDto;
 import lombok.RequiredArgsConstructor;
-import io.ylab.dto.response.MeterDTO;
 import io.ylab.service.MeterService;
 
 import java.util.Collection;
@@ -25,7 +25,7 @@ public class MeterController {
      * @param userId The ID of the user for which to retrieve meters.
      * @return A collection of meter DTOs associated with the specified user.
      */
-    public Collection<MeterDTO> getAllByUserId(Long userId) {
+    public Collection<MeterDto> getAllByUserId(Long userId) {
         return meterService.getMeterDTOsByUserId(userId);
     }
 }

@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
 import io.ylab.controller.LoginController;
-import io.ylab.dto.response.MessageDTO;
+import io.ylab.dto.response.MessageDto;
 import io.ylab.exception.BaseMonitoringServiceException;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.ApplicationComponentsFactory;
@@ -26,7 +26,7 @@ public class LogoutServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             loginController.logout();
-            var responseDTO = MessageDTO.builder().message("user logged out").build();
+            var responseDTO = MessageDto.builder().message("user logged out").build();
             var output = JsonUtils.writeJsonAsBytes(responseDTO);
             ResponseUtils.callOkResponse(resp, output);
         } catch (UserNotAuthorizedException ex) {

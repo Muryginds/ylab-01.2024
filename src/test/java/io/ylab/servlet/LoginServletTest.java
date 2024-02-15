@@ -1,5 +1,6 @@
 package io.ylab.servlet;
 
+import io.ylab.dto.response.UserDto;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import io.ylab.controller.LoginController;
-import io.ylab.dto.request.UserAuthorizationRequestDTO;
-import io.ylab.dto.response.UserDTO;
+import io.ylab.dto.request.UserAuthorizationRequestDto;
 import io.ylab.enumerated.UserRole;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.JsonUtils;
@@ -49,8 +49,8 @@ class LoginServletTest {
 
     @Test
     void testDoPost_whenValidRequest_returnStatusOK() throws Exception {
-        UserAuthorizationRequestDTO requestDTO = new UserAuthorizationRequestDTO("name", "password");
-        UserDTO userDTO = new UserDTO(1L, "user", UserRole.USER);
+        UserAuthorizationRequestDto requestDTO = new UserAuthorizationRequestDto("name", "password");
+        UserDto userDTO = new UserDto(1L, "user", UserRole.USER);
         byte[] responseBody = JsonUtils.writeJsonAsBytes(userDTO);
 
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(new String(JsonUtils.writeJsonAsBytes(requestDTO)))));
@@ -67,7 +67,7 @@ class LoginServletTest {
 
     @Test
     void testDoPost_whenAuthorizationFails_returnStatusBadRequest() throws Exception {
-        UserAuthorizationRequestDTO requestDTO = new UserAuthorizationRequestDTO("name", "password");
+        UserAuthorizationRequestDto requestDTO = new UserAuthorizationRequestDto("name", "password");
 
         doThrow(new UserNotAuthorizedException()).when(loginController).authorize(requestDTO);
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(new String(JsonUtils.writeJsonAsBytes((requestDTO))))));

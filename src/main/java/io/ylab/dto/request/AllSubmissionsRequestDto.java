@@ -6,12 +6,12 @@ import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 
 /**
- * Data Transfer Object (DTO) representing a request to retrieve audition events by user ID.
+ * Data Transfer Object (DTO) representing a request to retrieve all submissions by user ID.
  *
- * <p>This class is used to transfer information about a user's request to retrieve audition events by specifying user ID.
+ * <p>This class is used to transfer information about a user's request to retrieve all submissions by specifying user ID.
  */
 @Builder
-public record AuditionEventsRequestDTO(
+public record AllSubmissionsRequestDto(
         @Positive
         @NotNull
         @JsonProperty("userId")

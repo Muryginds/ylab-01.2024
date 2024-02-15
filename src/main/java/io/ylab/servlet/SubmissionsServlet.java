@@ -9,9 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
 import io.ylab.controller.ReadingsRecordingController;
 import io.ylab.controller.SubmissionController;
-import io.ylab.dto.request.NewReadingsSubmissionRequestDTO;
-import io.ylab.dto.request.SubmissionRequestDTO;
-import io.ylab.dto.response.MessageDTO;
+import io.ylab.dto.request.NewReadingsSubmissionRequestDto;
+import io.ylab.dto.request.SubmissionRequestDto;
+import io.ylab.dto.response.MessageDto;
 import io.ylab.exception.BaseMonitoringServiceException;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.ApplicationComponentsFactory;
@@ -33,7 +33,7 @@ public class SubmissionsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            var requestDTO = JsonUtils.readJson(req.getReader(), SubmissionRequestDTO.class);
+            var requestDTO = JsonUtils.readJson(req.getReader(), SubmissionRequestDto.class);
             requestValidator.validateRequest(requestDTO);
             var submissionDTO = submissionController.getSubmissionDTO(requestDTO);
             var output = JsonUtils.writeJsonAsBytes(submissionDTO);
@@ -48,10 +48,10 @@ public class SubmissionsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            var requestDTO = JsonUtils.readJson(req.getReader(), NewReadingsSubmissionRequestDTO.class);
+            var requestDTO = JsonUtils.readJson(req.getReader(), NewReadingsSubmissionRequestDto.class);
             requestValidator.validateRequest(requestDTO);
             readingsRecordingController.saveNewSubmission(requestDTO);
-            var responseDTO = MessageDTO.builder().message("new readings saved").build();
+            var responseDTO = MessageDto.builder().message("new readings saved").build();
             var output = JsonUtils.writeJsonAsBytes(responseDTO);
             ResponseUtils.callOkResponse(resp, output);
         } catch (UserNotAuthorizedException ex) {

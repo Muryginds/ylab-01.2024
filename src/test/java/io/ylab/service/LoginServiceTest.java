@@ -7,8 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import io.ylab.dto.request.UserAuthorizationRequestDTO;
-import io.ylab.dto.request.UserRegistrationRequestDTO;
+import io.ylab.dto.request.UserAuthorizationRequestDto;
+import io.ylab.dto.request.UserRegistrationRequestDto;
 import io.ylab.entity.User;
 import io.ylab.exception.UserAlreadyExistException;
 import io.ylab.exception.UserAuthenticationException;
@@ -38,7 +38,7 @@ class LoginServiceTest {
 
     @Test
     void testRegisterUser_whenNonExistingUser_thenReturnUserDTO() {
-        var requestDTO = new UserRegistrationRequestDTO("testUser", "password");
+        var requestDTO = new UserRegistrationRequestDto("testUser", "password");
         Mockito.when(userService.checkUserExistsByName(requestDTO.name())).thenReturn(false);
         Mockito.when(passwordEncoder.encode(requestDTO.password())).thenReturn("encodedPassword");
 
@@ -52,7 +52,7 @@ class LoginServiceTest {
 
     @Test
     void testRegisterUser_whenExistingUserName_throwUserAlreadyExistException() {
-        var requestDTO = new UserRegistrationRequestDTO("existingUser", "password");
+        var requestDTO = new UserRegistrationRequestDto("existingUser", "password");
         Mockito.when(userService.checkUserExistsByName(requestDTO.name())).thenReturn(true);
 
         Assertions.assertThrows(UserAlreadyExistException.class, () -> loginService.registerUser(requestDTO));
@@ -63,7 +63,7 @@ class LoginServiceTest {
 
     @Test
     void testAuthorize_whenExistingUser_thenReturnUserDTO() {
-        var requestDTO = new UserAuthorizationRequestDTO("testUser", "password");
+        var requestDTO = new UserAuthorizationRequestDto("testUser", "password");
         var user = User.builder().name("testUser").password("encodedPassword").build();
         Mockito.when(userService.getUserByName(requestDTO.name())).thenReturn(user);
         Mockito.when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(true);
@@ -76,7 +76,7 @@ class LoginServiceTest {
 
     @Test
     void testAuthorize_whenNonExistingUser_throwUserAuthenticationException() {
-        var requestDTO = new UserAuthorizationRequestDTO("nonExistingUser", "password");
+        var requestDTO = new UserAuthorizationRequestDto("nonExistingUser", "password");
         Mockito.when(userService.getUserByName(requestDTO.name())).thenThrow(new UserAuthenticationException());
 
         Assertions.assertThrows(UserAuthenticationException.class, () -> loginService.authorize(requestDTO));
@@ -85,7 +85,7 @@ class LoginServiceTest {
 
     @Test
     void testAuthorize_whenWrongPassword_throwUserAuthenticationException() {
-        var requestDTO = new UserAuthorizationRequestDTO("testUser", "wrongPassword");
+        var requestDTO = new UserAuthorizationRequestDto("testUser", "wrongPassword");
         var user = User.builder().name("testUser").password("encodedPassword").build();
         Mockito.when(userService.getUserByName(requestDTO.name())).thenThrow(new UserAuthenticationException());
         Mockito.when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(false);

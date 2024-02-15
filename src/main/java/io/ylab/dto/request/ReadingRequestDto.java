@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 
 @Builder
-public record ReadingRequestDTO(
+public record ReadingRequestDto(
         @Positive
         @NotEmpty
         @JsonProperty("meterId")

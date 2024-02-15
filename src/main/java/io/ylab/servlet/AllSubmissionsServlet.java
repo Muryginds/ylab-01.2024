@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
 import io.ylab.controller.SubmissionController;
-import io.ylab.dto.request.AllSubmissionsRequestDTO;
+import io.ylab.dto.request.AllSubmissionsRequestDto;
 import io.ylab.exception.BaseMonitoringServiceException;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.ApplicationComponentsFactory;
@@ -28,7 +28,7 @@ public class AllSubmissionsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            var requestDTO = JsonUtils.readJson(req.getReader(), AllSubmissionsRequestDTO.class);
+            var requestDTO = JsonUtils.readJson(req.getReader(), AllSubmissionsRequestDto.class);
             requestValidator.validateRequest(requestDTO);
             var allSubmissionDTOs = submissionController.getAllSubmissionDTOs(requestDTO);
             var output = JsonUtils.writeJsonAsBytes(allSubmissionDTOs);

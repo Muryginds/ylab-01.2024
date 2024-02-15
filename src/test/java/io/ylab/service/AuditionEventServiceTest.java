@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import io.ylab.dto.request.AuditionEventsRequestDTO;
+import io.ylab.dto.request.AuditionEventsRequestDto;
 import io.ylab.entity.AuditionEvent;
 import io.ylab.entity.User;
 import io.ylab.enumerated.AuditionEventType;
@@ -36,7 +36,7 @@ class AuditionEventServiceTest {
     @Test
     void testGetEventsByUserId_whenExistingUser_thenReturnCollectionOfAuditionEventDTOs() {
         var userId = 1L;
-        var request = AuditionEventsRequestDTO.builder().userId(userId).build();
+        var request = AuditionEventsRequestDto.builder().userId(userId).build();
         var adminUser = User.builder().id(userId).role(UserRole.ADMIN).build();
         var event1 =  AuditionEvent.builder().id(1L).user(adminUser)
                 .eventType(AuditionEventType.SESSION_START).message("User logged in").build();

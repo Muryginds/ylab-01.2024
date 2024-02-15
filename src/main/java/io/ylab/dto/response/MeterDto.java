@@ -9,10 +9,10 @@ import lombok.Builder;
  * such as between service and controller layers.
  */
 @Builder
-public record MeterDTO(
+public record MeterDto(
         Long id,
         String factoryNumber,
-        UserDTO userDTO,
-        MeterTypeDTO meterTypeDTO
+        UserDto userDTO,
+        MeterTypeDto meterTypeDTO
 ) {
 }

@@ -2,7 +2,7 @@ package io.ylab.service;
 
 import lombok.RequiredArgsConstructor;
 import io.ylab.annotation.Auditable;
-import io.ylab.dto.request.NewReadingsSubmissionRequestDTO;
+import io.ylab.dto.request.NewReadingsSubmissionRequestDto;
 import io.ylab.entity.Meter;
 import io.ylab.entity.MeterReading;
 import io.ylab.entity.Submission;
@@ -27,12 +27,12 @@ public class ReadingsRecordingService {
     /**
      * Saves a new submission with the provided meter readings.
      *
-     * @param request The request containing user ID and meter readings.
+     * @param requestDto The request containing user ID and meter readings.
      * @throws SubmissionExistsException If a submission already exists for the user on the current date.
      * @throws MeterNotFoundException If a meter specified in the readings is not found.
      */
     @Auditable(eventType = AuditionEventType.READINGS_SUBMISSION)
-    public void saveNewSubmission(NewReadingsSubmissionRequestDTO request) {
+    public void saveNewSubmission(NewReadingsSubmissionRequestDto requestDto) {
         var date = LocalDate.now();
         var user = userService.getCurrentUser();
         if (submissionService.checkExistsByUserIdAndDate(user.getId(), date)) {
@@ -45,7 +45,7 @@ public class ReadingsRecordingService {
                 .user(user)
                 .build();
         submissionService.save(submission);
-        var readings = request.meterReadings().stream()
+        var readings = requestDto.meterReadings().stream()
                 .map(newReadingRequest -> {
                     var meter = getUserMeterById(newReadingRequest.meterId(), currentUserMetersMap);
                     return createMeterReading(meter, newReadingRequest.value(), submission);

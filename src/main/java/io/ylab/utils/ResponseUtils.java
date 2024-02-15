@@ -2,7 +2,7 @@ package io.ylab.utils;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.experimental.UtilityClass;
-import io.ylab.dto.response.ErrorDTO;
+import io.ylab.dto.response.ErrorDto;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ public class ResponseUtils {
             HttpServletResponse response,
             Exception ex
     ) throws IOException {
-        var errorDTO = ErrorDTO.builder().error(ex.getMessage()).build();
+        var errorDTO = ErrorDto.builder().error(ex.getMessage()).build();
         var output = JsonUtils.writeJsonAsBytes(errorDTO);
         prepareResponse(response, HttpServletResponse.SC_BAD_REQUEST, output);
     }
@@ -28,7 +28,7 @@ public class ResponseUtils {
             HttpServletResponse response,
             Exception ex
     ) throws IOException {
-        var errorDTO = ErrorDTO.builder().error(ex.getMessage()).build();
+        var errorDTO = ErrorDto.builder().error(ex.getMessage()).build();
         var output = JsonUtils.writeJsonAsBytes(errorDTO);
         prepareResponse(response, HttpServletResponse.SC_UNAUTHORIZED, output);
     }

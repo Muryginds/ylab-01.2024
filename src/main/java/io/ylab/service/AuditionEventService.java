@@ -1,9 +1,9 @@
 package io.ylab.service;
 
 import lombok.RequiredArgsConstructor;
-import io.ylab.dto.request.AuditionEventsRequestDTO;
+import io.ylab.dto.request.AuditionEventsRequestDto;
 import io.ylab.entity.AuditionEvent;
-import io.ylab.dto.response.AuditionEventDTO;
+import io.ylab.dto.response.AuditionEventDto;
 import io.ylab.enumerated.UserRole;
 import io.ylab.exception.NoPermissionException;
 import io.ylab.mapper.AuditionEventMapper;
@@ -28,7 +28,7 @@ public class AuditionEventService {
      * @param request Contains the ID of the user for whom audition events are retrieved.
      * @return Collection of AuditionEventDTO representing the user's audition events.
      */
-    public Collection<AuditionEventDTO> getEvents(AuditionEventsRequestDTO request) {
+    public Collection<AuditionEventDto> getEvents(AuditionEventsRequestDto request) {
         var userId = request.userId();
         var currentUser = userService.getCurrentUser();
         if (currentUser == null || !currentUser.getRole().equals(UserRole.ADMIN)) {

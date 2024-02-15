@@ -1,9 +1,9 @@
 package io.ylab.controller;
 
+import io.ylab.dto.response.UserDto;
 import lombok.RequiredArgsConstructor;
-import io.ylab.dto.response.UserDTO;
-import io.ylab.dto.request.UserAuthorizationRequestDTO;
-import io.ylab.dto.request.UserRegistrationRequestDTO;
+import io.ylab.dto.request.UserAuthorizationRequestDto;
+import io.ylab.dto.request.UserRegistrationRequestDto;
 import io.ylab.exception.UserAuthenticationException;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.service.LoginService;
@@ -18,22 +18,22 @@ public class LoginController {
     /**
      * Registers a new user based on the provided registration request.
      *
-     * @param request The registration request containing user details.
+     * @param requestDto The registration request containing user details.
      * @return The UserDTO representing the registered user.
      */
-    public UserDTO register(UserRegistrationRequestDTO request) {
-        return loginService.registerUser(request);
+    public UserDto register(UserRegistrationRequestDto requestDto) {
+        return loginService.registerUser(requestDto);
     }
 
     /**
      * Authorizes a user based on the provided authorization request.
      *
-     * @param request The authorization request containing user credentials.
+     * @param requestDto The authorization request containing user credentials.
      * @return The UserDTO representing the authorized user.
      * @throws UserAuthenticationException If authentication fails.
      */
-    public UserDTO authorize(UserAuthorizationRequestDTO request) {
-        return loginService.authorize(request);
+    public UserDto authorize(UserAuthorizationRequestDto requestDto) {
+        return loginService.authorize(requestDto);
     }
 
     /**

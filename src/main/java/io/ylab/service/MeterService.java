@@ -1,10 +1,10 @@
 package io.ylab.service;
 
+import io.ylab.dto.response.MeterDto;
 import lombok.RequiredArgsConstructor;
 import io.ylab.entity.Meter;
 import io.ylab.entity.User;
 import io.ylab.exception.MeterNotFoundException;
-import io.ylab.dto.response.MeterDTO;
 import io.ylab.mapper.MeterMapper;
 import io.ylab.repository.MeterRepository;
 
@@ -64,7 +64,7 @@ public class MeterService {
      * @param userId The ID of the user for whom meters are retrieved.
      * @return Collection of MeterDTO representing meters associated with the user.
      */
-    public Collection<MeterDTO> getMeterDTOsByUserId(Long userId) {
+    public Collection<MeterDto> getMeterDTOsByUserId(Long userId) {
         return MeterMapper.MAPPER.toMeterDTOs(getMetersByUserId(userId));
     }
 

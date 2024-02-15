@@ -11,7 +11,7 @@ import java.time.LocalDate;
  * <p>This class is used to transfer information about a user's request to retrieve a submission by specifying a date and user ID.
  */
 @Builder
-public record SubmissionRequestDTO(
+public record SubmissionRequestDto(
         @JsonProperty("date")
         LocalDate date,
         @JsonProperty("userId")

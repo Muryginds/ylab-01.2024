@@ -1,13 +1,13 @@
 package io.ylab.utils;
 
 import lombok.experimental.UtilityClass;
-import io.ylab.dto.response.MeterReadingDTO;
-import io.ylab.dto.response.SubmissionDTO;
+import io.ylab.dto.response.MeterReadingDto;
+import io.ylab.dto.response.SubmissionDto;
 
 @UtilityClass
 public class ConsoleUtils {
 
-    public void submissionFormattedOutput(SubmissionDTO submissionDTO, StringBuilder sb) {
+    public void submissionFormattedOutput(SubmissionDto submissionDTO, StringBuilder sb) {
         sb.append("Submission by user '")
                 .append(submissionDTO.userDTO().name())
                 .append("' id #'")
@@ -18,7 +18,7 @@ public class ConsoleUtils {
         submissionDTO.readings().forEach(mr -> ConsoleUtils.meterReadingFormattedOutput(mr, sb));
     }
 
-    public void meterReadingFormattedOutput(MeterReadingDTO meterReadingDTO, StringBuilder sb) {
+    public void meterReadingFormattedOutput(MeterReadingDto meterReadingDTO, StringBuilder sb) {
         sb.append("Meter #'")
                 .append(meterReadingDTO.meterDTO().factoryNumber())
                 .append("' type:'")

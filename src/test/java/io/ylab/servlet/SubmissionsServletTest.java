@@ -1,5 +1,6 @@
 package io.ylab.servlet;
 
+import io.ylab.dto.response.SubmissionDto;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,10 +10,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import io.ylab.controller.ReadingsRecordingController;
 import io.ylab.controller.SubmissionController;
-import io.ylab.dto.request.NewReadingsSubmissionRequestDTO;
-import io.ylab.dto.request.SubmissionRequestDTO;
-import io.ylab.dto.response.MessageDTO;
-import io.ylab.dto.response.SubmissionDTO;
+import io.ylab.dto.request.NewReadingsSubmissionRequestDto;
+import io.ylab.dto.request.SubmissionRequestDto;
+import io.ylab.dto.response.MessageDto;
 import io.ylab.utils.JsonUtils;
 import io.ylab.utils.RequestValidator;
 
@@ -55,8 +55,8 @@ class SubmissionsServletTest {
 
     @Test
     void testDoGet_whenValidRequest_returnStatusOK() throws Exception {
-        SubmissionRequestDTO requestDTO = new SubmissionRequestDTO(LocalDate.now(), 1L);
-        SubmissionDTO responseDTO = new SubmissionDTO(1L, null, "", null);
+        SubmissionRequestDto requestDTO = new SubmissionRequestDto(LocalDate.now(), 1L);
+        SubmissionDto responseDTO = new SubmissionDto(1L, null, "", null);
         byte[] responseBody = JsonUtils.writeJsonAsBytes(responseDTO);
 
         BufferedReader reader = new BufferedReader(new StringReader(new String(JsonUtils.writeJsonAsBytes(requestDTO))));
@@ -74,8 +74,8 @@ class SubmissionsServletTest {
 
     @Test
     void testDoPost_whenValidRequest_returnStatusOK() throws Exception {
-        NewReadingsSubmissionRequestDTO requestDTO = new NewReadingsSubmissionRequestDTO(null);
-        MessageDTO responseDTO = new MessageDTO("new readings saved");
+        NewReadingsSubmissionRequestDto requestDTO = new NewReadingsSubmissionRequestDto(null);
+        MessageDto responseDTO = new MessageDto("new readings saved");
         byte[] responseBody = JsonUtils.writeJsonAsBytes(responseDTO);
 
         BufferedReader reader = new BufferedReader(new StringReader(new String(JsonUtils.writeJsonAsBytes(requestDTO))));

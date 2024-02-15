@@ -12,9 +12,9 @@ import java.util.List;
  * <p>This class is used to transfer information about a user's meter readings submission from the client to the server.
  */
 @Builder
-public record NewReadingsSubmissionRequestDTO(
+public record NewReadingsSubmissionRequestDto(
         @NotEmpty
         @JsonProperty("meterReadings")
-        List<ReadingRequestDTO> meterReadings
+        List<ReadingRequestDto> meterReadings
 ) {
 }

@@ -1,5 +1,6 @@
 package io.ylab.servlet;
 
+import io.ylab.dto.response.UserDto;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import io.ylab.controller.LoginController;
-import io.ylab.dto.request.UserRegistrationRequestDTO;
-import io.ylab.dto.response.UserDTO;
+import io.ylab.dto.request.UserRegistrationRequestDto;
 import io.ylab.enumerated.UserRole;
 import io.ylab.exception.BaseMonitoringServiceException;
 import io.ylab.utils.JsonUtils;
@@ -51,8 +51,8 @@ class RegistrationServletTest {
 
     @Test
     void testDoPost_whenRegistrationSuccessful_returnStatusOK() throws Exception {
-        UserRegistrationRequestDTO requestDTO = new UserRegistrationRequestDTO("username", "password");
-        UserDTO responseDTO = new UserDTO(1L, "username", UserRole.USER);
+        UserRegistrationRequestDto requestDTO = new UserRegistrationRequestDto("username", "password");
+        UserDto responseDTO = new UserDto(1L, "username", UserRole.USER);
         byte[] responseBody = JsonUtils.writeJsonAsBytes(responseDTO);
         byte[] requestBody = JsonUtils.writeJsonAsBytes(requestDTO);
         BufferedReader reader = new BufferedReader(new StringReader(new String(requestBody)));
@@ -73,7 +73,7 @@ class RegistrationServletTest {
 
     @Test
     void testDoPost_whenErrorOccurs_returnStatusBadRequest() throws Exception {
-        UserRegistrationRequestDTO requestDTO = new UserRegistrationRequestDTO("username", "password");
+        UserRegistrationRequestDto requestDTO = new UserRegistrationRequestDto("username", "password");
         byte[] requestBody = JsonUtils.writeJsonAsBytes(requestDTO);
         BufferedReader reader = new BufferedReader(new StringReader(new String(requestBody)));
 

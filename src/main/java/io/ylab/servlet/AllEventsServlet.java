@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
 import io.ylab.controller.AuditionEventController;
-import io.ylab.dto.request.AuditionEventsRequestDTO;
+import io.ylab.dto.request.AuditionEventsRequestDto;
 import io.ylab.exception.BaseMonitoringServiceException;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.ApplicationComponentsFactory;
@@ -28,7 +28,7 @@ public class AllEventsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            var requestDTO = JsonUtils.readJson(req.getReader(), AuditionEventsRequestDTO.class);
+            var requestDTO = JsonUtils.readJson(req.getReader(), AuditionEventsRequestDto.class);
             requestValidator.validateRequest(requestDTO);
             var eventDTO = auditionEventController.getEvents(requestDTO);
             var output = JsonUtils.writeJsonAsBytes(eventDTO);

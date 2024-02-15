@@ -10,9 +10,9 @@ import io.ylab.enumerated.AuditionEventType;
  * such as between service and controller layers.
  */
 @Builder
-public record AuditionEventDTO(
+public record AuditionEventDto(
         Long id,
-        UserDTO userDTO,
+        UserDto userDTO,
         AuditionEventType eventType,
         String message,
         String date

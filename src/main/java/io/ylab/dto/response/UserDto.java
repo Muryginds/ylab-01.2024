@@ -10,7 +10,7 @@ import io.ylab.enumerated.UserRole;
  * such as between service and controller layers.
  */
 @Builder
-public record UserDTO(
+public record UserDto(
         Long id,
         String name,
         UserRole role

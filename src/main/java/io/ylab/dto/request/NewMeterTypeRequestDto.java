@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 @Builder
-public record NewMeterTypeRequestDTO(
+public record NewMeterTypeRequestDto(
         @NotBlank
         @JsonProperty("typeName")
         String typeName

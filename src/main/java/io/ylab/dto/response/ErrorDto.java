@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 @Builder
-public record ErrorDTO(
+public record ErrorDto(
         @JsonProperty("error")
         String error
 ) {

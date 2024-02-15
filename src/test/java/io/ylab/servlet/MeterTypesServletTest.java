@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import io.ylab.controller.MeterTypeController;
-import io.ylab.dto.request.NewMeterTypeRequestDTO;
-import io.ylab.dto.response.MessageDTO;
+import io.ylab.dto.request.NewMeterTypeRequestDto;
+import io.ylab.dto.response.MessageDto;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.JsonUtils;
 import io.ylab.utils.RequestValidator;
@@ -51,8 +51,8 @@ class MeterTypesServletTest {
 
     @Test
     void testDoGet_whenSaveSuccessful_returnStatusOK() throws Exception {
-        NewMeterTypeRequestDTO requestDTO = new NewMeterTypeRequestDTO("Electricity");
-        MessageDTO responseDTO = new MessageDTO("new meter type saved");
+        NewMeterTypeRequestDto requestDTO = new NewMeterTypeRequestDto("Electricity");
+        MessageDto responseDTO = new MessageDto("new meter type saved");
         byte[] responseBody = JsonUtils.writeJsonAsBytes(responseDTO);
 
         doNothing().when(meterTypeController).save(requestDTO);
@@ -73,7 +73,7 @@ class MeterTypesServletTest {
 
     @Test
     void testDoGet_whenUserNotAuthorized_returnStatusUnauthorized() throws Exception {
-        NewMeterTypeRequestDTO requestDTO = new NewMeterTypeRequestDTO("Electricity");
+        NewMeterTypeRequestDto requestDTO = new NewMeterTypeRequestDto("Electricity");
         doThrow(new UserNotAuthorizedException()).when(meterTypeController).save(requestDTO);
         byte[] requestBody = JsonUtils.writeJsonAsBytes(requestDTO);
         BufferedReader reader = new BufferedReader(new StringReader(new String(requestBody)));

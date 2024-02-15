@@ -1,5 +1,6 @@
 package io.ylab.servlet;
 
+import io.ylab.dto.response.UserDto;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import io.ylab.controller.UserController;
-import io.ylab.dto.response.UserDTO;
 import io.ylab.enumerated.UserRole;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.JsonUtils;
@@ -39,7 +39,7 @@ class CurrentUserServletTest {
 
     @Test
     void testDoGet_whenValidRequest_returnStatusOK() throws Exception {
-        UserDTO userDTO = new UserDTO(1L, "name", UserRole.USER);
+        UserDto userDTO = new UserDto(1L, "name", UserRole.USER);
         byte[] responseBody = JsonUtils.writeJsonAsBytes(userDTO);
 
         when(userController.getCurrentUser()).thenReturn(userDTO);

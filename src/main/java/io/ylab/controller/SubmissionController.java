@@ -1,9 +1,9 @@
 package io.ylab.controller;
 
+import io.ylab.dto.response.SubmissionDto;
 import lombok.RequiredArgsConstructor;
-import io.ylab.dto.response.SubmissionDTO;
-import io.ylab.dto.request.AllSubmissionsRequestDTO;
-import io.ylab.dto.request.SubmissionRequestDTO;
+import io.ylab.dto.request.AllSubmissionsRequestDto;
+import io.ylab.dto.request.SubmissionRequestDto;
 import io.ylab.service.SubmissionRepresentationService;
 
 import java.util.Collection;
@@ -24,20 +24,20 @@ public class SubmissionController {
     /**
      * Retrieves all submissions for a user with the specified ID.
      *
-     * @param request The request containing ID of the user for whom submissions are retrieved.
+     * @param requestDto The request containing ID of the user for whom submissions are retrieved.
      * @return A collection of SubmissionDTO representing the user's submissions.
      */
-    public Collection<SubmissionDTO> getAllSubmissionDTOs(AllSubmissionsRequestDTO request) {
-        return submissionRepresentationService.getAllSubmissionDTOs(request);
+    public Collection<SubmissionDto> getAllSubmissionDTOs(AllSubmissionsRequestDto requestDto) {
+        return submissionRepresentationService.getAllSubmissionDTOs(requestDto);
     }
 
     /**
      * Retrieves a submission for a user based on the specified date.
      *
-     * @param request The request containing the user ID and submission date.
+     * @param requestDto The request containing the user ID and submission date.
      * @return The SubmissionDTO representing the user's submission on the specified date.
      */
-    public SubmissionDTO getSubmissionDTO(SubmissionRequestDTO request) {
-        return submissionRepresentationService.getSubmissionDTO(request);
+    public SubmissionDto getSubmissionDTO(SubmissionRequestDto requestDto) {
+        return submissionRepresentationService.getSubmissionDTO(requestDto);
     }
 }

@@ -1,7 +1,7 @@
 package io.ylab.controller;
 
 import lombok.RequiredArgsConstructor;
-import io.ylab.dto.response.UserDTO;
+import io.ylab.dto.response.UserDto;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.mapper.UserMapper;
 import io.ylab.service.UserService;
@@ -24,7 +24,7 @@ public class UserController {
      * @return The UserDTO representing the current user.
      * @throws UserNotAuthorizedException If user is not authorized.
      */
-    public UserDTO getCurrentUser() {
+    public UserDto getCurrentUser() {
         var user = userService.getCurrentUser();
         return UserMapper.MAPPER.toUserDTO(user);
     }

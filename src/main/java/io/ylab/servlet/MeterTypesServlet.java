@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
 import io.ylab.controller.MeterTypeController;
-import io.ylab.dto.request.NewMeterTypeRequestDTO;
-import io.ylab.dto.response.MessageDTO;
+import io.ylab.dto.request.NewMeterTypeRequestDto;
+import io.ylab.dto.response.MessageDto;
 import io.ylab.exception.BaseMonitoringServiceException;
 import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.utils.ApplicationComponentsFactory;
@@ -29,10 +29,10 @@ public class MeterTypesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            var requestDTO = JsonUtils.readJson(req.getReader(), NewMeterTypeRequestDTO.class);
+            var requestDTO = JsonUtils.readJson(req.getReader(), NewMeterTypeRequestDto.class);
             requestValidator.validateRequest(requestDTO);
             meterTypeController.save(requestDTO);
-            var responseDTO = MessageDTO.builder().message("new meter type saved").build();
+            var responseDTO = MessageDto.builder().message("new meter type saved").build();
             var output = JsonUtils.writeJsonAsBytes(responseDTO);
             ResponseUtils.callOkResponse(resp, output);
         } catch (UserNotAuthorizedException ex) {

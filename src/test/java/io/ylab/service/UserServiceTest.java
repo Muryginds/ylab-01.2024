@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import io.ylab.dto.request.UserAuthorizationRequestDTO;
+import io.ylab.dto.request.UserAuthorizationRequestDto;
 import io.ylab.mapper.UserMapper;
 import io.ylab.model.UserModel;
 import io.ylab.repository.UserRepository;
@@ -59,7 +59,7 @@ class UserServiceTest {
 
     @Test
     void testGetCurrentUserDTO() {
-        var requestDTO = new UserAuthorizationRequestDTO("testUser", "password");
+        var requestDTO = new UserAuthorizationRequestDto("testUser", "password");
         var userModel = UserModel.builder().name("testUser").password("password").build();
         var user = UserMapper.MAPPER.toUser(userModel);
         Mockito.when(userRepository.findUserByName(requestDTO.name())).thenReturn(Optional.of(userModel));
