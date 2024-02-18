@@ -1,79 +1,57 @@
 package io.ylab.repository.impl;
 
-import lombok.RequiredArgsConstructor;
 import io.ylab.entity.AuditionEvent;
 import io.ylab.enumerated.AuditionEventType;
 import io.ylab.model.AuditionEventModel;
 import io.ylab.repository.AuditionEventRepository;
-import io.ylab.utils.DbConnectionFactory;
-import io.ylab.utils.ExceptionHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.stereotype.Repository;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class JdbcAuditionEventRepository implements AuditionEventRepository {
-    private final DbConnectionFactory dbConnectionFactory;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Collection<AuditionEventModel> getEventsByUserId(Long userId) {
-        var selectQuery = "SELECT id, user_id, event_type, message, date FROM private.audition_events " +
+        var sql = "SELECT id, user_id, event_type, message, date FROM private.audition_events " +
                 "WHERE user_id = ? ORDER BY date DESC";
-        var auditionEventModels = new HashSet<AuditionEventModel>();
-
-        try (Connection connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(selectQuery)) {
-
-            preparedStatement.setLong(1, userId);
-            try (var resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    AuditionEventModel auditionEventModel = mapResultSetToAuditionEventModel(resultSet);
-                    auditionEventModels.add(auditionEventModel);
-                }
-            }
-
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
-
-        return auditionEventModels;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> mapRowToAuditionEventModel(rs), userId);
     }
 
     @Override
     public void save(AuditionEvent auditionEvent) {
-        String insertQuery = "INSERT INTO private.audition_events (user_id, event_type, message, date) " +
-                "VALUES (?, ?, ?, ?)";
-
-        try (Connection connection = dbConnectionFactory.getConnection();
-             PreparedStatement preparedStatement =
-                     connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
-
-            preparedStatement.setLong(1, auditionEvent.getUser().getId());
-            preparedStatement.setString(2, auditionEvent.getEventType().name());
-            preparedStatement.setString(3, auditionEvent.getMessage());
-            preparedStatement.setTimestamp(4, Timestamp.valueOf(auditionEvent.getDate()));
-            preparedStatement.executeUpdate();
-
-            try (var resultSet = preparedStatement.getGeneratedKeys()) {
-                if (resultSet.next()) {
-                    var generatedId = resultSet.getLong(1);
-                    auditionEvent.setId(generatedId);
-                }
-            }
-
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
+        var sql = "INSERT INTO private.audition_events (user_id, event_type, message, date) VALUES (?, ?, ?, ?)";
+        var keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(
+                con -> {
+                    var preparedStatement =
+                            con.prepareStatement(sql, new String[]{"id"});
+                    preparedStatement.setLong(1, auditionEvent.getUser().getId());
+                    preparedStatement.setString(2, auditionEvent.getEventType().name());
+                    preparedStatement.setString(3, auditionEvent.getMessage());
+                    preparedStatement.setTimestamp(4, Timestamp.valueOf(auditionEvent.getDate()));
+                    return preparedStatement;
+                }, keyHolder);
+        var optionalNumber = Optional.ofNullable(keyHolder.getKey());
+        optionalNumber.ifPresent(num -> auditionEvent.setId(num.longValue()));
     }
 
-    private AuditionEventModel mapResultSetToAuditionEventModel(ResultSet resultSet) throws SQLException {
+    private AuditionEventModel mapRowToAuditionEventModel(ResultSet rs) throws SQLException {
         return AuditionEventModel.builder()
-                .id(resultSet.getLong("id"))
-                .userId(resultSet.getLong("user_id"))
-                .eventType(AuditionEventType.valueOf(resultSet.getString("event_type")))
-                .message(resultSet.getString("message"))
-                .date(resultSet.getTimestamp("date").toLocalDateTime())
+                .id(rs.getLong("id"))
+                .userId(rs.getLong("user_id"))
+                .eventType(AuditionEventType.valueOf(rs.getString("event_type")))
+                .message(rs.getString("message"))
+                .date(rs.getTimestamp("date").toLocalDateTime())
                 .build();
     }
 }

@@ -1,46 +1,45 @@
 package io.ylab.controller;
 
-import io.ylab.dto.response.UserDto;
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import io.ylab.dto.request.UserAuthorizationRequestDto;
-import io.ylab.dto.request.UserRegistrationRequestDto;
-import io.ylab.exception.UserAuthenticationException;
-import io.ylab.exception.UserNotAuthorizedException;
-import io.ylab.service.LoginService;
+import io.ylab.dto.response.ErrorResponseDto;
+import io.ylab.dto.response.MessageDto;
+import io.ylab.dto.response.UserDto;
+import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * Controller responsible for handling user authentication and registration.
  */
-@RequiredArgsConstructor
-public class LoginController {
-    private final LoginService loginService;
+@Tag(name = "Authorization")
+public interface LoginController {
 
-    /**
-     * Registers a new user based on the provided registration request.
-     *
-     * @param requestDto The registration request containing user details.
-     * @return The UserDTO representing the registered user.
-     */
-    public UserDto register(UserRegistrationRequestDto requestDto) {
-        return loginService.registerUser(requestDto);
-    }
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пользователь авторизован",
+                    content = @Content(schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = "Неверный пароль или имя пользователя",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @Operation(summary = "Авторизация пользователя")
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    UserDto authorize(@Valid @RequestBody UserAuthorizationRequestDto requestDto);
 
-    /**
-     * Authorizes a user based on the provided authorization request.
-     *
-     * @param requestDto The authorization request containing user credentials.
-     * @return The UserDTO representing the authorized user.
-     * @throws UserAuthenticationException If authentication fails.
-     */
-    public UserDto authorize(UserAuthorizationRequestDto requestDto) {
-        return loginService.authorize(requestDto);
-    }
-
-    /**
-     * Logs out the currently logged-in user.
-     * @throws UserNotAuthorizedException if user not authorized.
-     */
-    public void logout() {
-        loginService.logout();
-    }
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пользователь закончил сесиию",
+                    content = @Content(schema = @Schema(implementation = MessageDto.class))),
+            @ApiResponse(responseCode = "403", description = "Пользователь не авторизован",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @Operation(summary = "Завершение сессии пользователя")
+    @PostMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
+    MessageDto logout();
 }

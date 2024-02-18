@@ -1,49 +1,44 @@
 package io.ylab.aspect;
 
+import io.ylab.annotation.Auditable;
+import io.ylab.dto.response.UserDto;
+import io.ylab.entity.AuditionEvent;
+import io.ylab.service.AuditionEventService;
+import io.ylab.service.UserService;
+import io.ylab.utils.CurrentUserUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import io.ylab.annotation.Auditable;
-import io.ylab.dto.response.UserDto;
-import io.ylab.entity.AuditionEvent;
-import io.ylab.entity.User;
-import io.ylab.exception.UserNotAuthorizedException;
-import io.ylab.service.AuditionEventService;
-import io.ylab.service.UserService;
-import io.ylab.utils.ApplicationComponentsFactory;
+import org.springframework.stereotype.Component;
 
-@Aspect
 @Slf4j
+@Aspect
+@Component
+@RequiredArgsConstructor
 public class AuditableAspect {
-    private final AuditionEventService auditionEventService =
-            ApplicationComponentsFactory.getAuditionEventService();
-    private final UserService userService = ApplicationComponentsFactory.getUserService();
+    private final AuditionEventService auditionEventService;
+    private final UserService userService;
 
-    @Pointcut("execution(ru.ylab.dto.response.UserDTO ru.ylab.service.LoginService.registerUser(..))")
-    public void registerUserPointcut() {
+    @Pointcut("execution(io.ylab.dto.response.UserDto io.ylab.service.AccountService.registerUser(..))" +
+            "|| execution(io.ylab.dto.response.UserDto io.ylab.service.LoginService.authorize(..))")
+    public void unauthorizedUserMethodPointcut() {
     }
 
-    @Pointcut("@annotation(ru.ylab.annotation.Auditable) && execution(* *(..))")
+    @Pointcut("@annotation(io.ylab.annotation.Auditable) && execution(* *(..))")
     public void auditableMethod() {
     }
 
-    @Around("auditableMethod() && !registerUserPointcut()")
+    @Around("auditableMethod() && !unauthorizedUserMethodPointcut()")
     public Object auditableMethodAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
         var methodName = joinPoint.getSignature().getName();
         log.info("AUDITING " + methodName);
         var type = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(Auditable.class).eventType();
-        User user;
-        Object proceed;
-        try {
-            user = userService.getCurrentUser();
-            proceed = joinPoint.proceed();
-        } catch (UserNotAuthorizedException ex) {
-            proceed = joinPoint.proceed();
-            user = userService.getCurrentUser();
-        }
+        var user = CurrentUserUtils.getCurrentUser();
+        var proceed = joinPoint.proceed();
         var event = AuditionEvent.builder()
                 .user(user)
                 .eventType(type)
@@ -53,13 +48,13 @@ public class AuditableAspect {
         return proceed;
     }
 
-    @Around("auditableMethod() && registerUserPointcut()")
+    @Around("auditableMethod() && unauthorizedUserMethodPointcut()")
     public Object auditableRegisterUserAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
         var methodName = joinPoint.getSignature().getName();
         log.info("AUDITING " + methodName);
         var type = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(Auditable.class).eventType();
         var proceed = (UserDto)joinPoint.proceed();
-        var user = userService.getUserById(proceed.id());
+        var user = userService.getUserById(proceed.getId());
         var event = AuditionEvent.builder()
                 .user(user)
                 .eventType(type)

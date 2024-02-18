@@ -1,26 +1,32 @@
 package io.ylab.service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import io.ylab.dto.request.ReadingRequestDto;
 import io.ylab.dto.request.NewReadingsSubmissionRequestDto;
-import io.ylab.entity.Meter;
-import io.ylab.entity.MeterType;
+import io.ylab.dto.request.ReadingRequestDto;
+import io.ylab.dto.response.MessageDto;
 import io.ylab.entity.User;
-import io.ylab.enumerated.UserRole;
 import io.ylab.exception.MeterNotFoundException;
 import io.ylab.exception.SubmissionExistsException;
+import io.ylab.utils.CurrentUserUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 class ReadingsRecordingServiceTest {
-
     @Mock
     private MeterReadingsService meterReadingsService;
 
@@ -30,66 +36,58 @@ class ReadingsRecordingServiceTest {
     @Mock
     private SubmissionService submissionService;
 
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private AuditionEventService auditionEventService;
-
     @InjectMocks
     private ReadingsRecordingService readingsRecordingService;
 
+    private MockedStatic<CurrentUserUtils> utilsMockedStatic;
+
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+    void setUp() {
+        utilsMockedStatic = Mockito.mockStatic(CurrentUserUtils.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        utilsMockedStatic.close();
     }
 
     @Test
-    void testSaveNewSubmission_whenSubmissionExistsByDate_throwSubmissionExistsException() {
-        var userId = 1L;
-        var date = LocalDate.now();
-        var user = User.builder().id(userId).name("user").password("user").role(UserRole.USER).build();
-        var requestDTO = new NewReadingsSubmissionRequestDto(Collections.emptyList());
-        Mockito.when(userService.getCurrentUser()).thenReturn(user);
-        Mockito.when(userService.getUserById(userId)).thenReturn(user);
-        Mockito.when(submissionService.checkExistsByUserIdAndDate(userId, date)).thenReturn(true);
+    void testSaveNewSubmission_Success() {
+        var requestDto = NewReadingsSubmissionRequestDto.builder().meterReadings(Collections.emptyList()).build();
+        var user = User.builder().id(1L).build();
+        when(CurrentUserUtils.getCurrentUser()).thenReturn(user);
+        when(submissionService.checkExistsByUserIdAndDate(anyLong(), any(LocalDate.class))).thenReturn(false);
+        when(meterService.getMetersByUserId(anyLong())).thenReturn(Collections.emptyList());
 
-        Assertions.assertThrows(SubmissionExistsException.class,
-                () -> readingsRecordingService.saveNewSubmission(requestDTO));
+        MessageDto result = readingsRecordingService.saveNewSubmission(requestDto);
+
+        assertEquals("New submission saved", result.message());
+        verify(meterReadingsService, times(1)).saveAll(Collections.emptySet());
     }
 
     @Test
-    void testSaveNewSubmission_whenMeterNotFound_throwMeterNotFoundException() {
-        var userId = 1L;
-        var date = LocalDate.now();
-        var user = User.builder().id(userId).name("user").password("user").role(UserRole.USER).build();
-        var requestDTO = new NewReadingsSubmissionRequestDto(
-                Collections.singletonList(ReadingRequestDto.builder().meterId(1L).value(10L).build())
-        );
-        Mockito.when(userService.getCurrentUser()).thenReturn(user);
-        Mockito.when(userService.getUserById(userId)).thenReturn(user);
-        Mockito.when(submissionService.checkExistsByUserIdAndDate(userId, date)).thenReturn(false);
-        Mockito.when(meterService.getMetersByUserId(userId)).thenReturn(Collections.emptySet());
+    void testSaveNewSubmission_SubmissionExistsException() {
+        var user = User.builder().id(1L).build();
+        when(CurrentUserUtils.getCurrentUser()).thenReturn(user);
+        when(submissionService.checkExistsByUserIdAndDate(anyLong(), any(LocalDate.class))).thenReturn(true);
+        var submissionRequest = NewReadingsSubmissionRequestDto.builder().build();
 
-        Assertions.assertThrows(MeterNotFoundException.class,
-                () -> readingsRecordingService.saveNewSubmission(requestDTO));
+        assertThrows(SubmissionExistsException.class,
+                () -> readingsRecordingService.saveNewSubmission(submissionRequest));
+        verifyNoInteractions(meterReadingsService);
     }
 
     @Test
-    void testSaveNewSubmission_whenValid_thenDoNothing() {
-        var userId = 1L;
-        var date = LocalDate.now();
-        var user = User.builder().id(userId).name("user").password("user").role(UserRole.USER).build();
-        var meterType = MeterType.builder().typeName("Electricity").build();
-        var meter = Meter.builder().factoryNumber("123456789").user(user).meterType(meterType).build();
-        var requestDTO = new NewReadingsSubmissionRequestDto(
-                Collections.singletonList(ReadingRequestDto.builder().meterId(meter.getId()).value(10L).build())
-        );
-        Mockito.when(userService.getCurrentUser()).thenReturn(user);
-        Mockito.when(userService.getUserById(userId)).thenReturn(user);
-        Mockito.when(submissionService.checkExistsByUserIdAndDate(userId, date)).thenReturn(false);
-        Mockito.when(meterService.getMetersByUserId(userId)).thenReturn(Collections.singleton(meter));
+    void testSaveNewSubmission_MeterNotFoundException() {
+        var requestDto = NewReadingsSubmissionRequestDto.builder()
+                .meterReadings(List.of(ReadingRequestDto.builder().meterId(100L).build()))
+                .build();
+        var user = User.builder().id(1L).build();
+        when(CurrentUserUtils.getCurrentUser()).thenReturn(user);
+        when(submissionService.checkExistsByUserIdAndDate(anyLong(), any(LocalDate.class))).thenReturn(false);
+        when(meterService.getMetersByUserId(anyLong())).thenReturn(Collections.emptyList());
 
-        Assertions.assertDoesNotThrow(() -> readingsRecordingService.saveNewSubmission(requestDTO));
+        assertThrows(MeterNotFoundException.class, () -> readingsRecordingService.saveNewSubmission(requestDto));
+        verifyNoInteractions(meterReadingsService);
     }
 }

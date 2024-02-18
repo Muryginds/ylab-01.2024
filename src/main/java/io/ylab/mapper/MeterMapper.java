@@ -1,9 +1,9 @@
 package io.ylab.mapper;
 
 import io.ylab.dto.response.MeterDto;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 import io.ylab.entity.Meter;
 import io.ylab.entity.MeterType;
 import io.ylab.entity.User;
@@ -11,9 +11,9 @@ import io.ylab.model.MeterModel;
 
 import java.util.Collection;
 
-@Mapper(uses = {UserMapper.class, MeterTypeMapper.class})
+@Mapper(componentModel = "spring", uses = {UserMapper.class, MeterTypeMapper.class},
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface MeterMapper {
-    MeterMapper MAPPER = Mappers.getMapper(MeterMapper.class);
 
     @Mapping(target = "userDTO", source = "user")
     @Mapping(target = "meterTypeDTO", source = "meterType")

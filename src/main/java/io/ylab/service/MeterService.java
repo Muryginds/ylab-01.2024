@@ -1,12 +1,12 @@
 package io.ylab.service;
 
-import io.ylab.dto.response.MeterDto;
-import lombok.RequiredArgsConstructor;
 import io.ylab.entity.Meter;
 import io.ylab.entity.User;
 import io.ylab.exception.MeterNotFoundException;
 import io.ylab.mapper.MeterMapper;
 import io.ylab.repository.MeterRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,6 +17,7 @@ import java.util.Random;
  * It includes methods for saving new meters, retrieving meters by various criteria, and generating meters for new users.
  * This service interacts with the MeterRepository and MeterTypeRepository.
  */
+@Service
 @RequiredArgsConstructor
 public class MeterService {
     private static final Random random = new Random();
@@ -24,6 +25,7 @@ public class MeterService {
     private final MeterRepository meterRepository;
     private final MeterTypeService meterTypeService;
     private final UserService userService;
+    private final MeterMapper meterMapper;
 
     /**
      * Saves a single meter.
@@ -55,17 +57,7 @@ public class MeterService {
                 .orElseThrow(() -> new MeterNotFoundException(meterId));
         var meterType = meterTypeService.getMeterTypeById(meterModel.meterTypeId());
         var user = userService.getUserById(meterModel.userId());
-        return MeterMapper.MAPPER.toMeter(meterModel, meterType, user);
-    }
-
-    /**
-     * Retrieves DTOs for all meters associated with a specific user.
-     *
-     * @param userId The ID of the user for whom meters are retrieved.
-     * @return Collection of MeterDTO representing meters associated with the user.
-     */
-    public Collection<MeterDto> getMeterDTOsByUserId(Long userId) {
-        return MeterMapper.MAPPER.toMeterDTOs(getMetersByUserId(userId));
+        return meterMapper.toMeter(meterModel, meterType, user);
     }
 
     /**
@@ -80,7 +72,7 @@ public class MeterService {
         var collection = new HashSet<Meter>();
         for (var meterModel : meterModels) {
             var meterType = meterTypeService.getMeterTypeById(meterModel.meterTypeId());
-            collection.add(MeterMapper.MAPPER.toMeter(meterModel, meterType, user));
+            collection.add(meterMapper.toMeter(meterModel, meterType, user));
         }
         return collection;
     }

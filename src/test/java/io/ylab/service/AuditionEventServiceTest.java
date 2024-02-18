@@ -1,76 +1,76 @@
 package io.ylab.service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import io.ylab.dto.request.AuditionEventsRequestDto;
+import io.ylab.dto.response.AuditionEventDto;
 import io.ylab.entity.AuditionEvent;
 import io.ylab.entity.User;
-import io.ylab.enumerated.AuditionEventType;
 import io.ylab.enumerated.UserRole;
+import io.ylab.exception.NoPermissionException;
 import io.ylab.mapper.AuditionEventMapper;
 import io.ylab.repository.AuditionEventRepository;
+import io.ylab.utils.CurrentUserUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
-class AuditionEventServiceTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+class AuditionEventServiceTest {
     @Mock
     private AuditionEventRepository auditionEventRepository;
 
     @Mock
-    private UserService userService;
+    private AuditionEventMapper auditionEventMapper;
 
     @InjectMocks
     private AuditionEventService auditionEventService;
 
+    private MockedStatic<CurrentUserUtils> utilsMockedStatic;
+
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+    void setUp() {
+        utilsMockedStatic = Mockito.mockStatic(CurrentUserUtils.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        utilsMockedStatic.close();
     }
 
     @Test
-    void testGetEventsByUserId_whenExistingUser_thenReturnCollectionOfAuditionEventDTOs() {
-        var userId = 1L;
-        var request = AuditionEventsRequestDto.builder().userId(userId).build();
-        var adminUser = User.builder().id(userId).role(UserRole.ADMIN).build();
-        var event1 =  AuditionEvent.builder().id(1L).user(adminUser)
-                .eventType(AuditionEventType.SESSION_START).message("User logged in").build();
-        var event2 = AuditionEvent.builder().id(2L).user(adminUser)
-                .eventType(AuditionEventType.SESSION_END).message("User logged out").build();
-        var auditionEventModels = Set.of(
-                AuditionEventMapper.MAPPER.toAuditionEventModel(event1),
-                AuditionEventMapper.MAPPER.toAuditionEventModel(event2)
-        );
-        var expectedEventDTOs = Set.of(
-                AuditionEventMapper.MAPPER.toAuditionEventDTO(event1),
-                AuditionEventMapper.MAPPER.toAuditionEventDTO(event2)
-        );
-        Mockito.when(auditionEventRepository.getEventsByUserId(userId)).thenReturn(auditionEventModels);
-        Mockito.when(userService.getUserById(userId)).thenReturn(adminUser);
-        Mockito.when(userService.getCurrentUser()).thenReturn(adminUser);
+    void testGetEvents_WithAdminRole_ReturnsEvents() {
+        long userId = 123;
+        var admin = User.builder().id(userId).name("admin").role(UserRole.ADMIN).build();
+        when(CurrentUserUtils.getCurrentUser()).thenReturn(admin);
+        var expectedEvents = new HashSet<AuditionEventDto>();
+        when(auditionEventRepository.getEventsByUserId(userId)).thenReturn(Collections.emptySet());
+        when(auditionEventMapper.toAuditionEventDTOs(any())).thenReturn(expectedEvents);
 
-        var result = auditionEventService.getEvents(request);
+        Set<AuditionEventDto> actualEvents = auditionEventService.getEvents(userId);
 
-        Assertions.assertTrue(result.containsAll(expectedEventDTOs));
-        Assertions.assertEquals(result.size(), expectedEventDTOs.size());
+        assertEquals(expectedEvents, actualEvents);
+        verify(auditionEventRepository, times(1)).getEventsByUserId(userId);
+        verify(auditionEventMapper, times(1)).toAuditionEventDTOs(any());
     }
 
     @Test
-    void testSave_whenValid_thenDoNothing() {
-        AuditionEvent auditionEvent = AuditionEvent.builder()
-                .id(1L)
-                .user(User.builder().build())
-                .eventType(AuditionEventType.REGISTRATION)
-                .message("User logged in")
-                .build();
+    void testGetEvents_WithNonAdminRole_ThrowsNoPermissionException() {
+        long userId = 123;
+        var user = User.builder().id(userId).name("user").role(UserRole.USER).build();
+        when(CurrentUserUtils.getCurrentUser()).thenReturn(user);
 
-        auditionEventService.save(auditionEvent);
-
-        Mockito.verify(auditionEventRepository, Mockito.times(1)).save(auditionEvent);
+        assertThrows(NoPermissionException.class, () -> auditionEventService.getEvents(userId));
+        verify(auditionEventRepository, never()).getEventsByUserId(anyLong());
+        verify(auditionEventMapper, never()).toAuditionEventDTOs(any());
     }
 }

@@ -1,8 +1,8 @@
 package io.ylab.mapper;
 
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 import io.ylab.entity.Meter;
 import io.ylab.entity.MeterReading;
 import io.ylab.dto.response.MeterReadingDto;
@@ -11,9 +11,9 @@ import io.ylab.model.MeterReadingModel;
 
 import java.util.Set;
 
-@Mapper(uses = {UserMapper.class, MeterMapper.class})
+@Mapper(componentModel = "spring", uses = {UserMapper.class, MeterMapper.class},
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface MeterReadingMapper {
-    MeterReadingMapper MAPPER = Mappers.getMapper(MeterReadingMapper.class);
 
     @Mapping(target = "meterDTO", source = "meter")
     MeterReadingDto toMeterReadingDTO(MeterReading meterReading);

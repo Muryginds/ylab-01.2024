@@ -4,7 +4,6 @@ import io.ylab.entity.MeterReading;
 import io.ylab.model.MeterReadingModel;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * Repository interface for managing meter reading-related data operations.
@@ -17,7 +16,7 @@ public interface MeterReadingRepository {
      * @param submissionId The ID of the submission.
      * @return A set of meter reading model associated with the specified submission.
      */
-    Set<MeterReadingModel> getAllBySubmissionId(Long submissionId);
+    Collection<MeterReadingModel> getAllBySubmissionId(Long submissionId);
 
     /**
      * Saves a single meter reading in the repository.

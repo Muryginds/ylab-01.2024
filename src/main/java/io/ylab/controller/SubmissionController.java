@@ -1,12 +1,25 @@
 package io.ylab.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.ylab.dto.request.NewReadingsSubmissionRequestDto;
+import io.ylab.dto.response.ErrorResponseDto;
+import io.ylab.dto.response.MessageDto;
 import io.ylab.dto.response.SubmissionDto;
-import lombok.RequiredArgsConstructor;
-import io.ylab.dto.request.AllSubmissionsRequestDto;
-import io.ylab.dto.request.SubmissionRequestDto;
-import io.ylab.service.SubmissionRepresentationService;
+import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Collection;
+import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * Controller class for handling submission-related operations and interactions.
@@ -14,30 +27,39 @@ import java.util.Collection;
  * <p>This class acts as an interface between the user interface and the underlying business logic
  * related to user submissions.
  */
-@RequiredArgsConstructor
-public class SubmissionController {
-    /**
-     * The associated service for submission-related operations.
-     */
-    private final SubmissionRepresentationService submissionRepresentationService;
+@ApiResponse(responseCode = "403", description = "Пользователь не авторизован",
+        content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+@Tag(name = "Submission")
+public interface SubmissionController {
 
-    /**
-     * Retrieves all submissions for a user with the specified ID.
-     *
-     * @param requestDto The request containing ID of the user for whom submissions are retrieved.
-     * @return A collection of SubmissionDTO representing the user's submissions.
-     */
-    public Collection<SubmissionDto> getAllSubmissionDTOs(AllSubmissionsRequestDto requestDto) {
-        return submissionRepresentationService.getAllSubmissionDTOs(requestDto);
-    }
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Показания получены",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = SubmissionDto.class)))),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @Operation(summary = "Получение списка показаний")
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    Set<SubmissionDto> getAllSubmissionDTOs(@RequestParam(name = "userId") long userId);
 
-    /**
-     * Retrieves a submission for a user based on the specified date.
-     *
-     * @param requestDto The request containing the user ID and submission date.
-     * @return The SubmissionDTO representing the user's submission on the specified date.
-     */
-    public SubmissionDto getSubmissionDTO(SubmissionRequestDto requestDto) {
-        return submissionRepresentationService.getSubmissionDTO(requestDto);
-    }
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Показание получено",
+                    content = @Content(schema = @Schema(implementation = SubmissionDto.class))),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @Operation(summary = "Получение показания")
+    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    SubmissionDto getSubmissionDTO(@RequestParam(name = "date", required = false) LocalDate date,
+                                   @RequestParam(name = "userId", required = false) Long userId);
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Сохранение прошло успешно",
+                    content = @Content(schema = @Schema(implementation = MessageDto.class))),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @Operation(summary = "Добавление новых показаний")
+    @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    MessageDto saveNewSubmission(@Valid @RequestBody NewReadingsSubmissionRequestDto requestDto);
 }

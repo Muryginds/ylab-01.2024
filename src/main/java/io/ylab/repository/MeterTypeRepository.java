@@ -34,6 +34,14 @@ public interface MeterTypeRepository {
     Optional<MeterTypeModel> findById(Long meterTypeId);
 
     /**
+     * Finds a meter type model by its name in the repository.
+     *
+     * @param meterTypeName The Name of the meter type.
+     * @return An optional containing the found meter type model or empty if not found.
+     */
+    Optional<MeterTypeModel> findByName(String meterTypeName);
+
+    /**
      * Checks if a meter type with a given name exists in the repository.
      *
      * @param typeName The name of the meter type.

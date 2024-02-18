@@ -5,7 +5,6 @@ import io.ylab.model.MeterModel;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Repository interface for managing meter-related data operations.
@@ -18,7 +17,7 @@ public interface MeterRepository {
      * @param userId The ID of the user.
      * @return A set of meter models associated with the specified user.
      */
-    Set<MeterModel> getByUserId(Long userId);
+    Collection<MeterModel> getByUserId(Long userId);
 
     /**
      * Saves a single meter in the repository.

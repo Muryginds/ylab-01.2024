@@ -1,36 +1,38 @@
 package io.ylab.service;
 
-import lombok.RequiredArgsConstructor;
-import io.ylab.dto.request.AuditionEventsRequestDto;
-import io.ylab.entity.AuditionEvent;
 import io.ylab.dto.response.AuditionEventDto;
+import io.ylab.entity.AuditionEvent;
 import io.ylab.enumerated.UserRole;
 import io.ylab.exception.NoPermissionException;
 import io.ylab.mapper.AuditionEventMapper;
 import io.ylab.repository.AuditionEventRepository;
+import io.ylab.utils.CurrentUserUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
- * The AuditionEventService class provides functionality for managing audition events.
+ * The AuditionEventServiceImpl class provides functionality for managing audition events.
  * It includes methods for retrieving events by user ID and adding new audition events.
  * This service interacts with the AuditionEventRepository.
  */
+@Service
 @RequiredArgsConstructor
 public class AuditionEventService {
     private final AuditionEventRepository auditionEventRepository;
     private final UserService userService;
+    private final AuditionEventMapper auditionEventMapper;
 
     /**
      * Retrieves a collection of audition events associated with a specific user.
      *
-     * @param request Contains the ID of the user for whom audition events are retrieved.
+     * @param userId Contains the ID of the user for whom audition events are retrieved.
      * @return Collection of AuditionEventDTO representing the user's audition events.
      */
-    public Collection<AuditionEventDto> getEvents(AuditionEventsRequestDto request) {
-        var userId = request.userId();
-        var currentUser = userService.getCurrentUser();
+    public Set<AuditionEventDto> getEvents(long userId) {
+        var currentUser = CurrentUserUtils.getCurrentUser();
         if (currentUser == null || !currentUser.getRole().equals(UserRole.ADMIN)) {
             throw new NoPermissionException();
         }
@@ -39,10 +41,10 @@ public class AuditionEventService {
         if (!eventModels.isEmpty()) {
             var targetUser = userService.getUserById(userId);
             for (var eventModel : eventModels) {
-                collection.add(AuditionEventMapper.MAPPER.toAuditionEvent(eventModel, targetUser));
+                collection.add(auditionEventMapper.toAuditionEvent(eventModel, targetUser));
             }
         }
-        return AuditionEventMapper.MAPPER.toAuditionEventDTOs(collection);
+        return auditionEventMapper.toAuditionEventDTOs(collection);
     }
 
     /**

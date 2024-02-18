@@ -1,26 +1,31 @@
 package io.ylab.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import io.ylab.dto.response.AuditionEventDto;
-import lombok.RequiredArgsConstructor;
-import io.ylab.dto.request.AuditionEventsRequestDto;
-import io.ylab.service.AuditionEventService;
+import io.ylab.dto.response.ErrorResponseDto;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Collection;
+import java.util.Set;
 
-/**
- * Controller responsible for handling audition event-related operations.
- */
-@RequiredArgsConstructor
-public class AuditionEventController {
-    private final AuditionEventService auditionEventService;
+@ApiResponse(responseCode = "403", description = "Пользователь не авторизован",
+        content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+@Tag(name = "Audition")
+public interface AuditionEventController {
 
-    /**
-     * Retrieves audition events associated with a specific user ID.
-     *
-     * @param requestDto Contains the ID of the user.
-     * @return A collection of AuditionEventDTO representing the audition events.
-     */
-    public Collection<AuditionEventDto> getEvents(AuditionEventsRequestDto requestDto){
-        return auditionEventService.getEvents(requestDto);
-    }
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "События получены",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = AuditionEventDto.class)))),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @Operation(summary = "Получение списка событий")
+    @GetMapping(value = "/all")
+    Set<AuditionEventDto> getEvents(@RequestParam(name = "userId") long userId);
 }

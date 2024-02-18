@@ -1,98 +1,64 @@
 package io.ylab.repository.impl;
 
-import lombok.RequiredArgsConstructor;
 import io.ylab.entity.MeterReading;
 import io.ylab.model.MeterReadingModel;
 import io.ylab.repository.MeterReadingRepository;
-import io.ylab.utils.DbConnectionFactory;
-import io.ylab.utils.ExceptionHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.stereotype.Repository;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class JdbcMeterReadingRepository implements MeterReadingRepository {
-    private final DbConnectionFactory dbConnectionFactory;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Set<MeterReadingModel> getAllBySubmissionId(Long submissionId) {
-        var selectQuery = "SELECT id, meter_id, value, submission_id FROM private.meter_readings " +
-                "WHERE submission_id = ?";
-        var meterReadingModels = new HashSet<MeterReadingModel>();
-
-        try (Connection connection = dbConnectionFactory.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
-
-            preparedStatement.setLong(1, submissionId);
-
-            try (var resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    MeterReadingModel meterReadingModel = mapResultSetToMeterReadingModel(resultSet);
-                    meterReadingModels.add(meterReadingModel);
-                }
-            }
-
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
-
-        return meterReadingModels;
+    public Collection<MeterReadingModel> getAllBySubmissionId(Long submissionId) {
+        var sql = "SELECT id, meter_id, value, submission_id FROM private.meter_readings WHERE submission_id = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> mapRowToMeterReadingModel(rs), submissionId);
     }
 
     @Override
     public void save(MeterReading meterReading) {
-        var insertQuery = "INSERT INTO private.meter_readings (submission_id, meter_id, value) VALUES (?, ?, ?)";
-
-        try (Connection connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
-
-            preparedStatement.setLong(1, meterReading.getSubmission().getId());
-            preparedStatement.setLong(2, meterReading.getMeter().getId());
-            preparedStatement.setLong(3, meterReading.getValue());
-            preparedStatement.executeUpdate();
-
-            try (var resultSet = preparedStatement.getGeneratedKeys()) {
-                if (resultSet.next()) {
-                    var generatedId = resultSet.getLong(1);
-                    meterReading.setId(generatedId);
-                }
-            }
-
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
+        var sql = "INSERT INTO private.meter_readings (submission_id, meter_id, value) VALUES (?, ?, ?)";
+        var keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(
+                con -> {
+                    var preparedStatement = con.prepareStatement(sql, new String[]{"id"});
+                    preparedStatement.setLong(1, meterReading.getSubmission().getId());
+                    preparedStatement.setLong(2, meterReading.getMeter().getId());
+                    preparedStatement.setLong(3, meterReading.getValue());
+                    return preparedStatement;
+                },
+                keyHolder
+        );
+        var optionalNumber = Optional.ofNullable(keyHolder.getKey());
+        optionalNumber.ifPresent(num -> meterReading.setId(num.longValue()));
     }
 
     @Override
     public void saveAll(Collection<MeterReading> meterReadings) {
-        String insertQuery = "INSERT INTO private.meter_readings (submission_id, meter_id, value) VALUES (?, ?, ?)";
-
-        try (var connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(insertQuery)) {
-
-            for (var meterReading : meterReadings) {
-                preparedStatement.setLong(1, meterReading.getSubmission().getId());
-                preparedStatement.setLong(2, meterReading.getMeter().getId());
-                preparedStatement.setLong(3, meterReading.getValue());
-                preparedStatement.addBatch();
-            }
-
-            preparedStatement.executeBatch();
-
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
+        var sql = "INSERT INTO private.meter_readings (submission_id, meter_id, value) VALUES (?, ?, ?)";
+        jdbcTemplate.batchUpdate(sql, meterReadings, meterReadings.size(),
+                (ps, meterReading) -> {
+                    ps.setLong(1, meterReading.getSubmission().getId());
+                    ps.setLong(2, meterReading.getMeter().getId());
+                    ps.setLong(3, meterReading.getValue());
+                });
     }
 
-    private MeterReadingModel mapResultSetToMeterReadingModel(ResultSet resultSet) throws SQLException {
+    private MeterReadingModel mapRowToMeterReadingModel(ResultSet rs) throws SQLException {
         return MeterReadingModel.builder()
-                .id(resultSet.getLong("id"))
-                .submissionId(resultSet.getLong("submission_id"))
-                .meterId(resultSet.getLong("meter_id"))
-                .value(resultSet.getLong("value"))
+                .id(rs.getLong("id"))
+                .submissionId(rs.getLong("submission_id"))
+                .meterId(rs.getLong("meter_id"))
+                .value(rs.getLong("value"))
                 .build();
     }
 }
-

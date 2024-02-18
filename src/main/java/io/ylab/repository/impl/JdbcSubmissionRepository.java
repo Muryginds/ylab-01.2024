@@ -1,164 +1,84 @@
 package io.ylab.repository.impl;
 
-import lombok.RequiredArgsConstructor;
 import io.ylab.entity.Submission;
 import io.ylab.model.SubmissionModel;
 import io.ylab.repository.SubmissionRepository;
-import io.ylab.utils.DbConnectionFactory;
-import io.ylab.utils.ExceptionHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class JdbcSubmissionRepository implements SubmissionRepository {
-    private final DbConnectionFactory dbConnectionFactory;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Collection<SubmissionModel> getByUserId(Long userId) {
-        var selectQuery = "SELECT id, user_id, date FROM private.submissions WHERE user_id = ?";
-        var submissionModels = new HashSet<SubmissionModel>();
-
-        try (var connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(selectQuery)) {
-
-            preparedStatement.setLong(1, userId);
-            try (var resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    var submissionModel = mapResultSetToSubmissionModel(resultSet);
-                    submissionModels.add(submissionModel);
-                }
-            }
-
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
-
-        return submissionModels;
+        var sql = "SELECT id, user_id, date FROM private.submissions WHERE user_id = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> mapRowToSubmissionModel(rs), userId);
     }
 
     @Override
     public Optional<SubmissionModel> getById(Long submissionId) {
-        var selectQuery = "SELECT id, user_id, date FROM private.submissions WHERE id = ?";
-
-        try (var connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(selectQuery)) {
-
-            preparedStatement.setLong(1, submissionId);
-            try (var resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Optional.of(mapResultSetToSubmissionModel(resultSet));
-                }
-            }
-
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
-
-        return Optional.empty();
+        var sql = "SELECT id, user_id, date FROM private.submissions WHERE id = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> mapRowToSubmissionModel(rs), submissionId)
+                .stream()
+                .findFirst();
     }
 
     @Override
     public void save(Submission submission) {
-        var insertQuery = "INSERT INTO private.submissions (user_id, date) VALUES (?, ?)";
-
-        try (var connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
-
-            preparedStatement.setLong(1, submission.getUser().getId());
-            preparedStatement.setDate(2, Date.valueOf(submission.getDate()));
-            preparedStatement.executeUpdate();
-
-            try (var resultSet = preparedStatement.getGeneratedKeys()) {
-                if (resultSet.next()) {
-                    var generatedId = resultSet.getLong(1);
-                    submission.setId(generatedId);
-                }
-            }
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
+        var sql = "INSERT INTO private.submissions (user_id, date) VALUES (?, ?)";
+        var keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(
+                con -> {
+                    var preparedStatement = con.prepareStatement(sql, new String[]{"id"});
+                    preparedStatement.setLong(1, submission.getUser().getId());
+                    preparedStatement.setDate(2, Date.valueOf(submission.getDate()));
+                    return preparedStatement;
+                },
+                keyHolder
+        );
+        var optionalNumber = Optional.ofNullable(keyHolder.getKey());
+        optionalNumber.ifPresent(num -> submission.setId(num.longValue()));
     }
 
     @Override
     public boolean checkExistsByUserIdAndDate(Long userId, LocalDate date) {
-        var selectQuery = "SELECT COUNT(id) FROM private.submissions WHERE user_id = ? AND date = ?";
-
-        try (var connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(selectQuery)) {
-
-            preparedStatement.setLong(1, userId);
-            preparedStatement.setDate(2, Date.valueOf(date));
-
-            try (var resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getLong(1) > 0;
-                }
-            }
-
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
-
-        return false;
+        var sql = "SELECT COUNT(id) FROM private.submissions WHERE user_id = ? AND date = ?";
+        var result = jdbcTemplate.queryForObject(sql, Integer.class, userId, date);
+        return Optional.ofNullable(result).orElse(0) > 0;
     }
 
     @Override
     public Optional<SubmissionModel> findSubmissionByUserIdAndDate(Long userId, LocalDate date) {
-        var selectQuery = "SELECT id, user_id, date FROM private.submissions WHERE user_id = ? " +
+        var sql = "SELECT id, user_id, date FROM private.submissions WHERE user_id = ? " +
                 "AND EXTRACT(MONTH FROM date) = ? AND EXTRACT(YEAR FROM date) = ?";
-        try (var connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(selectQuery)) {
-
-            preparedStatement.setLong(1, userId);
-            preparedStatement.setInt(2, date.getMonthValue());
-            preparedStatement.setInt(3, date.getYear());
-
-            try (var resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    var submissionModel = mapResultSetToSubmissionModel(resultSet);
-                    return Optional.of(submissionModel);
-                }
-            }
-
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
-
-        return Optional.empty();
+        return jdbcTemplate.query(
+                sql, (rs, rowNum) -> mapRowToSubmissionModel(rs), userId, date.getMonthValue(), date.getYear()
+                )
+                .stream()
+                .findFirst();
     }
 
     @Override
     public Optional<SubmissionModel> findLastSubmissionByUserId(Long userId) {
-        var selectQuery = "SELECT id, user_id, date FROM private.submissions " +
+        var sql = "SELECT id, user_id, date FROM private.submissions " +
                 "WHERE user_id = ? ORDER BY date DESC LIMIT 1";
-
-        try (var connection = dbConnectionFactory.getConnection();
-             var preparedStatement = connection.prepareStatement(selectQuery)) {
-
-            preparedStatement.setLong(1, userId);
-
-            try (var resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    var submissionModel = mapResultSetToSubmissionModel(resultSet);
-                    return Optional.of(submissionModel);
-                }
-            }
-
-        } catch (SQLException e) {
-            ExceptionHandler.handleSQLException(e);
-        }
-
-        return Optional.empty();
+        return jdbcTemplate.query(sql, (rs, rowNum) -> mapRowToSubmissionModel(rs), userId)
+                .stream()
+                .findFirst();
     }
 
-    private SubmissionModel mapResultSetToSubmissionModel(ResultSet resultSet) throws SQLException {
+    private SubmissionModel mapRowToSubmissionModel(ResultSet resultSet) throws SQLException {
         return SubmissionModel.builder()
                 .id(resultSet.getLong("id"))
                 .userId(resultSet.getLong("user_id"))

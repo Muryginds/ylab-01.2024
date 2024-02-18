@@ -1,5 +1,9 @@
 package io.ylab.service;
 
+import io.ylab.annotation.Loggable;
+import io.ylab.dto.response.MessageDto;
+import io.ylab.utils.ResponseUtils;
+import io.ylab.utils.CurrentUserUtils;
 import lombok.RequiredArgsConstructor;
 import io.ylab.annotation.Auditable;
 import io.ylab.dto.request.NewReadingsSubmissionRequestDto;
@@ -9,6 +13,7 @@ import io.ylab.entity.Submission;
 import io.ylab.enumerated.AuditionEventType;
 import io.ylab.exception.MeterNotFoundException;
 import io.ylab.exception.SubmissionExistsException;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -17,12 +22,12 @@ import java.util.stream.Collectors;
 /**
  * Service responsible for recording new submissions with meter readings.
  */
+@Service
 @RequiredArgsConstructor
 public class ReadingsRecordingService {
     private final MeterReadingsService meterReadingsService;
     private final MeterService meterService;
     private final SubmissionService submissionService;
-    private final UserService userService;
 
     /**
      * Saves a new submission with the provided meter readings.
@@ -31,10 +36,11 @@ public class ReadingsRecordingService {
      * @throws SubmissionExistsException If a submission already exists for the user on the current date.
      * @throws MeterNotFoundException If a meter specified in the readings is not found.
      */
+    @Loggable
     @Auditable(eventType = AuditionEventType.READINGS_SUBMISSION)
-    public void saveNewSubmission(NewReadingsSubmissionRequestDto requestDto) {
+    public MessageDto saveNewSubmission(NewReadingsSubmissionRequestDto requestDto) {
         var date = LocalDate.now();
-        var user = userService.getCurrentUser();
+        var user = CurrentUserUtils.getCurrentUser();
         if (submissionService.checkExistsByUserIdAndDate(user.getId(), date)) {
             throw new SubmissionExistsException(user.getName(), date);
         }
@@ -52,6 +58,7 @@ public class ReadingsRecordingService {
                 })
                 .collect(Collectors.toSet());
         meterReadingsService.saveAll(readings);
+        return ResponseUtils.responseWithMessage("New submission saved");
     }
 
     private MeterReading createMeterReading(Meter meter, Long value, Submission submission) {

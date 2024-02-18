@@ -1,38 +1,22 @@
 package io.ylab.service;
 
-import lombok.RequiredArgsConstructor;
 import io.ylab.entity.User;
-import io.ylab.exception.UserNotAuthorizedException;
 import io.ylab.exception.UserNotFoundException;
 import io.ylab.mapper.UserMapper;
 import io.ylab.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /**
  * The UserService class provides functionality related to user management.
  * It includes methods for user-related operations.
  * This service interacts with the UserRepository to perform various user-related tasks.
  */
+@Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private User sessionedUser;
-
-    /**
-     * Retrieves the current authorized User entity representing the user.
-     *
-     * @return User entity representing the user with the specified username.
-     * @throws UserNotAuthorizedException If user is not authorized.
-     */
-    public User getCurrentUser() {
-        if (sessionedUser == null) {
-            throw new UserNotAuthorizedException();
-        }
-        return sessionedUser;
-    }
-
-    public void setCurrentUser(User user) {
-        sessionedUser = user;
-    }
+    private final UserMapper userMapper;
 
     /**
      * Checks if a user with the given username already exists.
@@ -64,7 +48,7 @@ public class UserService {
     public User getUserById(Long userId) {
         var userModel = userRepository.findUserById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
-        return UserMapper.MAPPER.toUser(userModel);
+        return userMapper.toUser(userModel);
     }
 
     /**
@@ -77,7 +61,7 @@ public class UserService {
     public User getUserByName(String userName) {
         var userModel = userRepository.findUserByName(userName)
                 .orElseThrow(() -> new UserNotFoundException(userName));
-        return UserMapper.MAPPER.toUser(userModel);
+        return userMapper.toUser(userModel);
     }
 
     /**

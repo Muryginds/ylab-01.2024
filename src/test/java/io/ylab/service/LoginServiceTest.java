@@ -1,106 +1,70 @@
 package io.ylab.service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.ylab.dto.request.UserAuthorizationRequestDto;
+import io.ylab.dto.response.MessageDto;
+import io.ylab.dto.response.UserDto;
+import io.ylab.entity.User;
+import io.ylab.exception.UserAuthenticationException;
+import io.ylab.mapper.UserMapper;
+import io.ylab.security.JwtService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import io.ylab.dto.request.UserAuthorizationRequestDto;
-import io.ylab.dto.request.UserRegistrationRequestDto;
-import io.ylab.entity.User;
-import io.ylab.exception.UserAlreadyExistException;
-import io.ylab.exception.UserAuthenticationException;
-import io.ylab.security.PasswordEncoder;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class LoginServiceTest {
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private AuditionEventService auditionEventService;
-
-    @Mock
-    private MeterService meterService;
-
     @Mock
     private UserService userService;
+
+    @Mock
+    private UserMapper userMapper;
+
+    @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
 
     @InjectMocks
     private LoginService loginService;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @Test
+    void testAuthorize_SuccessfulAuthorization() {
+        var requestDto = new UserAuthorizationRequestDto("username", "password");
+        User user = User.builder().build();
+        String token = "jwtToken";
+        UserDto expectedUserDto = UserDto.builder().build();
+        when(userService.getUserByName("username")).thenReturn(user);
+        when(jwtService.generateToken(user)).thenReturn(token);
+        when(userMapper.toUserDto(user)).thenReturn(expectedUserDto);
+
+        UserDto actualUserDto = loginService.authorize(requestDto);
+
+        assertNotNull(actualUserDto);
+        assertEquals(expectedUserDto, actualUserDto);
+        assertEquals(token, actualUserDto.getToken());
     }
 
     @Test
-    void testRegisterUser_whenNonExistingUser_thenReturnUserDTO() {
-        var requestDTO = new UserRegistrationRequestDto("testUser", "password");
-        when(userService.checkUserExistsByName(requestDTO.name())).thenReturn(false);
-        when(passwordEncoder.encode(requestDTO.password())).thenReturn("encodedPassword");
+    void testAuthorize_AuthenticationFailure_ThrowsUserAuthenticationException() {
+        UserAuthorizationRequestDto requestDto = new UserAuthorizationRequestDto("username", "password");
+        when(authenticationManager.authenticate(any())).thenThrow(UserAuthenticationException.class);
 
-        var result = loginService.registerUser(requestDTO);
-
-        assertNotNull(result);
-        assertEquals(requestDTO.name(), result.name());
-        verify(userService, Mockito.times(1)).save(Mockito.any(User.class));
-        verify(meterService, Mockito.times(1)).generateForNewUser(Mockito.any(User.class));
+        assertThrows(UserAuthenticationException.class, () -> loginService.authorize(requestDto));
     }
 
     @Test
-    void testRegisterUser_whenExistingUserName_throwUserAlreadyExistException() {
-        var requestDTO = new UserRegistrationRequestDto("existingUser", "password");
-        when(userService.checkUserExistsByName(requestDTO.name())).thenReturn(true);
+    void testLogout_Successful() {
+        MessageDto messageDto = loginService.logout();
 
-        assertThrows(UserAlreadyExistException.class, () -> loginService.registerUser(requestDTO));
-        verify(userService, Mockito.times(0)).save(Mockito.any());
-        verify(meterService, Mockito.times(0)).generateForNewUser(Mockito.any());
-        verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
-    }
-
-    @Test
-    void testAuthorize_whenExistingUser_thenReturnUserDTO() {
-        var requestDTO = new UserAuthorizationRequestDto("testUser", "password");
-        var user = User.builder().name("testUser").password("encodedPassword").build();
-        when(userService.getUserByName(requestDTO.name())).thenReturn(user);
-        when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(true);
-
-        var result = loginService.authorize(requestDTO);
-
-        assertNotNull(result);
-        assertEquals(requestDTO.name(), result.name());
-    }
-
-    @Test
-    void testAuthorize_whenNonExistingUser_throwUserAuthenticationException() {
-        var requestDTO = new UserAuthorizationRequestDto("nonExistingUser", "password");
-        when(userService.getUserByName(requestDTO.name())).thenThrow(new UserAuthenticationException());
-
-        Assertions.assertThrows(UserAuthenticationException.class, () -> loginService.authorize(requestDTO));
-        verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
-    }
-
-    @Test
-    void testAuthorize_whenWrongPassword_throwUserAuthenticationException() {
-        var requestDTO = new UserAuthorizationRequestDto("testUser", "wrongPassword");
-        var user = User.builder().name("testUser").password("encodedPassword").build();
-        when(userService.getUserByName(requestDTO.name())).thenThrow(new UserAuthenticationException());
-        when(passwordEncoder.verify(requestDTO.password(), user.getPassword())).thenReturn(false);
-
-        Assertions.assertThrows(UserAuthenticationException.class, () -> loginService.authorize(requestDTO));
-        verify(auditionEventService, Mockito.times(0)).save(Mockito.any());
-    }
-
-    @Test
-    void testLogout() {
-        loginService.logout();
-        assertNull(userService.getCurrentUser());
+        assertNotNull(messageDto);
+        assertEquals("User logged out", messageDto.message());
     }
 }

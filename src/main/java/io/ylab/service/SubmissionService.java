@@ -1,9 +1,6 @@
 package io.ylab.service;
 
-import lombok.RequiredArgsConstructor;
 import io.ylab.annotation.Auditable;
-import io.ylab.dto.request.AllSubmissionsRequestDto;
-import io.ylab.dto.request.SubmissionRequestDto;
 import io.ylab.entity.Submission;
 import io.ylab.enumerated.AuditionEventType;
 import io.ylab.enumerated.UserRole;
@@ -11,6 +8,9 @@ import io.ylab.exception.NoPermissionException;
 import io.ylab.exception.NoSubmissionException;
 import io.ylab.mapper.SubmissionMapper;
 import io.ylab.repository.SubmissionRepository;
+import io.ylab.utils.CurrentUserUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -24,30 +24,31 @@ import java.util.stream.Collectors;
  * This service interacts with the SubmissionRepository,
  * UserService, and AuditionEventService to perform various submission-related tasks.
  */
+@Service
 @RequiredArgsConstructor
 public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final UserService userService;
+    private final SubmissionMapper submissionMapper;
 
     /**
      * Retrieves all submissions for a given user based on user ID.
      *
-     * @param requestDto The request containing ID of the user for whom submissions are retrieved.
+     * @param userId containing ID of the user for whom submissions are retrieved.
      * @return Collection of Submission entities representing the user's submission history.
      * @throws NoPermissionException                   If the current user does not have permission to access the history.
      * @throws io.ylab.exception.UserNotFoundException If user is not found with given ID.
      */
     @Auditable(eventType = AuditionEventType.SUBMISSION_HISTORY_ACQUIRE)
-    public Collection<Submission> getAll(AllSubmissionsRequestDto requestDto) {
-        var userId = requestDto.userId();
-        var currentUser = userService.getCurrentUser();
+    public Collection<Submission> getAll(Long userId) {
+        var currentUser = CurrentUserUtils.getCurrentUser();
         var targetUser = userId == null ? currentUser : userService.getUserById(userId);
         if (!(currentUser.equals(targetUser) || currentUser.getRole().equals(UserRole.ADMIN))) {
             throw new NoPermissionException();
         }
         var submissionModels = submissionRepository.getByUserId(targetUser.getId());
         return submissionModels.stream()
-                .map(sm -> SubmissionMapper.MAPPER.toSubmission(sm, targetUser))
+                .map(sm -> submissionMapper.toSubmission(sm, targetUser))
                 .collect(Collectors.toSet());
     }
 
@@ -62,22 +63,21 @@ public class SubmissionService {
         var submissionModel = submissionRepository.getById(submissionId)
                 .orElseThrow(() -> new NoSubmissionException(submissionId));
         var user = userService.getUserById(submissionModel.userId());
-        return SubmissionMapper.MAPPER.toSubmission(submissionModel, user);
+        return submissionMapper.toSubmission(submissionModel, user);
     }
 
     /**
      * Retrieves a submission for a given user and date.
      *
-     * @param requestDto The request containing user ID and submission date.
+     * @param date request containing submission date.
+     * @param userId containing the user ID.
      * @return Submission for the user and date.
      * @throws NoPermissionException If the current user does not have permission to access the submission.
      * @throws NoSubmissionException If no submissions are found for the user and date.
      */
     @Auditable(eventType = AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
-    public Submission getSubmission(SubmissionRequestDto requestDto) {
-        var userId = requestDto.userId();
-        var date = requestDto.date();
-        var currentUser = userService.getCurrentUser();
+    public Submission getSubmission(LocalDate date, Long userId) {
+        var currentUser = CurrentUserUtils.getCurrentUser();
         var targetUser = userId == null ? currentUser : userService.getUserById(userId);
         if (!(currentUser.equals(targetUser) || currentUser.getRole().equals(UserRole.ADMIN))) {
             throw new NoPermissionException();
@@ -100,7 +100,7 @@ public class SubmissionService {
                 = submissionRepository.findLastSubmissionByUserId(userId);
         if (submissionModelOptional.isPresent()) {
             var user = userService.getUserById(userId);
-            var submission = SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user);
+            var submission = submissionMapper.toSubmission(submissionModelOptional.get(), user);
             return Optional.of(submission);
         }
         return Optional.empty();
@@ -110,7 +110,7 @@ public class SubmissionService {
         var submissionModelOptional = submissionRepository.findSubmissionByUserIdAndDate(userId, date);
         if (submissionModelOptional.isPresent()) {
             var user = userService.getUserById(userId);
-            var submission = SubmissionMapper.MAPPER.toSubmission(submissionModelOptional.get(), user);
+            var submission = submissionMapper.toSubmission(submissionModelOptional.get(), user);
             return Optional.of(submission);
         }
         return Optional.empty();

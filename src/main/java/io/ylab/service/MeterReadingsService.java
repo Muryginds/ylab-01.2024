@@ -6,6 +6,7 @@ import io.ylab.dto.response.MeterReadingDto;
 import io.ylab.entity.Submission;
 import io.ylab.mapper.MeterReadingMapper;
 import io.ylab.repository.MeterReadingRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,11 +17,13 @@ import java.util.Set;
  * It includes methods for retrieving meter readings, saving individual readings, and saving a collection of readings.
  * This service interacts with the MeterReadingsRepository.
  */
+@Service
 @RequiredArgsConstructor
 public class MeterReadingsService {
     private final MeterReadingRepository meterReadingRepository;
     private final SubmissionService submissionService;
     private final MeterService meterService;
+    private final MeterReadingMapper meterReadingMapper;
 
     /**
      * Retrieves all meter readings associated with a submission ID.
@@ -34,10 +37,10 @@ public class MeterReadingsService {
         var collection = new HashSet<MeterReading>();
         for (var meterReadingModel : meterReadingModels) {
             var meter = meterService.getById(meterReadingModel.meterId());
-            collection.add(MeterReadingMapper.MAPPER.toMeterReading(meterReadingModel, meter, submission));
+            collection.add(meterReadingMapper.toMeterReading(meterReadingModel, meter, submission));
         }
 
-        return  MeterReadingMapper.MAPPER.toMeterReadingDTOSet(collection);
+        return meterReadingMapper.toMeterReadingDTOSet(collection);
     }
 
     /**
@@ -51,7 +54,7 @@ public class MeterReadingsService {
         var collection = new HashSet<MeterReading>();
         for (var meterReadingModel : meterReadingModels) {
             var meter = meterService.getById(meterReadingModel.meterId());
-            collection.add(MeterReadingMapper.MAPPER.toMeterReading(meterReadingModel, meter, submission));
+            collection.add(meterReadingMapper.toMeterReading(meterReadingModel, meter, submission));
         }
 
         return collection;

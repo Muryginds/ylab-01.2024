@@ -1,9 +1,18 @@
 package io.ylab.controller;
 
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import io.ylab.dto.request.NewMeterTypeRequestDto;
-import io.ylab.exception.MeterTypeExistException;
-import io.ylab.service.MeterTypeService;
+import io.ylab.dto.response.ErrorResponseDto;
+import io.ylab.dto.response.MessageDto;
+import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * Controller class for handling meter type-related operations and interactions.
@@ -11,30 +20,18 @@ import io.ylab.service.MeterTypeService;
  * <p>This class acts as an interface between the user interface and the underlying business logic
  * related to meter types.
  */
-@RequiredArgsConstructor
-public class MeterTypeController {
-    /**
-     * The associated service for meter type-related operations.
-     */
-    private final MeterTypeService meterTypeService;
+@ApiResponse(responseCode = "403", description = "Пользователь не авторизован",
+        content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+@Tag(name = "Meter type")
+public interface MeterTypeController {
 
-    /**
-     * Checks if a meter type with the specified name already exists.
-     *
-     * @param typeName The name of the meter type to check.
-     * @return `true` if the meter type exists, otherwise `false`.
-     */
-    public boolean checkExistsByName(String typeName) {
-        return meterTypeService.checkExistsByName(typeName);
-    }
-
-    /**
-     * Saves a new meter type with the specified name.
-     *
-     * @param request Contains the name of the new meter type to be saved.
-     * @throws MeterTypeExistException If a meter type with the same name already exists.
-     */
-    public void save(NewMeterTypeRequestDto request) {
-        meterTypeService.save(request);
-    }
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Сохранение прошло успешно",
+                    content = @Content(schema = @Schema(implementation = MessageDto.class))),
+            @ApiResponse(responseCode = "400", description = "Некорректные параметры запроса",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @Operation(summary = "Добавление нового типа счетчика")
+    @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    MessageDto save(@Valid @RequestBody NewMeterTypeRequestDto requestDto);
 }
