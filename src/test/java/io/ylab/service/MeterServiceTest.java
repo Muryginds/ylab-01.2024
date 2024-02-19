@@ -1,7 +1,6 @@
 package io.ylab.service;
 
 import io.ylab.entity.Meter;
-import io.ylab.entity.MeterType;
 import io.ylab.entity.User;
 import io.ylab.exception.MeterNotFoundException;
 import io.ylab.mapper.MeterMapper;

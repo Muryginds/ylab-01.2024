@@ -1,7 +1,6 @@
 package io.ylab.service;
 
 import io.ylab.dto.response.AuditionEventDto;
-import io.ylab.entity.AuditionEvent;
 import io.ylab.entity.User;
 import io.ylab.enumerated.UserRole;
 import io.ylab.exception.NoPermissionException;

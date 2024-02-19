@@ -36,11 +36,14 @@ specific users.
 #### On Unix-like systems:
 
 ```bash
-./gradlew run -q --console=plain
+./gradlew clean war
+docker compose up -d
 ```
 #### On Windows:
 
 ```bash
-gradlew.bat run -q --console=plain
+gradlew.bat clean war
+docker compose up -d
 ```
 The Gradle wrapper will download the specified Gradle distribution, compile and run your Java application.
+You need to have docker installed

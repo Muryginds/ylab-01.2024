@@ -1,87 +1,112 @@
 package io.ylab.service;
 
-import io.ylab.utils.CurrentUserUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import io.ylab.dto.request.UserAuthorizationRequestDto;
+import io.ylab.entity.User;
+import io.ylab.exception.UserNotFoundException;
 import io.ylab.mapper.UserMapper;
 import io.ylab.model.UserModel;
 import io.ylab.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private AuditionEventService auditionEventService;
-
-    @Mock
-    private MeterService meterService;
+    private UserMapper userMapper;
 
     @InjectMocks
     private UserService userService;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @Test
+    void testCheckUserExistsByName_Exists() {
+        String username = "test";
+        when(userRepository.checkUserExistsByName(username)).thenReturn(true);
+
+        boolean result = userService.checkUserExistsByName(username);
+
+        assertTrue(result);
     }
 
     @Test
-    void testCheckUserExistsByName() {
-        var username = "existingUser";
-        Mockito.when(userRepository.checkUserExistsByName(username)).thenReturn(true);
+    void testCheckUserExistsByName_NotExists() {
+        String username = "test";
+        when(userRepository.checkUserExistsByName(username)).thenReturn(false);
 
-        var result = userService.checkUserExistsByName(username);
+        boolean result = userService.checkUserExistsByName(username);
 
-        Assertions.assertTrue(result);
+        assertFalse(result);
     }
 
     @Test
-    void testCheckUserExistsById() {
-        var userId = 1L;
-        Mockito.when(userRepository.checkUserExistsById(userId)).thenReturn(true);
+    void testCheckUserExistsById_Exists() {
+        Long userId = 1L;
+        when(userRepository.checkUserExistsById(userId)).thenReturn(true);
 
-        var result = userService.checkUserExistsById(userId);
+        boolean result = userService.checkUserExistsById(userId);
 
-        Assertions.assertTrue(result);
+        assertTrue(result);
     }
 
-//    @Test
-//    void testGetCurrentUserDTO() {
-//        var requestDTO = new UserAuthorizationRequestDto("testUser", "password");
-//        var userModel = UserModel.builder().name("testUser").password("password").build();
-//        var user = UserMapper.MAPPER.toUser(userModel);
-//        Mockito.when(userRepository.findUserByName(requestDTO.name())).thenReturn(Optional.of(userModel));
-//        Mockito.when(passwordEncoder.verify(requestDTO.password(), userModel.password())).thenReturn(true);
-//
-//        CurrentUserUtils.setCurrentUser(user);
-//
-//        var result = userService.getCurrentUser();
-//
-//        Assertions.assertEquals(userModel.name(), result.getName());
-//    }
-//
-//    @Test
-//    void testGetUserById() {
-//        var userId = 1L;
-//        var userModel = UserModel.builder().id(userId).name("testUser").password("password").build();
-//        var expectedUser = UserMapper.MAPPER.toUser(userModel);
-//        Mockito.when(userRepository.findUserById(userId)).thenReturn(Optional.of(userModel));
-//
-//        var userResult = userService.getUserById(userId);
-//
-//        Assertions.assertEquals(expectedUser, userResult);
-//    }
+    @Test
+    void testCheckUserExistsById_NotExists() {
+        Long userId = 1L;
+        when(userRepository.checkUserExistsById(userId)).thenReturn(false);
+
+        boolean result = userService.checkUserExistsById(userId);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testGetUserById_Exists() {
+        Long userId = 1L;
+        User user = User.builder().id(userId).build();
+        UserModel userModel = UserModel.builder().id(userId).build();
+        when(userRepository.findUserById(userId)).thenReturn(Optional.of(userModel));
+        when(userMapper.toUser(userModel)).thenReturn(user);
+
+        User result = userService.getUserById(userId);
+
+        assertEquals(user, result);
+    }
+
+    @Test
+    void testGetUserById_NotExists() {
+        Long userId = 1L;
+        when(userRepository.findUserById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.getUserById(userId));
+    }
+
+    @Test
+    void testGetUserByName_Exists() {
+        String userName = "test";
+        User user = User.builder().name(userName).build();
+        UserModel userModel = UserModel.builder().name(userName).build();
+        when(userRepository.findUserByName(userName)).thenReturn(Optional.of(userModel));
+        when(userMapper.toUser(userModel)).thenReturn(user);
+
+        User result = userService.getUserByName(userName);
+
+        assertEquals(user, result);
+    }
+
+    @Test
+    void testGetUserByName_NotExists() {
+        String userName = "test";
+        when(userRepository.findUserByName(userName)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.getUserByName(userName));
+    }
 }

@@ -8,8 +8,8 @@ import io.ylab.service.UserService;
 import io.ylab.utils.CurrentUserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -32,35 +32,31 @@ public class AuditableAspect {
     public void auditableMethod() {
     }
 
-    @Around("auditableMethod() && !unauthorizedUserMethodPointcut()")
-    public Object auditableMethodAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
+    @AfterReturning("auditableMethod() && !unauthorizedUserMethodPointcut()")
+    public void auditableMethodAdvice(JoinPoint joinPoint) {
         var methodName = joinPoint.getSignature().getName();
         log.info("AUDITING " + methodName);
         var type = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(Auditable.class).eventType();
         var user = CurrentUserUtils.getCurrentUser();
-        var proceed = joinPoint.proceed();
         var event = AuditionEvent.builder()
                 .user(user)
                 .eventType(type)
                 .message("Method '%s' was called".formatted(methodName))
                 .build();
         auditionEventService.save(event);
-        return proceed;
     }
 
-    @Around("auditableMethod() && unauthorizedUserMethodPointcut()")
-    public Object auditableRegisterUserAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
+    @AfterReturning(value = "auditableMethod() && unauthorizedUserMethodPointcut()", returning = "userDto")
+    public void auditableRegisterUserAdvice(JoinPoint joinPoint, UserDto userDto) {
         var methodName = joinPoint.getSignature().getName();
         log.info("AUDITING " + methodName);
         var type = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(Auditable.class).eventType();
-        var proceed = (UserDto)joinPoint.proceed();
-        var user = userService.getUserById(proceed.getId());
+        var user = userService.getUserById(userDto.getId());
         var event = AuditionEvent.builder()
                 .user(user)
                 .eventType(type)
                 .message("Method '%s' was called".formatted(methodName))
                 .build();
         auditionEventService.save(event);
-        return proceed;
     }
 }

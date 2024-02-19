@@ -1,24 +1,36 @@
 package io.ylab.service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import io.ylab.entity.Submission;
 import io.ylab.entity.User;
-import io.ylab.enumerated.UserRole;
+import io.ylab.exception.NoPermissionException;
+import io.ylab.exception.NoSubmissionException;
 import io.ylab.mapper.SubmissionMapper;
+import io.ylab.model.SubmissionModel;
 import io.ylab.repository.SubmissionRepository;
+import io.ylab.utils.CurrentUserUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 class SubmissionServiceTest {
-
     @Mock
     private SubmissionRepository submissionRepository;
 
@@ -26,58 +38,60 @@ class SubmissionServiceTest {
     private UserService userService;
 
     @Mock
-    private AuditionEventService auditionEventService;
+    private SubmissionMapper submissionMapper;
 
     @InjectMocks
     private SubmissionService submissionService;
 
+    private MockedStatic<CurrentUserUtils> utilsMockedStatic;
+
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+    void setUp() {
+        utilsMockedStatic = Mockito.mockStatic(CurrentUserUtils.class);
     }
 
-//    @Test
-//    void testGetAllByUserId_whenCurrentUserHasPermission_thenReturnSubmissionDTOs() {
-//        var adminUserId = 1L;
-//        var targetUserId = 2L;
-//        var adminUser = User.builder().id(adminUserId).name("admin").password("admin").role(UserRole.ADMIN).build();
-//        var targetUser = User.builder().id(targetUserId).name("user").password("user").role(UserRole.USER).build();
-//        Mockito.when(userService.getCurrentUser()).thenReturn(adminUser);
-//        Mockito.when(userService.getUserById(targetUserId)).thenReturn(targetUser);
-//
-//        var submission1 = Submission.builder().id(1L).user(targetUser).date(LocalDate.now()).build();
-//        var submission2 = Submission.builder().id(2L).user(targetUser).date(LocalDate.now()).build();
-//        var expectedSubmissions = Set.of(submission1, submission2);
-//        var submissionModels = Set.of(
-//                SubmissionMapper.MAPPER.toSubmissionModel(submission1),
-//                SubmissionMapper.MAPPER.toSubmissionModel(submission2)
-//        );
-//        Mockito.when(submissionRepository.getByUserId(targetUserId)).thenReturn(submissionModels);
-//
-//        var request = AllSubmissionsRequestDto.builder().userId(targetUserId).build();
-//        var result = submissionService.getAll(request);
-//
-//        Assertions.assertTrue(result.containsAll(expectedSubmissions));
-//        Assertions.assertEquals(result.size(), expectedSubmissions.size());
-//    }
-//
-//    @Test
-//    void testFindLastSubmissionByUserId_whenUserHasPermission_thenReturnOptionalSubmission() {
-//        var adminUserId = 1L;
-//        var targetUserId = 2L;
-//        var adminUser = User.builder().id(adminUserId).name("admin").password("admin").role(UserRole.ADMIN).build();
-//        var targetUser = User.builder().id(targetUserId).name("user").password("user").role(UserRole.USER).build();
-//        Mockito.when(userService.getCurrentUser()).thenReturn(adminUser);
-//        Mockito.when(userService.getUserById(targetUserId)).thenReturn(targetUser);
-//
-//        var expectedSubmission = Submission.builder().id(1L).user(targetUser).date(LocalDate.now()).build();
-//        var submissionModel = SubmissionMapper.MAPPER.toSubmissionModel(expectedSubmission);
-//
-//        Mockito.when(submissionRepository.findLastSubmissionByUserId(targetUserId))
-//                .thenReturn(Optional.of(submissionModel));
-//        var request = SubmissionRequestDto.builder().userId(targetUserId).build();
-//        var result = submissionService.getSubmission(request);
-//
-//        Assertions.assertEquals(expectedSubmission, result);
-//    }
+    @AfterEach
+    void tearDown() {
+        utilsMockedStatic.close();
+    }
+
+    @Test
+    void testGetAll() {
+        Long userId = 1L;
+        var user = User.builder().id(userId).build();
+        var submission = Submission.builder().user(user).build();
+        var submissionModel = SubmissionModel.builder().build();
+        when(CurrentUserUtils.getCurrentUser()).thenReturn(user);
+        when(userService.getUserById(userId)).thenReturn(submission.getUser());
+        when(submissionRepository.getByUserId(userId)).thenReturn(Collections.singletonList(submissionModel));
+        when(submissionMapper.toSubmission(any(), any())).thenReturn(submission);
+
+        Collection<Submission> result = submissionService.getAll(userId);
+
+        assertEquals(Collections.singletonList(submission), new ArrayList<>(result));
+    }
+
+    @Test
+    void testGetSubmission_NoPermission() {
+        LocalDate date = LocalDate.now();
+        Long userId = 1L;
+        var user = User.builder().build();
+        when(CurrentUserUtils.getCurrentUser()).thenReturn(user);
+
+        assertThrows(NoPermissionException.class, () -> submissionService.getSubmission(date, userId));
+    }
+
+    @Test
+    void testGetSubmission_NoSubmission() {
+        // Arrange
+        LocalDate date = LocalDate.now();
+        Long userId = 1L;
+        var user = User.builder().id(userId).build();
+        var submission = Submission.builder().user(user).build();
+        when(CurrentUserUtils.getCurrentUser()).thenReturn(submission.getUser());
+        when(userService.getUserById(userId)).thenReturn(submission.getUser());
+        when(submissionRepository.findSubmissionByUserIdAndDate(userId, date)).thenReturn(Optional.empty());
+
+        assertThrows(NoSubmissionException.class, () -> submissionService.getSubmission(date, userId));
+    }
 }

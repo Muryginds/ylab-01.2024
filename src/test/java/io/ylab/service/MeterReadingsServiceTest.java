@@ -40,10 +40,10 @@ class MeterReadingsServiceTest {
     @Test
     void testGetAllBySubmissionId() {
         Long submissionId = 1L;
-        Submission submission = Submission.builder().build();;
+        Submission submission = Submission.builder().build();
         submission.setId(submissionId);
         Set<MeterReadingModel> meterReadingModels = new HashSet<>();
-        MeterReadingDto meterReadingDto = MeterReadingDto.builder().build();;
+        MeterReadingDto meterReadingDto = MeterReadingDto.builder().build();
         meterReadingModels.add(MeterReadingModel.builder().build());
         when(submissionService.getSubmissionById(submissionId)).thenReturn(submission);
         when(meterReadingRepository.getAllBySubmissionId(submissionId)).thenReturn(meterReadingModels);
@@ -57,7 +57,7 @@ class MeterReadingsServiceTest {
 
     @Test
     void testGetBySubmission() {
-        Submission submission = Submission.builder().build();;
+        Submission submission = Submission.builder().build();
         submission.setId(1L);
         Set<MeterReadingModel> meterReadings = new HashSet<>();
         meterReadings.add(MeterReadingModel.builder().build());
