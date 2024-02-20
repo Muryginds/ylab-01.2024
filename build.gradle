@@ -65,7 +65,6 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt-api:${jwttVersion}"
     implementation 'com.jayway.jsonpath:json-path:2.9.0'
 
-
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jwttVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jwttVersion}"
 

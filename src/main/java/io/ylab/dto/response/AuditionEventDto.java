@@ -1,5 +1,6 @@
 package io.ylab.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import io.ylab.enumerated.AuditionEventType;
 
@@ -10,6 +11,7 @@ import io.ylab.enumerated.AuditionEventType;
  * such as between service and controller layers.
  */
 @Builder
+@Schema(description = "Модель данных аудита")
 public record AuditionEventDto(
         Long id,
         UserDto userDTO,

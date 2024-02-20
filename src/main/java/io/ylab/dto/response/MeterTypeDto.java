@@ -1,5 +1,6 @@
 package io.ylab.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Builder;
  * such as between service and controller layers.
  */
 @Builder
+@Schema(description = "Модель данных типа счетчика")
 public record MeterTypeDto(
         Long id,
         String typeName

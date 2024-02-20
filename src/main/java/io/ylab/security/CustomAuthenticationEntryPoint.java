@@ -1,4 +1,4 @@
-package io.ylab.service;
+package io.ylab.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ylab.utils.ResponseUtils;

@@ -1,5 +1,6 @@
 package io.ylab.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.Set;
  * such as between service and controller layers.
  */
 @Builder
+@Schema(description = "Модель данных показаний")
 public record SubmissionDto(
         Long id,
         UserDto userDTO,
