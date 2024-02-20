@@ -7,6 +7,7 @@ import io.ylab.mapper.MeterMapper;
 import io.ylab.repository.MeterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -52,6 +53,7 @@ public class MeterService {
      * @return Meter representing the retrieved meter.
      * @throws MeterNotFoundException If no meter is found with the given ID.
      */
+    @Transactional
     public Meter getById(Long meterId) {
         var meterModel =  meterRepository.findById(meterId)
                 .orElseThrow(() -> new MeterNotFoundException(meterId));
@@ -66,6 +68,7 @@ public class MeterService {
      * @param userId The ID of the user for whom meters are retrieved.
      * @return Collection of Meter representing meters associated with the user.
      */
+    @Transactional
     public Collection<Meter> getMetersByUserId(Long userId) {
         var user = userService.getUserById(userId);
         var meterModels = meterRepository.getByUserId(userId);
@@ -82,6 +85,7 @@ public class MeterService {
      *
      * @param user The new user for whom meters are generated.
      */
+    @Transactional
     public void generateForNewUser(User user) {
         var set = new HashSet<Meter>();
         var meterTypesModels = meterTypeService.getAll();

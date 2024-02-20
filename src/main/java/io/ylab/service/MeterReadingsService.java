@@ -7,6 +7,7 @@ import io.ylab.entity.Submission;
 import io.ylab.mapper.MeterReadingMapper;
 import io.ylab.repository.MeterReadingRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ public class MeterReadingsService {
      * @param submissionId The ID of the submission for which readings are retrieved.
      * @return Set of MeterReadingDTO representing all readings associated with the submission.
      */
+    @Transactional
     public Set<MeterReadingDto> getAllBySubmissionId(Long submissionId) {
         var submission = submissionService.getSubmissionById(submissionId);
         var meterReadingModels = meterReadingRepository.getAllBySubmissionId(submissionId);
@@ -49,6 +51,7 @@ public class MeterReadingsService {
      * @param submission The submission for which readings are retrieved.
      * @return Set of MeterReadingDTO representing all readings associated with the submission.
      */
+    @Transactional
     public Set<MeterReading> getBySubmission(Submission submission) {
         var meterReadingModels = meterReadingRepository.getAllBySubmissionId(submission.getId());
         var collection = new HashSet<MeterReading>();

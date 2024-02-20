@@ -9,6 +9,7 @@ import io.ylab.repository.AuditionEventRepository;
 import io.ylab.utils.CurrentUserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +32,7 @@ public class AuditionEventService {
      * @param userId Contains the ID of the user for whom audition events are retrieved.
      * @return Collection of AuditionEventDTO representing the user's audition events.
      */
+    @Transactional
     public Set<AuditionEventDto> getEvents(long userId) {
         var currentUser = CurrentUserUtils.getCurrentUser();
         if (currentUser == null || !currentUser.getRole().equals(UserRole.ADMIN)) {

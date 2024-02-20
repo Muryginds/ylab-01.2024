@@ -13,6 +13,7 @@ import io.ylab.utils.CurrentUserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service responsible for account-related operations.
@@ -34,6 +35,7 @@ public class AccountService {
      * @return UserDTO representing the registered user.
      * @throws UserAlreadyExistException If a user with the same name already exists.
      */
+    @Transactional
     @Auditable(eventType = AuditionEventType.REGISTRATION)
     public UserDto registerUser(UserRegistrationRequestDto requestDto) {
         if (userService.checkUserExistsByName(requestDto.name())) {

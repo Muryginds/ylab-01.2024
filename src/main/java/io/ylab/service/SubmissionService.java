@@ -11,6 +11,7 @@ import io.ylab.repository.SubmissionRepository;
 import io.ylab.utils.CurrentUserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -39,6 +40,7 @@ public class SubmissionService {
      * @throws NoPermissionException                   If the current user does not have permission to access the history.
      * @throws io.ylab.exception.UserNotFoundException If user is not found with given ID.
      */
+    @Transactional
     @Auditable(eventType = AuditionEventType.SUBMISSION_HISTORY_ACQUIRE)
     public Collection<Submission> getAll(Long userId) {
         var currentUser = CurrentUserUtils.getCurrentUser();
@@ -59,6 +61,7 @@ public class SubmissionService {
      * @return Submission by given ID.
      * @throws NoSubmissionException If no submissions with given ID exists.
      */
+    @Transactional
     public Submission getSubmissionById(Long submissionId) {
         var submissionModel = submissionRepository.getById(submissionId)
                 .orElseThrow(() -> new NoSubmissionException(submissionId));
@@ -75,6 +78,7 @@ public class SubmissionService {
      * @throws NoPermissionException If the current user does not have permission to access the submission.
      * @throws NoSubmissionException If no submissions are found for the user and date.
      */
+    @Transactional
     @Auditable(eventType = AuditionEventType.SINGLE_SUBMISSION_ACQUIRE)
     public Submission getSubmission(LocalDate date, Long userId) {
         var currentUser = CurrentUserUtils.getCurrentUser();

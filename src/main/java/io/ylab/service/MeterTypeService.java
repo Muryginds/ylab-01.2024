@@ -12,6 +12,7 @@ import io.ylab.repository.MeterTypeRepository;
 import io.ylab.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
@@ -32,6 +33,7 @@ public class MeterTypeService {
      * @param requestDto Contains the name of the new meter type to be added.
      * @throws MeterTypeExistException If a meter type with the same name already exists.
      */
+    @Transactional
     @Auditable(eventType = AuditionEventType.NEW_METER_TYPE_ADDITION)
     public MessageDto save(NewMeterTypeRequestDto requestDto) {
         var typeName = requestDto.typeName();

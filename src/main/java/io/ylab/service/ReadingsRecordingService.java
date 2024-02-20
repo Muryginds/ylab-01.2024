@@ -14,6 +14,7 @@ import io.ylab.enumerated.AuditionEventType;
 import io.ylab.exception.MeterNotFoundException;
 import io.ylab.exception.SubmissionExistsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class ReadingsRecordingService {
      * @throws MeterNotFoundException If a meter specified in the readings is not found.
      */
     @Loggable
+    @Transactional
     @Auditable(eventType = AuditionEventType.READINGS_SUBMISSION)
     public MessageDto saveNewSubmission(NewReadingsSubmissionRequestDto requestDto) {
         var date = LocalDate.now();
