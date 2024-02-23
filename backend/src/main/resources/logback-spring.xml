@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <timestamp key="byStartDate" datePattern="yyyy-MM-dd'_'HH-mm-ss.SSS"/>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/backend_${byStartDate}.log</file>
+        <encoder>
+            <pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+    </root>
+
+    <logger name="io.ylab.backend" level="WARN" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+</configuration>

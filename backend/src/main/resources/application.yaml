@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/monitoring
+    username: secretUser
+    password: secretPassword
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    changeLog: classpath:db/changelog/changelog-master.yaml
+    liquibase-schema: service
+    default-schema: private
+
+application:
+  security:
+    jwt:
+      secret-key: 17pRlrjZrQYhbg/1xIAb+vNtoLYlpHGl935sdrntLJk=
+      expiration-time: 1800000
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger

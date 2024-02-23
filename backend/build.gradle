@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.3'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'ru.ylab'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    password4jVersion = '1.7.3'
+    mapstructVersion = '1.5.5.Final'
+    mapstructProcessorVersion = '1.5.5.Final'
+    lombokVersion = '1.18.30'
+    lombokMapstructBindingVersion = '0.2.0'
+    postgresqlVersion = '42.7.1'
+    liquibaseVersion = '4.25.1'
+    preLiquibaseVersion = '1.5.0'
+    springdocVersion = '2.3.0'
+    jwttVersion = '0.12.5'
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation "com.password4j:password4j:${password4jVersion}"
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    implementation "org.liquibase:liquibase-core:${liquibaseVersion}"
+    implementation "net.lbruun.springboot:preliquibase-spring-boot-starter:${preLiquibaseVersion}"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+    implementation "io.jsonwebtoken:jjwt-api:${jwttVersion}"
+
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jwttVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jwttVersion}"
+    runtimeOnly "org.postgresql:postgresql:${postgresqlVersion}"
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructProcessorVersion}"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructProcessorVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+}
+
+test {
+    useJUnitPlatform()
+}
