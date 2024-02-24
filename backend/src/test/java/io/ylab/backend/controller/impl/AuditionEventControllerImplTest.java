@@ -3,7 +3,7 @@ package io.ylab.backend.controller.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ylab.backend.dto.response.AuditionEventDto;
 import io.ylab.backend.dto.response.UserDto;
-import io.ylab.backend.enumerated.AuditionEventType;
+import io.ylab.commons.enumerated.AuditionEventType;
 import io.ylab.backend.mapper.AuditionEventMapper;
 import io.ylab.backend.service.AuditionEventService;
 import org.junit.jupiter.api.BeforeEach;

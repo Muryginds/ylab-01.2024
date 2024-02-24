@@ -1,7 +1,7 @@
 package io.ylab.backend.service;
 
-import io.ylab.backend.entity.Submission;
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.Submission;
+import io.ylab.commons.entity.User;
 import io.ylab.backend.exception.NoPermissionException;
 import io.ylab.backend.exception.NoSubmissionException;
 import io.ylab.backend.mapper.SubmissionMapper;

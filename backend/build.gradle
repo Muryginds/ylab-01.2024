@@ -4,15 +4,8 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.4'
 }
 
-group = 'ru.ylab'
-version = '1.0-SNAPSHOT'
-
-java {
-    sourceCompatibility = '17'
-    targetCompatibility = '17'
-}
-
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -30,6 +23,10 @@ ext {
 }
 
 dependencies {
+    implementation 'io.ylab:logging-starter:1.0-SNAPSHOT'
+    implementation 'io.ylab:audition-starter:1.0-SNAPSHOT'
+    implementation project(":commons")
+
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -46,9 +43,6 @@ dependencies {
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jwttVersion}"
     runtimeOnly "org.postgresql:postgresql:${postgresqlVersion}"
 
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructProcessorVersion}"
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
 
@@ -65,6 +59,6 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
 }
 
-test {
+tasks.test {
     useJUnitPlatform()
 }

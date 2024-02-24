@@ -1,7 +1,7 @@
 package io.ylab.backend.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.ylab.backend.enumerated.AuditionEventType;
+import io.ylab.commons.enumerated.AuditionEventType;
 import lombok.Builder;
 
 /**

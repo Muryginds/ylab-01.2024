@@ -1,7 +1,7 @@
 package io.ylab.backend.mapper;
 
-import io.ylab.backend.entity.AuditionEvent;
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.AuditionEvent;
+import io.ylab.commons.entity.User;
 import io.ylab.backend.dto.response.AuditionEventDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

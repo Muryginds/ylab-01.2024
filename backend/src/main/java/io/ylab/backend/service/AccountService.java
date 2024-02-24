@@ -2,7 +2,7 @@ package io.ylab.backend.service;
 
 import io.ylab.backend.dto.request.UserRegistrationRequestDto;
 import io.ylab.backend.dto.response.UserDto;
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.User;
 import io.ylab.backend.exception.UserAlreadyExistException;
 import io.ylab.backend.exception.UserNotAuthorizedException;
 import io.ylab.backend.mapper.UserMapper;

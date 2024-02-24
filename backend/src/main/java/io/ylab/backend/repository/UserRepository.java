@@ -1,6 +1,6 @@
 package io.ylab.backend.repository;
 
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.User;
 import io.ylab.backend.model.UserModel;
 import java.util.Optional;
 

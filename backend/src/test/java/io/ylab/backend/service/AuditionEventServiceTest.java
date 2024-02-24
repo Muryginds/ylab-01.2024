@@ -1,8 +1,8 @@
 package io.ylab.backend.service;
 
 import io.ylab.backend.dto.response.AuditionEventDto;
-import io.ylab.backend.entity.User;
-import io.ylab.backend.enumerated.UserRole;
+import io.ylab.commons.entity.User;
+import io.ylab.commons.enumerated.UserRole;
 import io.ylab.backend.exception.NoPermissionException;
 import io.ylab.backend.mapper.AuditionEventMapper;
 import io.ylab.backend.repository.AuditionEventRepository;

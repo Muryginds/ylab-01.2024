@@ -1,17 +1,17 @@
 package io.ylab.backend.service;
 
-import io.ylab.backend.annotation.Loggable;
-import io.ylab.backend.annotation.Auditable;
+import io.ylab.audition.annotation.Auditable;
 import io.ylab.backend.dto.request.NewReadingsSubmissionRequestDto;
-import io.ylab.backend.entity.Meter;
-import io.ylab.backend.entity.MeterReading;
-import io.ylab.backend.entity.Submission;
-import io.ylab.backend.enumerated.AuditionEventType;
+import io.ylab.commons.entity.Meter;
+import io.ylab.commons.entity.MeterReading;
+import io.ylab.commons.entity.Submission;
+import io.ylab.commons.enumerated.AuditionEventType;
 import io.ylab.backend.exception.MeterNotFoundException;
 import io.ylab.backend.exception.SubmissionExistsException;
 import io.ylab.backend.utils.ResponseUtils;
 import io.ylab.backend.dto.response.MessageDto;
 import io.ylab.backend.utils.CurrentUserUtils;
+import io.ylab.logging.annotation.Loggable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

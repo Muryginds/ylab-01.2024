@@ -1,6 +1,6 @@
 package io.ylab.backend.repository.impl;
 
-import io.ylab.backend.entity.*;
+import io.ylab.commons.entity.*;
 import io.ylab.backend.mapper.MeterMapper;
 import io.ylab.backend.mapper.MeterTypeMapper;
 import io.ylab.backend.mapper.SubmissionMapper;

@@ -1,10 +1,10 @@
 package io.ylab.backend.repository.impl;
 
 import io.ylab.backend.CommonIntegrationContainerBasedTest;
-import io.ylab.backend.entity.AuditionEvent;
-import io.ylab.backend.entity.User;
-import io.ylab.backend.enumerated.AuditionEventType;
-import io.ylab.backend.enumerated.UserRole;
+import io.ylab.commons.entity.AuditionEvent;
+import io.ylab.commons.entity.User;
+import io.ylab.commons.enumerated.AuditionEventType;
+import io.ylab.commons.enumerated.UserRole;
 import io.ylab.backend.mapper.UserMapper;
 import io.ylab.backend.repository.AuditionEventRepository;
 import io.ylab.backend.repository.UserRepository;

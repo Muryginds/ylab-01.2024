@@ -1,8 +1,8 @@
 package io.ylab.backend.service;
 
 import io.ylab.backend.dto.response.SubmissionDto;
-import io.ylab.backend.entity.MeterReading;
-import io.ylab.backend.entity.Submission;
+import io.ylab.commons.entity.MeterReading;
+import io.ylab.commons.entity.Submission;
 import io.ylab.backend.mapper.SubmissionMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,6 +1,6 @@
 package io.ylab.backend.mapper;
 
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.User;
 import org.mapstruct.Mapper;
 import io.ylab.backend.dto.response.UserDto;
 import io.ylab.backend.model.UserModel;

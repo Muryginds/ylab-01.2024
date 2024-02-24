@@ -1,6 +1,6 @@
 package io.ylab.backend.repository;
 
-import io.ylab.backend.entity.AuditionEvent;
+import io.ylab.commons.entity.AuditionEvent;
 import io.ylab.backend.model.AuditionEventModel;
 
 import java.util.Collection;

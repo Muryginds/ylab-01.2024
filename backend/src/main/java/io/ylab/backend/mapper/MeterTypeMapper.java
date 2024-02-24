@@ -1,6 +1,6 @@
 package io.ylab.backend.mapper;
 
-import io.ylab.backend.entity.MeterType;
+import io.ylab.commons.entity.MeterType;
 import io.ylab.backend.dto.response.MeterTypeDto;
 import org.mapstruct.Mapper;
 import io.ylab.backend.model.MeterTypeModel;

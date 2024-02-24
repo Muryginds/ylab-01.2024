@@ -2,7 +2,7 @@ package io.ylab.backend.repository.impl;
 
 import org.junit.jupiter.api.Test;
 import io.ylab.backend.CommonIntegrationContainerBasedTest;
-import io.ylab.backend.entity.MeterType;
+import io.ylab.commons.entity.MeterType;
 import io.ylab.backend.repository.MeterTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 

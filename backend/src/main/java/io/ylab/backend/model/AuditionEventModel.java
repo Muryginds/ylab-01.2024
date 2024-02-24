@@ -1,6 +1,6 @@
 package io.ylab.backend.model;
 
-import io.ylab.backend.enumerated.AuditionEventType;
+import io.ylab.commons.enumerated.AuditionEventType;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

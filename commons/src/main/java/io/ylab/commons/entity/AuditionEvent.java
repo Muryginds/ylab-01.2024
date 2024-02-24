@@ -1,6 +1,6 @@
-package io.ylab.backend.entity;
+package io.ylab.commons.entity;
 
-import io.ylab.backend.enumerated.AuditionEventType;
+import io.ylab.commons.enumerated.AuditionEventType;
 import lombok.Builder;
 import lombok.Data;
 

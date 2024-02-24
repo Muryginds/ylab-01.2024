@@ -1,9 +1,9 @@
 package io.ylab.backend.repository.impl;
 
 import io.ylab.backend.CommonIntegrationContainerBasedTest;
-import io.ylab.backend.entity.Meter;
-import io.ylab.backend.entity.MeterType;
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.Meter;
+import io.ylab.commons.entity.MeterType;
+import io.ylab.commons.entity.User;
 import io.ylab.backend.mapper.MeterTypeMapper;
 import io.ylab.backend.mapper.UserMapper;
 import io.ylab.backend.repository.MeterRepository;

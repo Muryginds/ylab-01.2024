@@ -3,7 +3,7 @@ package io.ylab.backend.service;
 import io.ylab.backend.dto.request.NewReadingsSubmissionRequestDto;
 import io.ylab.backend.dto.request.ReadingRequestDto;
 import io.ylab.backend.dto.response.MessageDto;
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.User;
 import io.ylab.backend.exception.MeterNotFoundException;
 import io.ylab.backend.exception.SubmissionExistsException;
 import io.ylab.backend.utils.CurrentUserUtils;

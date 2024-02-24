@@ -1,7 +1,8 @@
-package io.ylab.backend.entity;
+package io.ylab.commons.entity;
 
-import io.ylab.backend.enumerated.UserRole;
-import lombok.*;
+import io.ylab.commons.enumerated.UserRole;
+import lombok.Builder;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

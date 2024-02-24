@@ -1,4 +1,4 @@
-package io.ylab.backend.entity;
+package io.ylab.commons.entity;
 
 import lombok.Builder;
 import lombok.Data;

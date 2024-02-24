@@ -1,9 +1,9 @@
 package io.ylab.backend.service;
 
-import io.ylab.backend.annotation.Auditable;
-import io.ylab.backend.entity.Submission;
-import io.ylab.backend.enumerated.AuditionEventType;
-import io.ylab.backend.enumerated.UserRole;
+import io.ylab.audition.annotation.Auditable;
+import io.ylab.commons.entity.Submission;
+import io.ylab.commons.enumerated.AuditionEventType;
+import io.ylab.commons.enumerated.UserRole;
 import io.ylab.backend.exception.NoPermissionException;
 import io.ylab.backend.exception.NoSubmissionException;
 import io.ylab.backend.exception.UserNotFoundException;

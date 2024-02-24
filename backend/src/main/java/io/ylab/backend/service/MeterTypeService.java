@@ -1,9 +1,9 @@
 package io.ylab.backend.service;
 
-import io.ylab.backend.annotation.Auditable;
+import io.ylab.audition.annotation.Auditable;
 import io.ylab.backend.dto.request.NewMeterTypeRequestDto;
-import io.ylab.backend.entity.MeterType;
-import io.ylab.backend.enumerated.AuditionEventType;
+import io.ylab.commons.entity.MeterType;
+import io.ylab.commons.enumerated.AuditionEventType;
 import io.ylab.backend.exception.MeterTypeExistException;
 import io.ylab.backend.exception.MeterTypeNotFoundException;
 import io.ylab.backend.mapper.MeterTypeMapper;

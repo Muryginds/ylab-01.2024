@@ -1,4 +1,4 @@
-package io.ylab.backend.enumerated;
+package io.ylab.commons.enumerated;
 
 /**
  * Enumeration representing different types of audition events in the system.

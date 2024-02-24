@@ -1,7 +1,7 @@
 package io.ylab.backend.repository.impl;
 
-import io.ylab.backend.entity.AuditionEvent;
-import io.ylab.backend.enumerated.AuditionEventType;
+import io.ylab.commons.entity.AuditionEvent;
+import io.ylab.commons.enumerated.AuditionEventType;
 import io.ylab.backend.model.AuditionEventModel;
 import io.ylab.backend.repository.AuditionEventRepository;
 import lombok.RequiredArgsConstructor;

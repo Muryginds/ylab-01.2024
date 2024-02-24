@@ -1,6 +1,6 @@
 package io.ylab.backend.utils;
 
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.User;
 import lombok.experimental.UtilityClass;
 import org.springframework.security.core.context.SecurityContextHolder;
 

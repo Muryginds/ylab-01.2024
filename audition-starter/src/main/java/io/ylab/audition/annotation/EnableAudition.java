@@ -1,14 +1,11 @@
-package io.ylab.backend.annotation;
-
-import io.ylab.backend.enumerated.AuditionEventType;
+package io.ylab.audition.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Auditable {
-    AuditionEventType eventType();
+public @interface EnableAudition {
 }

@@ -15,6 +15,7 @@ specific users.
 - <a href ="https://github.com/Muryginds/ylab-01.2024/pull/4"> sprint 2</a> Docker + postgres, liquibase migrations, repository tests
 - <a href ="https://github.com/Muryginds/ylab-01.2024/pull/5"> sprint 3</a> Servlets + tomcat, jackson, validations, aspects, logging
 - <a href ="https://github.com/Muryginds/ylab-01.2024/pull/6"> sprint 4</a> Spring core + controllers, jwt auth, rest template, open api + swagger
+- <a href ="https://github.com/Muryginds/ylab-01.2024/pull/7"> sprint 5</a> Spring boot. Aspects moved to starters, modules separated
 
 #### API
 ```
@@ -36,14 +37,14 @@ specific users.
 #### On Unix-like systems:
 
 ```bash
-./gradlew clean war
-docker compose up -d
+./gradlew publishtomavenlocal
+./gradlew backend:bootrun
 ```
 #### On Windows:
 
 ```bash
-gradlew.bat clean war
-docker compose up -d
+gradlew.bat publishtomavenlocal
+gradlew.bat backend:bootrun
 ```
 The Gradle wrapper will download the specified Gradle distribution, compile and run your Java application.
 You need to have docker installed

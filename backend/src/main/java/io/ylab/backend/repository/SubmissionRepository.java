@@ -1,6 +1,6 @@
 package io.ylab.backend.repository;
 
-import io.ylab.backend.entity.Submission;
+import io.ylab.commons.entity.Submission;
 import io.ylab.backend.model.SubmissionModel;
 
 import java.time.LocalDate;

@@ -1,4 +1,4 @@
-package io.ylab.backend.annotation;
+package io.ylab.logging.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

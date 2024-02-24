@@ -1,6 +1,6 @@
 package io.ylab.backend.service;
 
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.User;
 import io.ylab.backend.exception.UserNotFoundException;
 import io.ylab.backend.mapper.UserMapper;
 import io.ylab.backend.model.UserModel;

@@ -1,6 +1,6 @@
 package io.ylab.backend.repository.impl;
 
-import io.ylab.backend.entity.Submission;
+import io.ylab.commons.entity.Submission;
 import io.ylab.backend.model.SubmissionModel;
 import io.ylab.backend.repository.SubmissionRepository;
 import lombok.RequiredArgsConstructor;

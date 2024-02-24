@@ -25,19 +25,5 @@ services:
         max_attempts: 5
         window: 60s
 
-  tomcat:
-    container_name: tomcat_m
-    image: tomcat:jre17
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./build/libs/monitoring-service.war:/usr/local/tomcat/webapps/monitoring-service.war
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 3s
-        max_attempts: 5
-        window: 60s
-
 volumes:
   postgres:

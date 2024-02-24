@@ -1,8 +1,8 @@
 package io.ylab.backend.service;
 
 import io.ylab.backend.dto.response.MeterReadingDto;
-import io.ylab.backend.entity.MeterReading;
-import io.ylab.backend.entity.Submission;
+import io.ylab.commons.entity.MeterReading;
+import io.ylab.commons.entity.Submission;
 import io.ylab.backend.mapper.MeterReadingMapper;
 import io.ylab.backend.model.MeterReadingModel;
 import io.ylab.backend.repository.MeterReadingRepository;

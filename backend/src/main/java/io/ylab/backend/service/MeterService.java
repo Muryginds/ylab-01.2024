@@ -1,7 +1,7 @@
 package io.ylab.backend.service;
 
-import io.ylab.backend.entity.Meter;
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.Meter;
+import io.ylab.commons.entity.User;
 import io.ylab.backend.exception.MeterNotFoundException;
 import io.ylab.backend.mapper.MeterMapper;
 import io.ylab.backend.repository.MeterRepository;

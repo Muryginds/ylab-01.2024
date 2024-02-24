@@ -1,4 +1,4 @@
-package io.ylab.backend.enumerated;
+package io.ylab.commons.enumerated;
 
 /**
  * Enumeration representing user roles in the system.

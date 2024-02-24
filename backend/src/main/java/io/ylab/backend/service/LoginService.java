@@ -1,9 +1,9 @@
 package io.ylab.backend.service;
 
-import io.ylab.backend.annotation.Auditable;
+import io.ylab.audition.annotation.Auditable;
 import io.ylab.backend.dto.request.UserAuthorizationRequestDto;
-import io.ylab.backend.entity.User;
-import io.ylab.backend.enumerated.AuditionEventType;
+import io.ylab.commons.entity.User;
+import io.ylab.commons.enumerated.AuditionEventType;
 import io.ylab.backend.exception.UserAuthenticationException;
 import io.ylab.backend.exception.UserNotAuthorizedException;
 import io.ylab.backend.security.JwtService;

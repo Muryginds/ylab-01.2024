@@ -1,8 +1,8 @@
 package io.ylab.backend.mapper;
 
-import io.ylab.backend.entity.Meter;
-import io.ylab.backend.entity.MeterType;
-import io.ylab.backend.entity.User;
+import io.ylab.commons.entity.Meter;
+import io.ylab.commons.entity.MeterType;
+import io.ylab.commons.entity.User;
 import io.ylab.backend.dto.response.MeterDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

@@ -1,8 +1,8 @@
 package io.ylab.backend.repository.impl;
 
 import io.ylab.backend.CommonIntegrationContainerBasedTest;
-import io.ylab.backend.entity.User;
-import io.ylab.backend.enumerated.UserRole;
+import io.ylab.commons.entity.User;
+import io.ylab.commons.enumerated.UserRole;
 import io.ylab.backend.model.UserModel;
 import io.ylab.backend.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;

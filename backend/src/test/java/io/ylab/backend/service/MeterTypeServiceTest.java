@@ -1,7 +1,7 @@
 package io.ylab.backend.service;
 
 import io.ylab.backend.dto.request.NewMeterTypeRequestDto;
-import io.ylab.backend.entity.MeterType;
+import io.ylab.commons.entity.MeterType;
 import io.ylab.backend.exception.MeterTypeExistException;
 import io.ylab.backend.mapper.MeterTypeMapper;
 import io.ylab.backend.repository.MeterTypeRepository;

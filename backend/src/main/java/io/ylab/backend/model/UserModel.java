@@ -1,6 +1,6 @@
 package io.ylab.backend.model;
 
-import io.ylab.backend.enumerated.UserRole;
+import io.ylab.commons.enumerated.UserRole;
 import lombok.Builder;
 
 @Builder

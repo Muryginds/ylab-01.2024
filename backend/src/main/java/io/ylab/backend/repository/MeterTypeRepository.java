@@ -1,6 +1,6 @@
 package io.ylab.backend.repository;
 
-import io.ylab.backend.entity.MeterType;
+import io.ylab.commons.entity.MeterType;
 import io.ylab.backend.model.MeterTypeModel;
 
 import java.util.Collection;

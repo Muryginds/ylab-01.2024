@@ -24,4 +24,14 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="io.ylab.logging" level="WARN" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="io.ylab.audition" level="WARN" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
 </configuration>

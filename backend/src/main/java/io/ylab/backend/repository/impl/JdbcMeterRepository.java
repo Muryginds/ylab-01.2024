@@ -1,6 +1,6 @@
 package io.ylab.backend.repository.impl;
 
-import io.ylab.backend.entity.Meter;
+import io.ylab.commons.entity.Meter;
 import io.ylab.backend.model.MeterModel;
 import io.ylab.backend.repository.MeterRepository;
 import lombok.RequiredArgsConstructor;
