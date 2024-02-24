@@ -14,7 +14,7 @@ specific users.
 - <a href ="https://github.com/Muryginds/ylab-01.2024/pull/3"> sprint 1</a> Entities, in-memory collections, console interface, javadoc, service tests
 - <a href ="https://github.com/Muryginds/ylab-01.2024/pull/4"> sprint 2</a> Docker + postgres, liquibase migrations, repository tests
 - <a href ="https://github.com/Muryginds/ylab-01.2024/pull/5"> sprint 3</a> Servlets + tomcat, jackson, validations, aspects, logging
-- <a href ="https://github.com/Muryginds/ylab-01.2024/pull/6"> sprint 4</a> Spring + controllers, jwt auth, rest template, open api + swagger
+- <a href ="https://github.com/Muryginds/ylab-01.2024/pull/6"> sprint 4</a> Spring core + controllers, jwt auth, rest template, open api + swagger
 
 #### API
 ```

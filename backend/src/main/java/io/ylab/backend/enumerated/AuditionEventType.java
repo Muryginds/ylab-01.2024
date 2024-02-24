@@ -8,7 +8,6 @@ package io.ylab.backend.enumerated;
 public enum AuditionEventType {
     SESSION_START,
     SESSION_END,
-    REGISTRATION,
     READINGS_SUBMISSION,
     NEW_METER_TYPE_ADDITION,
     SINGLE_SUBMISSION_ACQUIRE,
