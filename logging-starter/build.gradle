@@ -2,6 +2,8 @@ plugins {
     id 'java-library'
     id 'maven-publish'
 }
+group 'io.ylab'
+version '1.0-SNAPSHOT'
 
 java {
     withSourcesJar()
@@ -14,6 +16,7 @@ dependencies {
 publishing {
     publications {
         maven(MavenPublication) {
+            from components.java
             versionMapping {
                 usage('java-api') {
                     fromResolutionOf('runtimeClasspath')
