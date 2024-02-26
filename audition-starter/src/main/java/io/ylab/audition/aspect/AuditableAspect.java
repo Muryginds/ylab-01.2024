@@ -14,6 +14,9 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Aspect
 @RequiredArgsConstructor
@@ -27,13 +30,16 @@ public class AuditableAspect {
     @AfterReturning("auditableMethod()")
     public void auditableMethodAdvice(JoinPoint joinPoint) {
         var methodName = joinPoint.getSignature().getName();
-        log.warn("AUDITING " + methodName);
-        var type = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(Auditable.class).eventType();
         var user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.warn("AUDITING {} by {}", methodName, user.getName());
+        var type = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(Auditable.class).eventType();
+        var params = Arrays.stream(joinPoint.getArgs())
+                .map(Object::toString)
+                .collect(Collectors.joining(", "));
         var event = AuditionEvent.builder()
                 .user(user)
                 .eventType(type)
-                .message("Method '%s' was called".formatted(methodName))
+                .message("Method '%s' was called with params %s".formatted(methodName, params))
                 .build();
         eventRepository.save(event);
     }
