@@ -6,8 +6,8 @@
                     pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
         </Console>
         <RollingFile name="XMLRollingfileAppender"
-                     fileName="target/logfile.xml"
-                     filePattern="target/logfile-%d{yyyy-MM-dd}-%i.log.gz">
+                     fileName="logs/logfile.xml"
+                     filePattern="logs/logfile-%d{yyyy-MM-dd}-%i.log.gz">
             <XMLLayout/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="17 kB"/>

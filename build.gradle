@@ -1,8 +1,6 @@
 plugins {
     id 'java'
-    id 'application'
     id 'war'
-    id "io.freefair.aspectj.post-compile-weaving" version "8.4" apply false
 }
 
 group = 'ru.ylab'
@@ -18,7 +16,6 @@ repositories {
 }
 
 ext {
-    isTest = System.properties['env'] == 'test'
     password4jVersion = '1.7.3'
     mapstructVersion = '1.5.5.Final'
     mapstructProcessorVersion = '1.5.5.Final'
@@ -36,13 +33,11 @@ ext {
     jakartaServletApiVersion = '6.1.0-M1'
     jacksonVersion = '2.16.1'
     hibernameValidatorVersion = '8.0.1.Final'
-    aspectjrtVersion = '1.9.21'
-}
-
-apply {
-    if (!isTest) {
-        apply plugin: 'io.freefair.aspectj.post-compile-weaving'
-    }
+    springVersion = '6.1.4'
+    snakeYamlVersion = '2.2'
+    springdocVersion = '2.3.0'
+    springSecurityVersion = '6.2.1'
+    jwttVersion = '0.12.5'
 }
 
 dependencies {
@@ -57,7 +52,21 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}"
     implementation "org.hibernate.validator:hibernate-validator:${hibernameValidatorVersion}"
-    implementation "org.aspectj:aspectjrt:${aspectjrtVersion}"
+    implementation "org.springframework:spring-aspects:${springVersion}"
+    implementation "org.springframework:spring-aop:${springVersion}"
+    implementation "org.springframework:spring-context:${springVersion}"
+    implementation "org.springframework:spring-web:${springVersion}"
+    implementation "org.springframework:spring-webmvc:${springVersion}"
+    implementation "org.springframework.security:spring-security-web:${springSecurityVersion}"
+    implementation "org.springframework.security:spring-security-config:${springSecurityVersion}"
+    implementation "org.springframework:spring-jdbc:${springVersion}"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+    implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
+    implementation "io.jsonwebtoken:jjwt-api:${jwttVersion}"
+    implementation 'com.jayway.jsonpath:json-path:2.9.0'
+
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jwttVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jwttVersion}"
 
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     compileOnly "jakarta.servlet:jakarta.servlet-api:${jakartaServletApiVersion}"
@@ -69,6 +78,8 @@ dependencies {
     testImplementation platform("org.junit:junit-bom:${junitVersion}")
     testImplementation "org.junit.jupiter:junit-jupiter"
     testImplementation "org.mockito:mockito-core:${mockitoCoreVersion}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoCoreVersion}"
+    testImplementation "org.springframework:spring-test:${springVersion}"
     testImplementation "org.testcontainers:postgresql:${testContainersPostgresVersion}"
     testImplementation "jakarta.servlet:jakarta.servlet-api:${jakartaServletApiVersion}"
 
@@ -77,14 +88,6 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructProcessorVersion}"
     testAnnotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
-}
-
-application {
-    mainClassName = 'ru.ylab.Application'
-}
-
-run {
-    standardInput = System.in
 }
 
 tasks.war {
