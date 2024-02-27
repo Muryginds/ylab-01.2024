@@ -7,6 +7,8 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import io.ylab.backend.configuration.property.OpenApiProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,18 +18,20 @@ import static io.swagger.v3.oas.models.security.SecurityScheme.In.HEADER;
 import static io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP;
 
 @Configuration
+@RequiredArgsConstructor
 public class OpenApiConfig {
     public static final String SECURITY_SCHEME_NAME = "bearerAuth";
+    private final OpenApiProperties openApiProperties;
 
     @Bean
     public OpenAPI customOpenApi() {
-        return new OpenAPI().info(new Info().title("OpenApi specification - Monitoring System")
-                        .version("1.0")
-                        .description("OpenApi documentation for Monitoring Service")
-                        .contact(new Contact().name("Muryginds")
-                                .email("muryginds@gmail.com")))
-                .servers(List.of(new Server().url("http://localhost:8080/monitoring-service")
-                        .description("Local ENV")))
+        return new OpenAPI().info(new Info().title(openApiProperties.getTitle())
+                        .version(openApiProperties.getVersion())
+                        .description(openApiProperties.getDescription())
+                        .contact(new Contact().name(openApiProperties.getContact().name())
+                                .email(openApiProperties.getContact().email())))
+                .servers(List.of(new Server().url(openApiProperties.getServer().url())
+                        .description(openApiProperties.getServer().description())))
                 .addSecurityItem(new SecurityRequirement()
                         .addList(SECURITY_SCHEME_NAME))
                 .components(new Components()

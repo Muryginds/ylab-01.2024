@@ -23,9 +23,8 @@ specific users.
 ```
 
 #### Testing
-    By default, added user 'admin' with password 'admin' and administrative role
-
-    to run tests, add -Denv=test
+    By default, added user 'admin' with password 'admin'
+    and administrative role to run tests, add -Denv=test
 
 ### Run the Project:
 

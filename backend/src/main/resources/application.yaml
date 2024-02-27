@@ -15,6 +15,24 @@ application:
     jwt:
       secret-key: 17pRlrjZrQYhbg/1xIAb+vNtoLYlpHGl935sdrntLJk=
       expiration-time: 1800000
+    white-list:
+      - '/api/v1/auth/login'
+      - '/api/v1/accounts/register'
+      - '/swagger-ui/**'
+      - '/swagger'
+      - '/v3/api-docs/**'
+      - '/api-docs'
+      - '/api-docs/**'
+  openapi:
+    title: 'OpenApi specification - Monitoring System'
+    version: '1.0'
+    description: 'OpenApi documentation for Monitoring Service'
+    contact:
+      name: 'Muryginds'
+      email: 'muryginds@gmail.com'
+    server:
+      url: 'http://localhost:8080/monitoring-service'
+      description: 'Local ENV'
 
 springdoc:
   api-docs:

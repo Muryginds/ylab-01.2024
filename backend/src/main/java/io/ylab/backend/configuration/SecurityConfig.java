@@ -1,5 +1,6 @@
 package io.ylab.backend.configuration;
 
+import io.ylab.backend.configuration.property.SecurityProperties;
 import io.ylab.backend.security.FilterChainExceptionHandler;
 import io.ylab.backend.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -24,27 +25,19 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final String[] WHITE_LIST_URL = {
-            "/api/v1/auth/login",
-            "/api/v1/accounts/register",
-            "/swagger-ui/**",
-            "/swagger",
-            "/v3/api-docs/**",
-            "/api-docs",
-            "/api-docs/**"
-    };
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final FilterChainExceptionHandler filterChainExceptionHandler;
+    private final SecurityProperties securityProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        var whiteList = securityProperties.getWhiteList().toArray(new String[0]);
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractAuthenticationFilterConfigurer::disable)
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers(WHITE_LIST_URL)
+                        .requestMatchers(whiteList)
                         .permitAll()
                         .anyRequest()
                         .authenticated()
