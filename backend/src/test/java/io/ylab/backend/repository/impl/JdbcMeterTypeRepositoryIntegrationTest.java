@@ -1,14 +1,14 @@
 package io.ylab.backend.repository.impl;
 
-import org.junit.jupiter.api.Test;
 import io.ylab.backend.CommonIntegrationContainerBasedTest;
-import io.ylab.commons.entity.MeterType;
 import io.ylab.backend.repository.MeterTypeRepository;
+import io.ylab.commons.entity.MeterType;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class JdbcMeterTypeRepositoryIntegrationTest extends CommonIntegrationContainerBasedTest {
     @Autowired
@@ -18,15 +18,15 @@ class JdbcMeterTypeRepositoryIntegrationTest extends CommonIntegrationContainerB
     void testGetById_whenSave_thenReturnCorrectData() {
         var newTypeName = "Electricity";
         var meterType = MeterType.builder().typeName(newTypeName).build();
-        assertFalse(meterTypeRepository.checkExistsByName(newTypeName));
+        assertThat(meterTypeRepository.checkExistsByName(newTypeName)).isFalse();
 
         meterTypeRepository.save(meterType);
-        assertTrue(meterTypeRepository.checkExistsByName(newTypeName));
+        assertThat(meterTypeRepository.checkExistsByName(newTypeName)).isTrue();
 
         var allMeterTypeModels = meterTypeRepository.getAll();
         var newTypeModelOptional =
                 allMeterTypeModels.stream().filter(m -> m.typeName().equals(newTypeName)).findFirst();
-        assertTrue(newTypeModelOptional.isPresent());
+        assertThat(newTypeModelOptional).isPresent();
     }
 
     @Test
@@ -39,20 +39,20 @@ class JdbcMeterTypeRepositoryIntegrationTest extends CommonIntegrationContainerB
         meterTypeRepository.save(Set.of(meterType1, meterType2));
 
         var allMeterTypeModelsAfterSave = meterTypeRepository.getAll();
-        assertEquals(allMeterTypeModelsSizeBeforeSave + 2, allMeterTypeModelsAfterSave.size());
-
-        assertTrue(allMeterTypeModelsAfterSave.stream().anyMatch(m -> m.typeName().equals("Water")));
-        assertTrue(allMeterTypeModelsAfterSave.stream().anyMatch(m -> m.typeName().equals("Gas")));
+        assertThat(allMeterTypeModelsAfterSave)
+                .hasSize(allMeterTypeModelsSizeBeforeSave + 2)
+                .anyMatch(m -> m.typeName().equals("Water"))
+                .anyMatch(m -> m.typeName().equals("Gas"));
     }
 
     @Test
     void testSave_whenCorrectData_thenExistsInDatabase() {
         var newTypeName = "Air";
         var meterType = MeterType.builder().typeName(newTypeName).build();
-        assertFalse(meterTypeRepository.checkExistsByName(newTypeName));
+        assertThat(meterTypeRepository.checkExistsByName(newTypeName)).isFalse();
 
         meterTypeRepository.save(meterType);
-        assertTrue(meterTypeRepository.checkExistsByName(newTypeName));
+        assertThat(meterTypeRepository.checkExistsByName(newTypeName)).isTrue();
     }
 
     @Test
@@ -65,6 +65,8 @@ class JdbcMeterTypeRepositoryIntegrationTest extends CommonIntegrationContainerB
         meterTypeRepository.save(Set.of(meterType1, meterType2));
 
         var allMeterTypeModelsAfterSave = meterTypeRepository.getAll();
-        assertEquals(allMeterTypeModelsSizeBeforeSave + 2, allMeterTypeModelsAfterSave.size());
+
+        assertThat(allMeterTypeModelsAfterSave)
+                .hasSize(allMeterTypeModelsSizeBeforeSave + 2);
     }
 }

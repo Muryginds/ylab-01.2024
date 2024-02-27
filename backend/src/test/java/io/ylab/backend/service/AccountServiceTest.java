@@ -17,6 +17,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,8 +60,8 @@ class AccountServiceTest {
 
         var actualUserDto = accountService.registerUser(requestDto);
 
-        assertNotNull(actualUserDto);
-        assertEquals(expectedUserDto, actualUserDto);
+        assertThat(actualUserDto).isNotNull();
+        assertThat(expectedUserDto).isEqualTo(actualUserDto);
         verify(userService, Mockito.times(1)).save(user);
         verify(meterService, Mockito.times(1)).generateForNewUser(user);
         verify(jwtService, Mockito.times(1)).generateToken(user);
@@ -86,8 +87,8 @@ class AccountServiceTest {
 
         var actualUserDto = accountService.getCurrentUserDto();
 
-        assertNotNull(actualUserDto);
-        assertEquals(expectedUserDto, actualUserDto);
+        assertThat(actualUserDto).isNotNull();
+        assertThat(expectedUserDto).isEqualTo(actualUserDto);
     }
 
     @Test

@@ -1,13 +1,13 @@
 package io.ylab.backend.service;
 
-import io.ylab.commons.entity.Submission;
-import io.ylab.commons.entity.User;
 import io.ylab.backend.exception.NoPermissionException;
 import io.ylab.backend.exception.NoSubmissionException;
 import io.ylab.backend.mapper.SubmissionMapper;
 import io.ylab.backend.model.SubmissionModel;
 import io.ylab.backend.repository.SubmissionRepository;
 import io.ylab.backend.utils.CurrentUserUtils;
+import io.ylab.commons.entity.Submission;
+import io.ylab.commons.entity.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,11 +19,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -64,7 +63,7 @@ class SubmissionServiceTest {
 
         var result = submissionService.getAll(userId);
 
-        assertEquals(Collections.singletonList(submission), new ArrayList<>(result));
+        assertThat(result).containsExactly(submission);
     }
 
     @Test

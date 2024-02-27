@@ -1,24 +1,23 @@
 package io.ylab.backend.repository.impl;
 
-import io.ylab.commons.entity.*;
+import io.ylab.backend.CommonIntegrationContainerBasedTest;
 import io.ylab.backend.mapper.MeterMapper;
 import io.ylab.backend.mapper.MeterTypeMapper;
 import io.ylab.backend.mapper.SubmissionMapper;
 import io.ylab.backend.mapper.UserMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import io.ylab.backend.CommonIntegrationContainerBasedTest;
 import io.ylab.backend.repository.MeterRepository;
 import io.ylab.backend.repository.MeterTypeRepository;
 import io.ylab.backend.repository.SubmissionRepository;
 import io.ylab.backend.repository.UserRepository;
+import io.ylab.commons.entity.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 class JdbcMeterReadingRepositoryIntegrationTest extends CommonIntegrationContainerBasedTest {
@@ -58,7 +57,7 @@ class JdbcMeterReadingRepositoryIntegrationTest extends CommonIntegrationContain
         submissionRepository.save(submission);
 
         var savedSubmissionModel = submissionRepository.findSubmissionByUserIdAndDate(user.getId(), date);
-        assertTrue(savedSubmissionModel.isPresent());
+        assertThat(savedSubmissionModel).isPresent();
 
         var electricityMeterType = meterTypeMapper.toMeterType(
                 meterTypeRepository.findByName("Electricity").orElseThrow()
@@ -72,8 +71,8 @@ class JdbcMeterReadingRepositoryIntegrationTest extends CommonIntegrationContain
         var meterModel1 = meterModels.stream().filter(m -> m.meterTypeId().equals(electricityMeterType.getId())).findFirst();
         var meterModel2 = meterModels.stream().filter(m -> m.meterTypeId().equals(waterMeterType.getId())).findFirst();
 
-        assertTrue(meterModel1.isPresent());
-        assertTrue(meterModel2.isPresent());
+        assertThat(meterModel1).isPresent();
+        assertThat(meterModel2).isPresent();
 
         var meterReading1 = MeterReading.builder()
                 .meter(meterMapper.toMeter(meterModel1.get(), electricityMeterType, user))
@@ -92,7 +91,7 @@ class JdbcMeterReadingRepositoryIntegrationTest extends CommonIntegrationContain
 
         var savedMeterReadingModels = meterReadingsRepository.getAllBySubmissionId(submission.getId());
 
-        assertEquals(2, savedMeterReadingModels.size());
+        assertThat(savedMeterReadingModels).hasSize(2);
     }
 
     private void createTestData() {

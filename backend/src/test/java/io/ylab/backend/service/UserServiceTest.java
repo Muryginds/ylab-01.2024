@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -75,7 +76,7 @@ class UserServiceTest {
 
         var result = userService.getUserById(userId);
 
-        assertEquals(user, result);
+        assertThat(result).isEqualTo(user);
     }
 
     @Test
@@ -96,7 +97,7 @@ class UserServiceTest {
 
         var result = userService.getUserByName(userName);
 
-        assertEquals(user, result);
+        assertThat(result).isEqualTo(user);
     }
 
     @Test

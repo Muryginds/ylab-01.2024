@@ -1,10 +1,10 @@
 package io.ylab.backend.service;
 
 import io.ylab.backend.dto.request.NewMeterTypeRequestDto;
-import io.ylab.commons.entity.MeterType;
 import io.ylab.backend.exception.MeterTypeExistException;
 import io.ylab.backend.mapper.MeterTypeMapper;
 import io.ylab.backend.repository.MeterTypeRepository;
+import io.ylab.commons.entity.MeterType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +34,10 @@ class MeterTypeServiceTest {
 
         var result = meterTypeService.save(requestDto);
 
-        assertEquals("Meter type 'Electricity' saved", result.message());
+        var message = "Meter type 'Electricity' saved";
+
+        assertThat(result).isNotNull();
+        assertThat(result.message()).isEqualTo(message);
         Mockito.verify(meterTypeRepository, Mockito.times(1)).save(newType);
     }
 

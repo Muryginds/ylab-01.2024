@@ -1,11 +1,11 @@
 package io.ylab.backend.service;
 
 import io.ylab.backend.dto.response.MeterReadingDto;
-import io.ylab.commons.entity.MeterReading;
-import io.ylab.commons.entity.Submission;
 import io.ylab.backend.mapper.MeterReadingMapper;
 import io.ylab.backend.model.MeterReadingModel;
 import io.ylab.backend.repository.MeterReadingRepository;
+import io.ylab.commons.entity.MeterReading;
+import io.ylab.commons.entity.Submission;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.*;
@@ -46,8 +46,9 @@ class MeterReadingsServiceTest {
 
         var result = meterReadingsService.getAllBySubmissionId(submissionId);
 
-        assertEquals(1, result.size());
-        assertEquals(meterReadingDto, result.iterator().next());
+        assertThat(result)
+                .hasSize(1)
+                .containsExactly(meterReadingDto);
     }
 
     @Test
@@ -60,7 +61,7 @@ class MeterReadingsServiceTest {
 
         var result = meterReadingsService.getBySubmission(submission);
 
-        assertEquals(1, result.size());
+        assertThat(result).hasSize(1);
     }
 
     @Test

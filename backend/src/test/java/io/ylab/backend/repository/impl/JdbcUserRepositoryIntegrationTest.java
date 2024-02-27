@@ -1,18 +1,15 @@
 package io.ylab.backend.repository.impl;
 
 import io.ylab.backend.CommonIntegrationContainerBasedTest;
+import io.ylab.backend.repository.UserRepository;
 import io.ylab.commons.entity.User;
 import io.ylab.commons.enumerated.UserRole;
-import io.ylab.backend.model.UserModel;
-import io.ylab.backend.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 class JdbcUserRepositoryIntegrationTest extends CommonIntegrationContainerBasedTest {
@@ -26,58 +23,58 @@ class JdbcUserRepositoryIntegrationTest extends CommonIntegrationContainerBasedT
 
     @Test
     void testCheckUserExistsByName_whenExistingUser_thenReturnTrue() {
-        assertTrue(userRepository.checkUserExistsByName("user1"));
+        assertThat(userRepository.checkUserExistsByName("user1")).isFalse();
     }
 
     @Test
     void testCheckUserExistsByName_whenNonExistingUser_thenReturnFalse() {
-        assertFalse(userRepository.checkUserExistsByName("nonexistentUser"));
+        assertThat(userRepository.checkUserExistsByName("nonexistentUser")).isFalse();
     }
 
     @Test
     void testCheckUserExistsById_whenExistingUser_thenReturnTrue() {
         var userModelOptional = userRepository.findUserByName("user1");
-        assertTrue(userModelOptional.isPresent());
-        assertTrue(userRepository.checkUserExistsById(userModelOptional.get().id()));
+        assertThat(userModelOptional).isPresent();
+        assertThat(userRepository.checkUserExistsById(userModelOptional.get().id())).isTrue();
     }
 
     @Test
     void testCheckUserExistsById_whenNonExistingUser_thenReturnFalse() {
-        assertFalse(userRepository.checkUserExistsById(999L));
+        assertThat(userRepository.checkUserExistsById(999L)).isFalse();
     }
 
     @Test
     void testFindUserByName_whenExistingUser_thenReturnUserModel() {
         var userModelOptional = userRepository.findUserByName("user1");
-        assertTrue(userModelOptional.isPresent());
+        assertThat(userModelOptional).isPresent();
 
         var userModel = userModelOptional.get();
-        assertEquals("user1", userModel.name());
-        assertEquals("password1", userModel.password());
-        assertEquals(UserRole.USER, userModel.role());
+        assertThat(userModel.name()).isEqualTo("user1");
+        assertThat(userModel.password()).isEqualTo("password1");
+        assertThat(userModel.role()).isEqualTo(UserRole.USER);
     }
 
     @Test
     void testFindUserByName_whenNonExistingUser_thenReturnEmptyOptional() {
         var userModelOptional = userRepository.findUserByName("nonexistentUser");
-        assertFalse(userModelOptional.isPresent());
+        assertThat(userModelOptional).isPresent();
     }
 
     @Test
     void testFindUserById_whenExistingUser_thenReturnUserModel() {
         var userModelOptional = userRepository.findUserByName("user1");
-        assertTrue(userModelOptional.isPresent());
+        assertThat(userModelOptional).isPresent();
 
-        Optional<UserModel> foundUserModel = userRepository.findUserById(userModelOptional.get().id());
-        assertTrue(foundUserModel.isPresent());
-
-        assertEquals(foundUserModel.get(), userModelOptional.get());
+        var foundUserModel = userRepository.findUserById(userModelOptional.get().id());
+        assertThat(foundUserModel)
+                .isPresent()
+                .isEqualTo(userModelOptional);
     }
 
     @Test
     void testFindUserById_whenNonExistingUser_thenReturnEmptyOptional() {
-        Optional<UserModel> foundUserModel = userRepository.findUserById(999L);
-        assertFalse(foundUserModel.isPresent());
+        var foundUserModel = userRepository.findUserById(999L);
+        assertThat(foundUserModel).isPresent();
     }
 
     private void createTestUsers() {

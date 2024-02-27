@@ -1,13 +1,13 @@
 package io.ylab.backend.repository.impl;
 
 import io.ylab.backend.CommonIntegrationContainerBasedTest;
+import io.ylab.backend.mapper.UserMapper;
+import io.ylab.backend.repository.AuditionEventRepository;
+import io.ylab.backend.repository.UserRepository;
 import io.ylab.commons.entity.AuditionEvent;
 import io.ylab.commons.entity.User;
 import io.ylab.commons.enumerated.AuditionEventType;
 import io.ylab.commons.enumerated.UserRole;
-import io.ylab.backend.mapper.UserMapper;
-import io.ylab.backend.repository.AuditionEventRepository;
-import io.ylab.backend.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 class JdbcAuditionEventRepositoryIntegrationTest extends CommonIntegrationContainerBasedTest {
@@ -35,12 +34,14 @@ class JdbcAuditionEventRepositoryIntegrationTest extends CommonIntegrationContai
     @Test
     void testGetEventsByUserId_whenExists_thenReturnCorrectSetOfEvents() {
         var user = userRepository.findUserByName("user1");
-        assertTrue(user.isPresent());
+        assertThat(user).isPresent();
+
         var userId = user.get().id();
         var auditionEventModels = auditionEventRepository.getEventsByUserId(userId);
 
-        assertEquals(2, auditionEventModels.size());
-        assertTrue(auditionEventModels.stream().allMatch(event -> event.userId().equals(userId)));
+        assertThat(auditionEventModels)
+                .hasSize(2)
+                .allMatch(event -> event.userId().equals(userId));
     }
 
     @Test
@@ -63,12 +64,12 @@ class JdbcAuditionEventRepositoryIntegrationTest extends CommonIntegrationContai
                 .filter(event -> event.eventType().equals(eventType))
                 .findFirst();
 
-        assertTrue(savedEventOptional.isPresent());
+        assertThat(savedEventOptional).isPresent();
 
         var savedEvent = savedEventOptional.get();
-        assertEquals(user1.getId(), savedEvent.userId());
-        assertEquals(eventType, savedEvent.eventType());
-        assertEquals(message, savedEvent.message());
+        assertThat(savedEvent.userId()).isEqualTo(user1.getId());
+        assertThat(eventType).isEqualTo(savedEvent.eventType());
+        assertThat(message).isEqualTo(savedEvent.message());
     }
 
     private void createTestData() {

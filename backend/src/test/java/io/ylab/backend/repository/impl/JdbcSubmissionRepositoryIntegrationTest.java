@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
@@ -30,26 +31,28 @@ class JdbcSubmissionRepositoryIntegrationTest extends CommonIntegrationContainer
     @Test
     void testGetByUserId_whenSubmissionExists_thenReturnCorrectSetOfSubmissions() {
         var user = userRepository.findUserByName("user1");
-        assertTrue(user.isPresent());
+        assertThat(user).isPresent();
+
         var userId = user.get().id();
         var submissionModels = submissionRepository.getByUserId(userId);
 
-        assertEquals(2, submissionModels.size());
-        assertTrue(submissionModels.stream().allMatch(submission -> submission.userId().equals(userId)));
+        assertThat(submissionModels).hasSize(2)
+                        .allMatch(submission -> submission.userId().equals(userId));
     }
 
     @Test
     void testGetById_whenExistingSubmission_thenReturnSubmissionModel() {
         var user = userRepository.findUserByName("user1");
-        assertTrue(user.isPresent());
+        assertThat(user).isPresent();
+
         var submissions = submissionRepository.getByUserId(user.get().id());
-        assertFalse(submissions.isEmpty());
-        var existingSubmission = submissions.stream().findFirst();
-        var existingSubmissionId = existingSubmission.get().id();
+        assertThat(submissions).isNotEmpty();
+
+        var existingSubmissionId = submissions.stream().findFirst().get().id();
         var submissionModelOptional = submissionRepository.getById(existingSubmissionId);
 
-        assertTrue(submissionModelOptional.isPresent());
-        assertEquals(existingSubmissionId, submissionModelOptional.get().id());
+        assertThat(submissionModelOptional).isPresent();
+        assertThat(submissionModelOptional.get().id()).isEqualTo(existingSubmissionId);
     }
 
     @Test
@@ -57,38 +60,40 @@ class JdbcSubmissionRepositoryIntegrationTest extends CommonIntegrationContainer
         var nonExistingSubmissionId = 999L;
         var submissionModelOptional = submissionRepository.getById(nonExistingSubmissionId);
 
-        assertTrue(submissionModelOptional.isEmpty());
+        assertThat(submissionModelOptional).isEmpty();
     }
 
     @Test
     void testCheckExistsByUserIdAndDate_whenExistingSubmission_thenReturnTrue() {
         var user = userRepository.findUserByName("user1");
-        assertTrue(user.isPresent());
+        assertThat(user).isPresent();
+
         var existingUserId = user.get().id();
         var existingDate = LocalDate.of(2021, 12, 1);
-        assertTrue(submissionRepository.checkExistsByUserIdAndDate(existingUserId, existingDate));
+        assertThat(submissionRepository.checkExistsByUserIdAndDate(existingUserId, existingDate)).isTrue();
     }
 
     @Test
     void testCheckExistsByUserIdAndDate_whenNonExistingSubmission_thenReturnFalse() {
         var nonExistingUserId = 999L;
         var nonExistingDate = LocalDate.of(2021, 12, 1);
-        assertFalse(submissionRepository.checkExistsByUserIdAndDate(nonExistingUserId, nonExistingDate));
+        assertThat(submissionRepository.checkExistsByUserIdAndDate(nonExistingUserId, nonExistingDate)).isFalse();
     }
 
     @Test
     void testFindSubmissionByUserIdAndDate_whenExistingSubmission_thenReturnSubmissionModel() {
         var user = userRepository.findUserByName("user1");
-        assertTrue(user.isPresent());
+        assertThat(user).isPresent();
+
         var existingUserId = user.get().id();
         var existingDate = LocalDate.of(2021, 12, 1);
         var submissionModelOptional = submissionRepository.findSubmissionByUserIdAndDate(existingUserId, existingDate);
 
-        assertTrue(submissionModelOptional.isPresent());
+        assertThat(submissionModelOptional).isPresent();
 
         var submissionModel = submissionModelOptional.get();
-        assertEquals(existingUserId, submissionModel.userId());
-        assertEquals(existingDate, submissionModel.date());
+        assertThat(submissionModel.userId()).isEqualTo(existingUserId);
+        assertThat(submissionModel.date()).isEqualTo(existingDate);
     }
 
     @Test
@@ -103,14 +108,15 @@ class JdbcSubmissionRepositoryIntegrationTest extends CommonIntegrationContainer
     @Test
     void testFindLastSubmissionByUserId_whenExistingSubmission_thenReturnLastSubmissionModel() {
         var user = userRepository.findUserByName("user1");
-        assertTrue(user.isPresent());
+        assertThat(user).isPresent();
+
         var existingUserId = user.get().id();
         var lastSubmissionModelOptional = submissionRepository.findLastSubmissionByUserId(existingUserId);
 
-        assertTrue(lastSubmissionModelOptional.isPresent());
+        assertThat(lastSubmissionModelOptional).isPresent();
 
         var lastSubmissionModel = lastSubmissionModelOptional.get();
-        assertEquals(existingUserId, lastSubmissionModel.userId());
+        assertThat(lastSubmissionModel.userId()).isEqualTo(existingUserId);
     }
 
     @Test
@@ -118,7 +124,7 @@ class JdbcSubmissionRepositoryIntegrationTest extends CommonIntegrationContainer
         var nonExistingUserId = 999L;
         var lastSubmissionModelOptional = submissionRepository.findLastSubmissionByUserId(nonExistingUserId);
 
-        assertTrue(lastSubmissionModelOptional.isEmpty());
+        assertThat(lastSubmissionModelOptional).isEmpty();
     }
 
     private void createTestData() {

@@ -1,21 +1,20 @@
 package io.ylab.backend.repository.impl;
 
 import io.ylab.backend.CommonIntegrationContainerBasedTest;
-import io.ylab.commons.entity.Meter;
-import io.ylab.commons.entity.MeterType;
-import io.ylab.commons.entity.User;
 import io.ylab.backend.mapper.MeterTypeMapper;
 import io.ylab.backend.mapper.UserMapper;
 import io.ylab.backend.repository.MeterRepository;
 import io.ylab.backend.repository.MeterTypeRepository;
 import io.ylab.backend.repository.UserRepository;
+import io.ylab.commons.entity.Meter;
+import io.ylab.commons.entity.MeterType;
+import io.ylab.commons.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 class JdbcMeterRepositoryIntegrationTest extends CommonIntegrationContainerBasedTest {
@@ -38,12 +37,14 @@ class JdbcMeterRepositoryIntegrationTest extends CommonIntegrationContainerBased
     @Test
     void testGetByUserId_whenExists_thenReturnCorrectSetOfMeters() {
         var user = userRepository.findUserByName("user1");
-        assertTrue(user.isPresent());
+        assertThat(user).isPresent();
+
         var userId = user.get().id();
         var meterModels = meterRepository.getByUserId(userId);
 
-        assertEquals(2, meterModels.size());
-        assertTrue(meterModels.stream().allMatch(meter -> meter.userId().equals(userId)));
+        assertThat(meterModels)
+                .hasSize(2)
+                .allMatch(meter -> meter.userId().equals(userId));
     }
 
     @Test
@@ -61,12 +62,12 @@ class JdbcMeterRepositoryIntegrationTest extends CommonIntegrationContainerBased
         var savedMeterOptional = meterRepository.getByUserId(userModel.id()).stream()
                 .filter(m -> m.meterTypeId().equals(1L)).findFirst();
 
-        assertTrue(savedMeterOptional.isPresent());
+        assertThat(savedMeterOptional).isPresent();
 
         var savedMeter = savedMeterOptional.get();
-        assertEquals(newMeter.getFactoryNumber(), savedMeter.factoryNumber());
-        assertEquals(newMeter.getUser().getId(), savedMeter.userId());
-        assertEquals(newMeter.getMeterType().getId(), savedMeter.meterTypeId());
+        assertThat(savedMeter.factoryNumber()).isEqualTo(newMeter.getFactoryNumber());
+        assertThat(savedMeter.userId()).isEqualTo(newMeter.getUser().getId());
+        assertThat(savedMeter.meterTypeId()).isEqualTo(newMeter.getMeterType().getId());
     }
 
     private void createTestData() {

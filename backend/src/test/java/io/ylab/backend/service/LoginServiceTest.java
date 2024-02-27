@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -42,9 +43,9 @@ class LoginServiceTest {
 
         var actualUserDto = loginService.authorize(requestDto);
 
-        assertNotNull(actualUserDto);
-        assertEquals(expectedUserDto, actualUserDto);
-        assertEquals(token, actualUserDto.getToken());
+        assertThat(actualUserDto).isNotNull();
+        assertThat(expectedUserDto).isEqualTo(actualUserDto);
+        assertThat(token).isEqualTo(actualUserDto.getToken());
     }
 
     @Test
@@ -58,8 +59,9 @@ class LoginServiceTest {
     @Test
     void testLogout_Successful() {
         var messageDto = loginService.logout();
+        var message = "User logged out";
 
-        assertNotNull(messageDto);
-        assertEquals("User logged out", messageDto.message());
+        assertThat(messageDto).isNotNull();
+        assertThat(messageDto.message()).isEqualTo(message);
     }
 }

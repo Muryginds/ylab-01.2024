@@ -21,7 +21,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -58,7 +58,11 @@ class ReadingsRecordingServiceTest {
 
         MessageDto result = readingsRecordingService.saveNewSubmission(requestDto);
 
-        assertEquals("New submission saved", result.message());
+        var message = "New submission saved";
+
+        assertThat(result).isNotNull();
+        assertThat(result.message()).isEqualTo(message);
+
         verify(meterReadingsService, times(1)).saveAll(Collections.emptySet());
     }
 

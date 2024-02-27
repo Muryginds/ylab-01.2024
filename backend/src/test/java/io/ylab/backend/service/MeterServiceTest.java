@@ -1,11 +1,11 @@
 package io.ylab.backend.service;
 
-import io.ylab.commons.entity.Meter;
-import io.ylab.commons.entity.User;
 import io.ylab.backend.exception.MeterNotFoundException;
 import io.ylab.backend.mapper.MeterMapper;
 import io.ylab.backend.model.MeterModel;
 import io.ylab.backend.repository.MeterRepository;
+import io.ylab.commons.entity.Meter;
+import io.ylab.commons.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -69,7 +69,7 @@ class MeterServiceTest {
 
         Collection<Meter> result = meterService.getMetersByUserId(userId);
 
-        assertEquals(1, result.size());
+        assertThat(result).hasSize(1);
     }
 
     @Test

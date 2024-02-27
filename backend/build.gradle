@@ -20,6 +20,7 @@ ext {
     preLiquibaseVersion = '1.5.0'
     springdocVersion = '2.3.0'
     jwttVersion = '0.12.5'
+    assertjCoreVersion = '3.25.3'
 }
 
 dependencies {
@@ -51,6 +52,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:postgresql'
+    testImplementation "org.assertj:assertj-core:${assertjCoreVersion}"
 
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
 

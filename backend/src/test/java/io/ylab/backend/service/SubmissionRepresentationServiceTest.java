@@ -1,9 +1,9 @@
 package io.ylab.backend.service;
 
 import io.ylab.backend.dto.response.SubmissionDto;
+import io.ylab.backend.mapper.SubmissionMapper;
 import io.ylab.commons.entity.MeterReading;
 import io.ylab.commons.entity.Submission;
-import io.ylab.backend.mapper.SubmissionMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,9 +39,9 @@ class SubmissionRepresentationServiceTest {
         when(meterReadingsService.getBySubmission(submission)).thenReturn(meterReadings);
         when(submissionMapper.toSubmissionDTO(submission, meterReadings)).thenReturn(expectedDto);
 
-        SubmissionDto result = submissionRepresentationService.getSubmissionDTO(date, userId);
+        var result = submissionRepresentationService.getSubmissionDTO(date, userId);
 
-        assertEquals(expectedDto, result);
+        assertThat(expectedDto).isEqualTo(result);
     }
 
     @Test
@@ -57,6 +57,6 @@ class SubmissionRepresentationServiceTest {
 
         var result = submissionRepresentationService.getAllSubmissionDTOs(userId);
 
-        assertEquals(Collections.singleton(expectedDto), result);
+        assertThat(result).containsExactly(expectedDto);
     }
 }

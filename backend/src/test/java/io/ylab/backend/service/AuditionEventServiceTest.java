@@ -1,12 +1,12 @@
 package io.ylab.backend.service;
 
 import io.ylab.backend.dto.response.AuditionEventDto;
-import io.ylab.commons.entity.User;
-import io.ylab.commons.enumerated.UserRole;
 import io.ylab.backend.exception.NoPermissionException;
 import io.ylab.backend.mapper.AuditionEventMapper;
 import io.ylab.backend.repository.AuditionEventRepository;
 import io.ylab.backend.utils.CurrentUserUtils;
+import io.ylab.commons.entity.User;
+import io.ylab.commons.enumerated.UserRole;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,7 +54,7 @@ class AuditionEventServiceTest {
 
         var actualEvents = auditionEventService.getEvents(userId);
 
-        assertEquals(expectedEvents, actualEvents);
+        assertThat(expectedEvents).isEqualTo(actualEvents);
         verify(auditionEventRepository, Mockito.times(1)).getEventsByUserId(userId);
         verify(auditionEventMapper, Mockito.times(1)).toAuditionEventDTOs(ArgumentMatchers.any());
     }
