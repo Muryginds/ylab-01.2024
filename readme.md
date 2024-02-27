@@ -18,9 +18,7 @@ specific users.
 - <a href ="https://github.com/Muryginds/ylab-01.2024/pull/7"> sprint 5</a> Spring boot. Aspects moved to starters, modules separated
 
 #### API
-```
 ![img.png](img.png)
-```
 
 #### Testing
     By default, added user 'admin' with password 'admin'
