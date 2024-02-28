@@ -1,2 +1,6 @@
 rootProject.name = 'monitoring-service'
+include 'backend'
+include 'logging-starter'
+include 'audition-starter'
+include 'commons'
 
